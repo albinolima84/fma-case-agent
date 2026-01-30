@@ -1,0 +1,1052 @@
+{
+  "name": "Sistema de Pesquisa de Satisfação com IA",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-schedule",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "",
+      "notes": "Executa diariamente às 10h da manhã"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "hubspot_contact_id",
+              "value": "={{$json.contact_id}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set-contact-id",
+      "name": "Set Contact ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [450, 300],
+      "notes": "Define o ID do contato a ser processado"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts/={{$json.hubspot_contact_id}}",
+        "options": {
+          "qs": {
+            "properties": "firstname,lastname,email,phone,company,createdate"
+          }
+        }
+      },
+      "id": "hubspot-get-contact",
+      "name": "HubSpot - Get Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 200],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hubspot-api-key",
+          "name": "HubSpot API Key"
+        }
+      },
+      "notes": "Busca informações básicas do contato"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.hubapi.com/crm/v3/objects/emails/search",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filterGroups",
+              "value": "=[{\"filters\":[{\"propertyName\":\"associations.contact\",\"operator\":\"EQ\",\"value\":\"{{$json.hubspot_contact_id}}\"},{\"propertyName\":\"hs_timestamp\",\"operator\":\"GTE\",\"value\":\"{{$now.minus({days: 30}).toMillis()}}\"}]}]"
+            },
+            {
+              "name": "sorts",
+              "value": "=[{\"propertyName\":\"hs_timestamp\",\"direction\":\"DESCENDING\"}]"
+            },
+            {
+              "name": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "hubspot-get-emails",
+      "name": "HubSpot - Get Emails",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hubspot-api-key",
+          "name": "HubSpot API Key"
+        }
+      },
+      "notes": "Busca emails dos últimos 30 dias"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.hubapi.com/crm/v3/objects/deals/search",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filterGroups",
+              "value": "=[{\"filters\":[{\"propertyName\":\"associations.contact\",\"operator\":\"EQ\",\"value\":\"{{$json.hubspot_contact_id}}\"}]}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "hubspot-get-deals",
+      "name": "HubSpot - Get Deals",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 400],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hubspot-api-key",
+          "name": "HubSpot API Key"
+        }
+      },
+      "notes": "Busca deals/negócios do contato"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.hubapi.com/crm/v3/objects/tickets/search",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filterGroups",
+              "value": "=[{\"filters\":[{\"propertyName\":\"associations.contact\",\"operator\":\"EQ\",\"value\":\"{{$json.hubspot_contact_id}}\"}]}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "hubspot-get-tickets",
+      "name": "HubSpot - Get Tickets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 500],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hubspot-api-key",
+          "name": "HubSpot API Key"
+        }
+      },
+      "notes": "Busca tickets de suporte do contato"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.hubapi.com/crm/v3/objects/notes/search",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filterGroups",
+              "value": "=[{\"filters\":[{\"propertyName\":\"associations.contact\",\"operator\":\"EQ\",\"value\":\"{{$json.hubspot_contact_id}}\"},{\"propertyName\":\"hs_timestamp\",\"operator\":\"GTE\",\"value\":\"{{$now.minus({days: 30}).toMillis()}}\"}]}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "hubspot-get-notes",
+      "name": "HubSpot - Get Notes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [650, 600],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "hubspot-api-key",
+          "name": "HubSpot API Key"
+        }
+      },
+      "notes": "Busca notas/atividades dos últimos 30 dias"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AGENTE 1: DATA FETCHER - Consolidar dados do HubSpot\n\nconst contact = $input.first().json;\nconst emails = $('HubSpot - Get Emails').all()[0].json.results || [];\nconst deals = $('HubSpot - Get Deals').all()[0].json.results || [];\nconst tickets = $('HubSpot - Get Tickets').all()[0].json.results || [];\nconst notes = $('HubSpot - Get Notes').all()[0].json.results || [];\n\n// Estruturar dados consolidados\nconst customerData = {\n  contact: {\n    id: contact.id,\n    name: `${contact.properties.firstname} ${contact.properties.lastname}`,\n    email: contact.properties.email,\n    phone: contact.properties.phone,\n    company: contact.properties.company,\n    created_date: contact.properties.createdate\n  },\n  summary: {\n    total_emails: emails.length,\n    total_deals: deals.length,\n    total_tickets: tickets.length,\n    total_notes: notes.length\n  },\n  deals: deals.map(d => ({\n    id: d.id,\n    name: d.properties.dealname,\n    stage: d.properties.dealstage,\n    amount: d.properties.amount,\n    close_date: d.properties.closedate,\n    created_date: d.properties.createdate\n  })),\n  emails: emails.map(e => ({\n    subject: e.properties.hs_email_subject,\n    direction: e.properties.hs_email_direction,\n    timestamp: e.properties.hs_timestamp,\n    snippet: e.properties.hs_email_text ? e.properties.hs_email_text.substring(0, 200) : ''\n  })),\n  tickets: tickets.map(t => ({\n    id: t.id,\n    subject: t.properties.subject,\n    status: t.properties.hs_ticket_priority,\n    category: t.properties.hs_ticket_category,\n    created_date: t.properties.createdate,\n    closed_date: t.properties.closed_date\n  })),\n  notes: notes.map(n => ({\n    body: n.properties.hs_note_body,\n    timestamp: n.properties.hs_timestamp\n  }))\n};\n\nreturn { json: customerData };"
+      },
+      "id": "agent1-data-fetcher",
+      "name": "AGENTE 1 - Data Fetcher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 400],
+      "notes": "Consolida todos os dados do HubSpot em JSON estruturado"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.ANTHROPIC_API_KEY}}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "1024"
+            },
+            {
+              "name": "temperature",
+              "value": "0.3"
+            },
+            {
+              "name": "system",
+              "value": "={{$node[\"Read Prompt - Agent 2\"].json.system_prompt}}"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"user\",\"content\":JSON.stringify($json)}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "agent2-context-analyzer",
+      "name": "AGENTE 2 - Context Analyzer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 400],
+      "credentials": {},
+      "notes": "Claude API - Analisa contexto e gera insights"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse resposta do Claude e valida JSON\nconst claudeResponse = $input.first().json.content[0].text;\n\ntry {\n  const analysis = JSON.parse(claudeResponse);\n  \n  // Validações\n  const validSentiments = [\"very_positive\", \"positive\", \"neutral\", \"negative\", \"very_negative\"];\n  const validTones = [\"celebratory\", \"appreciative\", \"curious\", \"empathetic\", \"proactive\"];\n  \n  if (!validSentiments.includes(analysis.sentiment)) {\n    throw new Error(`Invalid sentiment: ${analysis.sentiment}`);\n  }\n  \n  if (!validTones.includes(analysis.suggested_tone)) {\n    throw new Error(`Invalid tone: ${analysis.suggested_tone}`);\n  }\n  \n  return { json: analysis };\n  \n} catch (error) {\n  // Fallback seguro\n  console.error('Erro ao parsear análise:', error);\n  return {\n    json: {\n      summary: \"Análise automática não disponível. Revisão manual necessária.\",\n      sentiment: \"neutral\",\n      key_events: [],\n      suggested_tone: \"curious\",\n      red_flags: [\"Erro na análise automática\"],\n      personalization_points: []\n    }\n  };\n}"
+      },
+      "id": "validate-analysis",
+      "name": "Validate Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 400],
+      "notes": "Valida JSON da análise e aplica fallback se necessário"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.ANTHROPIC_API_KEY}}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "256"
+            },
+            {
+              "name": "temperature",
+              "value": "0.7"
+            },
+            {
+              "name": "system",
+              "value": "={{$node[\"Read Prompt - Agent 3\"].json.system_prompt}}"
+            },
+            {
+              "name": "messages",
+              "value": "=[{\"role\":\"user\",\"content\":JSON.stringify({contact_name:$node['AGENTE 1 - Data Fetcher'].json.contact.name,analysis:$json})}]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "agent3-message-generator",
+      "name": "AGENTE 3 - Message Generator",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1450, 400],
+      "credentials": {},
+      "notes": "Claude API - Gera mensagem personalizada"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai mensagem do Claude\nconst claudeResponse = $input.first().json.content[0].text;\nconst message = claudeResponse.trim();\n\n// Validações\nif (message.length > 400) {\n  console.warn('Mensagem muito longa:', message.length);\n}\n\nif (!message.includes('1 a 5') && !message.includes('1-5')) {\n  console.warn('Mensagem não solicita nota explicitamente');\n}\n\nreturn { \n  json: { \n    message: message,\n    contact_name: $node['AGENTE 1 - Data Fetcher'].json.contact.name,\n    contact_phone: $node['AGENTE 1 - Data Fetcher'].json.contact.phone,\n    analysis: $node['Validate Analysis'].json\n  } \n};"
+      },
+      "id": "prepare-message",
+      "name": "Prepare Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1650, 400],
+      "notes": "Prepara mensagem para envio via WhatsApp"
+    },
+    {
+      "parameters": {
+        "authentication": "none",
+        "url": "http://evolution-api:8080/message/sendText/instance",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{$json.contact_phone}}"
+            },
+            {
+              "name": "textMessage",
+              "value": "={\"text\":\"{{$json.message}}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp Message",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1850, 300],
+      "credentials": {},
+      "notes": "Envia mensagem via Evolution API"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "public",
+        "table": "satisfaction_surveys",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "hubspot_contact_id": "={{$node['Set Contact ID'].json.hubspot_contact_id}}",
+            "contact_name": "={{$node['AGENTE 1 - Data Fetcher'].json.contact.name}}",
+            "contact_email": "={{$node['AGENTE 1 - Data Fetcher'].json.contact.email}}",
+            "contact_phone": "={{$node['AGENTE 1 - Data Fetcher'].json.contact.phone}}",
+            "context_summary": "={{$node['Validate Analysis'].json.summary}}",
+            "period_analyzed": "últimos 30 dias",
+            "channel": "whatsapp",
+            "status": "sent",
+            "sent_at": "={{$now.toISO()}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "supabase-insert-survey",
+      "name": "Supabase - Insert Survey",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1850, 400],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Registra pesquisa no banco de dados"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "http://chatwoot:3000/api/v1/accounts/1/conversations",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "inbox_id",
+              "value": "1"
+            },
+            {
+              "name": "contact_id",
+              "value": "={{$json.chatwoot_contact_id}}"
+            },
+            {
+              "name": "additional_attributes",
+              "value": "={\"hubspot_contact_id\":\"{{$node['Set Contact ID'].json.hubspot_contact_id}}\",\"context_summary\":\"{{$node['Validate Analysis'].json.summary}}\",\"survey_id\":\"{{$node['Supabase - Insert Survey'].json.id}}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "chatwoot-create-conversation",
+      "name": "Chatwoot - Create Conversation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1850, 500],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot-api-token",
+          "name": "Chatwoot API Token"
+        }
+      },
+      "notes": "Cria conversa no Chatwoot para monitoramento"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "webhook-whatsapp-response",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-whatsapp",
+      "name": "Webhook - WhatsApp Response",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 700],
+      "webhookId": "whatsapp-response-webhook",
+      "notes": "Recebe respostas do cliente via Evolution API"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extrai dados da mensagem recebida\nconst webhookData = $input.first().json;\n\nconst customerPhone = webhookData.data.key.remoteJid.replace('@s.whatsapp.net', '');\nconst customerMessage = webhookData.data.message.conversation || webhookData.data.message.extendedTextMessage?.text || '';\n\nreturn {\n  json: {\n    customer_phone: customerPhone,\n    customer_message: customerMessage,\n    timestamp: webhookData.data.messageTimestamp\n  }\n};"
+      },
+      "id": "parse-webhook",
+      "name": "Parse Webhook",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 700],
+      "notes": "Extrai mensagem do cliente do webhook"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "schema": "public",
+        "table": "satisfaction_surveys",
+        "filterType": "manual",
+        "matchingColumns": ["contact_phone"],
+        "matchingValues": {
+          "contact_phone": "={{$json.customer_phone}}"
+        },
+        "options": {
+          "sort": [
+            {
+              "field": "created_at",
+              "direction": "desc"
+            }
+          ],
+          "limit": 1
+        }
+      },
+      "id": "supabase-get-survey",
+      "name": "Supabase - Get Survey",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [650, 700],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Busca pesquisa ativa do cliente"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "https://api.anthropic.com/v1/messages",
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{$env.ANTHROPIC_API_KEY}}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "claude-3-5-sonnet-20241022"
+            },
+            {
+              "name": "max_tokens",
+              "value": "256"
+            },
+            {
+              "name": "temperature",
+              "value": "0.8"
+            },
+            {
+              "name": "system",
+              "value": "={{$node[\"Read Prompt - Agent 4\"].json.system_prompt}}"
+            },
+            {
+              "name": "messages",
+              "value": "={{$node['Build Conversation History'].json.messages}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "agent4-conversation-handler",
+      "name": "AGENTE 4 - Conversation Handler",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1050, 700],
+      "credentials": {},
+      "notes": "Claude API - Gerencia conversa bidirecional"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Constrói histórico da conversa para o Claude\nconst survey = $node['Supabase - Get Survey'].json[0];\nconst newMessage = $node['Parse Webhook'].json.customer_message;\n\n// Recupera histórico anterior ou inicia novo\nconst conversationHistory = survey.conversation_transcript || [];\n\n// Adiciona nova mensagem do cliente\nconversationHistory.push({\n  role: 'user',\n  content: newMessage\n});\n\nreturn {\n  json: {\n    messages: conversationHistory,\n    survey_id: survey.id,\n    turn_count: Math.floor(conversationHistory.length / 2) + 1\n  }\n};"
+      },
+      "id": "build-conversation-history",
+      "name": "Build Conversation History",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 700],
+      "notes": "Monta histórico completo da conversa"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse resposta do Claude (JSON com response, status, extracted_data)\nconst claudeResponse = $input.first().json.content[0].text;\n\ntry {\n  const response = JSON.parse(claudeResponse);\n  \n  const surveyData = $node['Supabase - Get Survey'].json[0];\n  const turnCount = $node['Build Conversation History'].json.turn_count;\n  const maxTurns = 5;\n  \n  // Decide se deve continuar ou finalizar\n  if (response.status === 'completed' || response.status === 'escalate') {\n    return {\n      json: {\n        ...response,\n        should_continue: false,\n        final_status: response.status,\n        survey_id: surveyData.id\n      }\n    };\n  }\n  \n  if (turnCount >= maxTurns) {\n    return {\n      json: {\n        response: \"Obrigada pelo seu tempo! Qualquer coisa, estamos à disposição.\",\n        status: 'completed',\n        extracted_data: response.extracted_data,\n        should_continue: false,\n        final_status: 'timeout',\n        survey_id: surveyData.id\n      }\n    };\n  }\n  \n  // Continuar conversa\n  return {\n    json: {\n      ...response,\n      should_continue: true,\n      turn_count: turnCount,\n      survey_id: surveyData.id\n    }\n  };\n  \n} catch (error) {\n  // Fallback: escalar para humano em caso de erro\n  console.error('Erro ao processar resposta:', error);\n  return {\n    json: {\n      response: \"Vou transferir você para nossa equipe. Aguarde um momento!\",\n      status: 'escalate',\n      extracted_data: { satisfaction_score: null, feedback: 'Erro no processamento' },\n      should_continue: false,\n      final_status: 'error',\n      survey_id: $node['Supabase - Get Survey'].json[0].id\n    }\n  };\n}"
+      },
+      "id": "process-conversation-response",
+      "name": "Process Conversation Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 700],
+      "notes": "Processa resposta e decide próximo passo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.should_continue}}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-continue-conversation",
+      "name": "IF - Continue Conversation?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1450, 700],
+      "notes": "Verifica se deve continuar ou finalizar"
+    },
+    {
+      "parameters": {
+        "authentication": "none",
+        "url": "http://evolution-api:8080/message/sendText/instance",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "={{$node['Parse Webhook'].json.customer_phone}}"
+            },
+            {
+              "name": "textMessage",
+              "value": "={\"text\":\"{{$json.response}}\"}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-whatsapp-response",
+      "name": "Send WhatsApp Response",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1650, 600],
+      "credentials": {},
+      "notes": "Envia resposta do agente via WhatsApp"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "satisfaction_surveys",
+        "updateKey": "id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "conversation_transcript": "={{JSON.stringify($node['Build Conversation History'].json.messages)}}",
+            "status": "in_progress"
+          }
+        },
+        "options": {}
+      },
+      "id": "supabase-update-ongoing",
+      "name": "Supabase - Update Ongoing",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1650, 700],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Atualiza conversa em andamento"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "satisfaction_surveys",
+        "updateKey": "id",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "satisfaction_score": "={{$json.extracted_data.satisfaction_score}}",
+            "customer_feedback": "={{$json.extracted_data.feedback}}",
+            "conversation_transcript": "={{JSON.stringify($node['Build Conversation History'].json.messages)}}",
+            "completed_at": "={{$now.toISO()}}",
+            "status": "={{$json.final_status}}"
+          }
+        },
+        "options": {}
+      },
+      "id": "supabase-update-completed",
+      "name": "Supabase - Update Completed",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1650, 800],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-credentials",
+          "name": "Supabase API"
+        }
+      },
+      "notes": "Finaliza pesquisa no banco de dados"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.final_status}}",
+              "operation": "equals",
+              "value2": "escalate"
+            }
+          ]
+        }
+      },
+      "id": "if-escalate",
+      "name": "IF - Escalate to Human?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1850, 800],
+      "notes": "Verifica se deve escalar para humano"
+    },
+    {
+      "parameters": {
+        "authentication": "headerAuth",
+        "url": "http://chatwoot:3000/api/v1/accounts/1/conversations/={{$node['Supabase - Get Survey'].json[0].conversation_id}}/assignments",
+        "method": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "assignee_id",
+              "value": "1"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "chatwoot-assign-human",
+      "name": "Chatwoot - Assign to Human",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [2050, 900],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "chatwoot-api-token",
+          "name": "Chatwoot API Token"
+        }
+      },
+      "notes": "Atribui conversa para gerente de qualidade"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "read",
+        "filePath": "/data/prompts/agent-2-context-analyzer.txt",
+        "options": {}
+      },
+      "id": "read-prompt-agent2",
+      "name": "Read Prompt - Agent 2",
+      "type": "n8n-nodes-base.filesOperations",
+      "typeVersion": 1,
+      "position": [850, 200],
+      "notes": "Lê prompt do Agente 2"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "read",
+        "filePath": "/data/prompts/agent-3-message-generator.txt",
+        "options": {}
+      },
+      "id": "read-prompt-agent3",
+      "name": "Read Prompt - Agent 3",
+      "type": "n8n-nodes-base.filesOperations",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "notes": "Lê prompt do Agente 3"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "operation": "read",
+        "filePath": "/data/prompts/agent-4-conversation-handler.txt",
+        "options": {}
+      },
+      "id": "read-prompt-agent4",
+      "name": "Read Prompt - Agent 4",
+      "type": "n8n-nodes-base.filesOperations",
+      "typeVersion": 1,
+      "position": [850, 500],
+      "notes": "Lê prompt do Agente 4"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Contact ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contact ID": {
+      "main": [
+        [
+          {
+            "node": "HubSpot - Get Contact",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HubSpot - Get Emails",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HubSpot - Get Deals",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HubSpot - Get Tickets",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HubSpot - Get Notes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot - Get Contact": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 1 - Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot - Get Emails": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 1 - Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot - Get Deals": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 1 - Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot - Get Tickets": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 1 - Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HubSpot - Get Notes": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 1 - Data Fetcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE 1 - Data Fetcher": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 2 - Context Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE 2 - Context Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Validate Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Analysis": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 3 - Message Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE 3 - Message Generator": {
+      "main": [
+        [
+          {
+            "node": "Prepare Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Message": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase - Insert Survey",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chatwoot - Create Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - WhatsApp Response": {
+      "main": [
+        [
+          {
+            "node": "Parse Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Webhook": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Survey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Survey": {
+      "main": [
+        [
+          {
+            "node": "Build Conversation History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Conversation History": {
+      "main": [
+        [
+          {
+            "node": "AGENTE 4 - Conversation Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AGENTE 4 - Conversation Handler": {
+      "main": [
+        [
+          {
+            "node": "Process Conversation Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Conversation Response": {
+      "main": [
+        [
+          {
+            "node": "IF - Continue Conversation?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Continue Conversation?": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Response",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase - Update Ongoing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase - Update Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Update Completed": {
+      "main": [
+        [
+          {
+            "node": "IF - Escalate to Human?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Escalate to Human?": {
+      "main": [
+        [
+          {
+            "node": "Chatwoot - Assign to Human",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2026-01-28T00:00:00.000Z",
+  "versionId": "1"
+}

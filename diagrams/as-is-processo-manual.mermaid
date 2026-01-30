@@ -1,0 +1,99 @@
+flowchart TD
+    Start([Início: Lista de Clientes]) --> A1[Gerente acessa HubSpot manualmente]
+
+    A1 --> A2[Busca histórico do cliente<br/>últimos 30 dias]
+
+    A2 --> A3{Revisar<br/>cada item}
+
+    A3 --> A3a[Ler emails trocados]
+    A3 --> A3b[Verificar negócios/deals]
+    A3 --> A3c[Analisar tickets de suporte]
+    A3 --> A3d[Revisar anotações]
+    A3 --> A3e[Conferir produtos contratados]
+
+    A3a --> A4
+    A3b --> A4
+    A3c --> A4
+    A3d --> A4
+    A3e --> A4
+
+    A4[Gerente analisa mentalmente<br/>contexto do cliente]
+
+    A4 --> A5[Redigir mensagem personalizada<br/>manualmente no canal]
+
+    A5 --> A6{Qual<br/>canal?}
+
+    A6 -->|WhatsApp| A6a[Abrir WhatsApp Web]
+    A6 -->|Telegram| A6b[Abrir Telegram]
+    A6 -->|SMS| A6c[Abrir plataforma SMS]
+
+    A6a --> A7
+    A6b --> A7
+    A6c --> A7
+
+    A7[Copiar/colar ou digitar<br/>mensagem personalizada]
+
+    A7 --> A8[Enviar mensagem]
+
+    A8 --> A9{Mensagem<br/>enviada?}
+
+    A9 -->|Não| Error1[❌ Erro no envio<br/>tentar novamente]
+    Error1 --> A7
+
+    A9 -->|Sim| A10[Aguardar resposta do cliente]
+
+    A10 --> A11{Cliente<br/>respondeu?}
+
+    A11 -->|Não em 24h| A11a[Marcar como<br/>não respondeu]
+    A11a --> A20
+
+    A11 -->|Sim| A12[Gerente lê resposta]
+
+    A12 --> A13{Resposta<br/>tem nota?}
+
+    A13 -->|Não| A14[Gerente responde<br/>manualmente pedindo nota]
+    A14 --> A10
+
+    A13 -->|Sim| A15[Gerente interpreta<br/>nota de 1-5]
+
+    A15 --> A16[Gerente pode continuar<br/>conversa se necessário]
+
+    A16 --> A17{Mais<br/>interações?}
+
+    A17 -->|Sim| A18[Trocar mensagens<br/>até finalizar]
+    A18 --> A16
+
+    A17 -->|Não| A19[Abrir planilha Excel/Google Sheets]
+
+    A19 --> A20[Registrar manualmente:<br/>- Nome do cliente<br/>- Data do contato<br/>- Nota de satisfação<br/>- Observações]
+
+    A20 --> A21{Erro de<br/>digitação?}
+
+    A21 -->|Sim| Error2[❌ Dados inconsistentes<br/>ou duplicados]
+    A21 -->|Não| A22
+    Error2 --> A22
+
+    A22{Mais<br/>clientes?}
+
+    A22 -->|Sim| A1
+    A22 -->|Não| End([Fim do dia])
+
+    %% Métricas
+    A1 -.->|⏱️ 5 min| A4
+    A4 -.->|⏱️ 10 min| A8
+    A8 -.->|⏱️ 10 min| A20
+    A20 -.->|⏱️ 5 min| A22
+
+    %% Styling
+    classDef manual fill:#ffcccc,stroke:#cc0000,stroke-width:2px
+    classDef error fill:#ff6666,stroke:#990000,stroke-width:3px
+    classDef decision fill:#ffffcc,stroke:#cccc00,stroke-width:2px
+    classDef data fill:#ccccff,stroke:#0000cc,stroke-width:2px
+
+    class A1,A2,A3a,A3b,A3c,A3d,A3e,A4,A5,A7,A12,A14,A15,A16,A18,A19,A20 manual
+    class Error1,Error2,A11a error
+    class A3,A6,A9,A11,A13,A17,A21,A22 decision
+    class A19,A20 data
+
+    %% Notas
+    note1[📊 Processo Atual - Manual<br/>⏱️ Tempo médio: 30 min/cliente<br/>❌ Propenso a erros<br/>📉 Baixa rastreabilidade<br/>👥 Máximo 16 clientes/dia/gerente]

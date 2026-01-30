@@ -1,0 +1,34 @@
+# Arquivos com credenciais sensíveis
+CREDENCIAIS-E-CONFIGS.md
+**/credentials.json
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Arquivos de checkpoints e anotações pessoais
+CHECKPOINT-*.md
+CONTINUAR-*.md
+STATUS-PROJETO.md
+
+# Configurações IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (se houver)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
