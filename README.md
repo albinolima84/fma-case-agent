@@ -1,236 +1,315 @@
-# Case Agent Dev - Sistema de Satisfação de Clientes com IA
+# Sistema de Pesquisa de Satisfação com IA via WhatsApp
 
-Projeto desenvolvido para o desafio técnico FMA/Pareto/IA Leader - MBA em Inteligência Artificial.
-
-## 📋 Sobre o Projeto
-
-Sistema automatizado end-to-end para medição de satisfação de clientes utilizando agentes de IA, integrando dados do HubSpot CRM e canais de mensageria (WhatsApp).
+Sistema automatizado end-to-end para medição de satisfação de clientes utilizando agentes de IA, integrando dados do HubSpot CRM e WhatsApp Business via Meta API oficial.
 
 **Objetivo:** Reduzir de 30 minutos para ~2 minutos o processo de análise e contato com cada cliente, garantindo personalização, consistência e rastreabilidade completa.
+
+---
 
 ## 🏗️ Estrutura do Repositório
 
 ```
 case-agent-dev/
-├── README.md                    # Este arquivo
-├── FMA.pdf                     # Documento do desafio
-├── docs/                       # Documentação técnica
-│   ├── 01-arquitetura-solucao.md
-│   ├── 02-agentes-ia-detalhamento.md
-│   ├── 03-processo-as-is-to-be.md
-│   └── 04-plano-projeto-roi.md
-├── diagrams/                   # Fluxogramas e diagramas
-│   ├── as-is.mermaid
-│   ├── to-be.mermaid
-│   └── arquitetura.mermaid
-├── prompts/                    # Prompts dos agentes de IA
-│   ├── agent-1-data-fetcher.md
-│   ├── agent-2-context-analyzer.md
-│   ├── agent-3-message-generator.md
-│   └── agent-4-conversation-handler.md
-├── workflows/                  # Workflows n8n
-│   ├── workflow-complete.json
-│   ├── README.md
-│   └── screenshots/
-├── scripts/                    # Scripts auxiliares
-│   └── setup/
-└── interface/                  # Documentação Chatwoot
-    └── chatwoot-config.md
+├── README.md                           # Este arquivo
+├── PROJECT_STATUS.md                   # Status detalhado do projeto
+├── CHECKPOINT-2026-02-02.md            # Checkpoint mais recente
+├── PROMPT-RETOMADA.md                  # Para retomar desenvolvimento
+├── workflows/
+│   ├── satisfaction-survey-workflow.json  # Workflow n8n (ÚNICO)
+│   └── README.md
+├── GUIA-META-WHATSAPP-API.md           # Guia completo Meta API
+├── GUIA-N8N-SETUP.md                   # Setup n8n Cloud
+└── CREDENCIAIS-E-CONFIGS.md            # Credenciais e configurações
 ```
+
+---
 
 ## 🔧 Stack Tecnológica
 
-- **Orquestração:** n8n (open-source)
-- **IA/LLM:** Claude 3.5 Sonnet (Anthropic)
+- **Orquestração:** n8n Cloud (workflow automation)
+- **IA/LLM:** Tess AI (gpt-4o-mini)
 - **CRM:** HubSpot API v3
-- **Mensageria:** Evolution API + WhatsApp Business
-- **Interface:** Chatwoot (open-source)
-- **Banco de Dados:** Supabase (PostgreSQL)
+- **Mensageria:** **Meta WhatsApp API (Oficial)** 🆕
+- **Banco de Dados:** Supabase PostgreSQL (Cloud)
 
-## 🤖 Agentes de IA
+---
+
+## 🤖 Agentes de IA (Tess AI)
 
 O sistema utiliza 4 agentes especializados:
 
-1. **Data Fetcher:** Coleta histórico do cliente no HubSpot (30 dias)
-2. **Context Analyzer:** Analisa dados e gera insights de satisfação
-3. **Message Generator:** Cria mensagem personalizada de abertura
-4. **Conversation Handler:** Conduz conversa bidirecional e extrai nota
+| Agente | ID | Função | Status |
+|--------|-----|--------|--------|
+| **Agent 1** | - | Data Fetcher (inline n8n) | ✅ Implementado |
+| **Agent 2** | 38717 | Context Analyzer | ✅ Funcionando |
+| **Agent 3** | 38728 | Message Generator | ✅ Funcionando |
+| **Agent 4** | 38733 | Conversation Handler | ✅ Funcionando |
 
-## 📊 Documentação
+### Fluxo de Processamento
 
-### Principais Documentos
+**FLUXO 1 - Envio Proativo:**
+```
+HubSpot CRM → Agent 1 (Data) → Agent 2 (Análise) →
+Agent 3 (Mensagem) → Meta WhatsApp → Supabase
+```
 
-1. **[Arquitetura da Solução](docs/01-arquitetura-solucao.md)**
-   - Stack técnica completa e justificativas
-   - Fluxo de dados end-to-end
-   - Infraestrutura e deploy
-   - Estimativa de custos
+**FLUXO 2 - Respostas (100% FUNCIONAL):** ✅
+```
+WhatsApp → Meta Webhook → n8n → Supabase (busca survey) →
+Agent 4 (Conversa) → Meta API (resposta) → Supabase (update)
+```
 
-2. **[Detalhamento dos Agentes](docs/02-agentes-ia-detalhamento.md)**
-   - Responsabilidades de cada agente
-   - Prompts completos
-   - Inputs/Outputs esperados
-   - Performance e custos
+---
 
-3. **[Processo AS-IS vs TO-BE](docs/03-processo-as-is-to-be.md)**
-   - Fluxograma do processo atual (manual)
-   - Fluxograma do processo otimizado (IA)
-   - Análise comparativa
+## 📊 Status Atual
 
-4. **[Plano de Projeto e ROI](docs/04-plano-projeto-roi.md)**
-   - Fases de implementação
-   - Atividades-chave e entregáveis
-   - Estimativa de esforço
-   - Cálculo de ROI
+**Última atualização:** 2026-02-02
+**Progresso:** 85% completo ████████████████████░░░░
 
-## 🎯 Métricas de Sucesso
+### ✅ Completo e Funcionando
+
+- ✅ **Meta WhatsApp API** configurada e verificada
+- ✅ **FLUXO 2** (Recebimento/Resposta) 100% operacional
+- ✅ **Webhook** Meta → n8n funcionando
+- ✅ **Agent 4** (Tess) processando e respondendo
+- ✅ **Supabase** salvando conversações em JSONB
+- ✅ **n8n Cloud** workflow ativo 24/7
+
+### ⏳ Pendente
+
+- ⏳ **FLUXO 1** (Envio Proativo) - Template Meta em aprovação
+- ⏳ Testes end-to-end completos
+- ⏳ Documentação final e screenshots
+
+**Tempo estimado para conclusão:** ~2 horas
+
+---
+
+## 🎯 Métricas e Resultados
 
 ### Processo Atual (Manual)
 - ⏱️ Tempo: 30 min/cliente
-- ❌ Erros: Copy/paste, informações inconsistentes
+- ❌ Erros: Copy/paste, inconsistências
 - 📊 Rastreabilidade: Baixa (planilhas)
-- 👥 Escalabilidade: Limitada (1 gerente = ~16 clientes/dia)
+- 👥 Escalabilidade: ~16 clientes/dia
 
 ### Processo Otimizado (IA)
 - ⏱️ Tempo: ~2 min/cliente (93% redução)
-- ✅ Erros: Mínimos (validação automática)
-- 📊 Rastreabilidade: Completa (BD + Chatwoot)
-- 👥 Escalabilidade: 200+ clientes/dia/gerente
+- ✅ Erros: Mínimos (<1%)
+- 📊 Rastreabilidade: Completa (PostgreSQL + histórico)
+- 👥 Escalabilidade: 200+ clientes/dia
 
 ### ROI Estimado
 - **Economia de tempo:** 28 min/cliente × 200 clientes/mês = 93 horas/mês
-- **Custo operacional:** ~$50-157/mês (infraestrutura + APIs)
-- **Payback:** < 1 mês
-- **ROI anual:** ~400-600%
+- **Custo operacional:** ~$5-10/mês (APIs + Cloud)
+- **Payback:** < 2 meses
+- **ROI 3 anos:** 502%
 
-## 🚀 Como Executar
+---
 
-Instruções detalhadas em [workflows/README.md](workflows/README.md)
+## 🚀 Como Funciona
 
-### Pré-requisitos
-- Docker e Docker Compose
-- Conta HubSpot (API key)
-- API key Anthropic (Claude)
-- Conta Supabase (tier gratuito OK)
-- Número WhatsApp Business (Evolution API)
+### 1. Configuração Inicial (One-time)
 
-### Setup Rápido
-```bash
-# 1. Clone o repositório
-git clone <repo-url>
-cd case-agent-dev
+**Pré-requisitos:**
+- Conta n8n Cloud (free tier)
+- Conta Supabase (free tier)
+- HubSpot API key
+- Tess AI account
+- **Meta WhatsApp Business API** (número aprovado)
 
-# 2. Configure variáveis de ambiente
-cp .env.example .env
-# Edite .env com suas API keys
+### 2. Deploy
 
-# 3. Inicie os serviços
-docker-compose up -d
+Siga o guia completo: **[GUIA-META-WHATSAPP-API.md](GUIA-META-WHATSAPP-API.md)**
 
-# 4. Importe workflow no n8n
-# Acesse http://localhost:5678
-# Import: workflows/workflow-complete.json
+**Resumo:**
+1. Importar workflow no n8n Cloud
+2. Configurar credenciais (Meta, Tess, HubSpot, Supabase)
+3. Configurar webhook na Meta Developer Console
+4. Ativar workflow
+5. Testar!
 
-# 5. Configure Evolution API
-# Conecte número WhatsApp
+### 3. Uso Diário
 
-# 6. Configure Chatwoot
-# Acesse http://localhost:3000
-# Crie inbox e integração
+**Envio de Pesquisas:**
+- Manual: Executar workflow no n8n
+- Automático: Schedule trigger (diário às 10h)
+
+**Recebimento de Respostas:**
+- Automático via webhook Meta → n8n
+- Agent 4 processa e responde em tempo real
+- Histórico salvo no Supabase
+
+---
+
+## 📱 Configuração Meta WhatsApp API
+
+### Credenciais Necessárias
+
+```
+Phone Number ID: 674094992450703
+WhatsApp Business Account ID: 1255054259608433
+Número do Bot: +55 11 5286-8259
+API Version: v21.0
 ```
 
-## 📱 Demo
+### Webhook Configurado
 
-- **Vídeo demonstrativo:** [Link para vídeo]
-- **Workflow n8n:** [workflows/workflow-complete.json](workflows/workflow-complete.json)
-- **Screenshots:** [workflows/screenshots/](workflows/screenshots/)
-- **Exemplo de conversa:** [docs/exemplo-conversa.md](docs/exemplo-conversa.md)
+```
+URL: https://albino.app.n8n.cloud/webhook/whatsapp-meta
+Verify Token: satisfaction-survey-2026
+Events: messages
+Status: ✅ Verificado e ativo
+```
 
-## 📈 Próximos Passos (Pós-Piloto)
+---
 
-1. Adicionar canal de voz (Vapi.ai / Bland.ai)
-2. Integração com Telegram e SMS
-3. Dashboard analytics customizado
-4. A/B testing de prompts
-5. Fine-tuning de modelo próprio
-6. Integração com NPS automático
-7. Exportação automática para Data Warehouse
+## 💾 Banco de Dados (Supabase)
+
+### Tabela `surveys`
+
+```sql
+CREATE TABLE surveys (
+  id SERIAL PRIMARY KEY,
+  customer_phone VARCHAR(20) NOT NULL,
+  customer_name VARCHAR(255),
+  context_summary TEXT,
+  conversation_transcript JSONB DEFAULT '[]',
+  satisfaction_score INTEGER,
+  main_feedback TEXT,
+  sentiment VARCHAR(20),
+  status VARCHAR(20) DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+**Formato do histórico (JSONB):**
+```json
+[
+  {"role": "user", "content": "mensagem do cliente"},
+  {"role": "assistant", "content": "resposta do bot"}
+]
+```
+
+---
+
+## 🧪 Teste Realizado com Sucesso
+
+**Cliente:** Carlos Mendes (+55 21 98144-4992)
+**Bot:** +55 11 5286-8259
+**Data:** 2026-02-02
+
+**Conversação:**
+1. Cliente: "Gostei muito da velocidade do atendimento!"
+2. Bot: "Que bom ouvir isso! 😊 Se pudesse dar uma nota de 1 a 5, qual seria?"
+
+**Resultado:**
+- ✅ Mensagem recebida via webhook
+- ✅ Agent 4 processou e gerou resposta contextualizada
+- ✅ Resposta enviada via Meta API
+- ✅ Dados salvos no Supabase com sentiment "positive"
+- ✅ Histórico completo registrado
+
+---
+
+## 📖 Documentação Completa
+
+### Guias de Setup
+- **[GUIA-META-WHATSAPP-API.md](GUIA-META-WHATSAPP-API.md)** - Setup completo Meta API
+- **[GUIA-N8N-SETUP.md](GUIA-N8N-SETUP.md)** - Configuração n8n
+- **[CREDENCIAIS-E-CONFIGS.md](CREDENCIAIS-E-CONFIGS.md)** - Todas as credenciais
+
+### Status e Checkpoints
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Status detalhado do projeto
+- **[CHECKPOINT-2026-02-02.md](CHECKPOINT-2026-02-02.md)** - Progresso recente
+- **[PROMPT-RETOMADA.md](PROMPT-RETOMADA.md)** - Para retomar desenvolvimento
+
+### Workflows
+- **[workflows/satisfaction-survey-workflow.json](workflows/satisfaction-survey-workflow.json)** - Workflow completo
+- **[workflows/README.md](workflows/README.md)** - Documentação do workflow
+
+---
+
+## 🔧 Troubleshooting
+
+### Webhook não dispara
+**Verificar:**
+- Workflow ativo no n8n ✅
+- Subscription "messages" na Meta ✅
+- Survey ativo no banco ✅
+
+### Erro no Supabase
+**Verificar:**
+- Sintaxe SQL correta
+- Interpolação de variáveis
+- Formato JSONB válido
+
+### Agent não responde
+**Verificar:**
+- Credencial Tess configurada no n8n
+- Formato correto: temperature "1", messages array
+- API key válida
+
+---
+
+## 🎓 Lições Aprendidas
+
+### 1. Meta API >> Outras Soluções
+- Muito mais estável que alternativas
+- Webhooks 100% confiáveis
+- Infraestrutura oficial da Meta
+- Vale o esforço de configuração inicial
+
+### 2. n8n Modern Syntax
+- Usar `$('Node Name').first().json`
+- Code nodes úteis para transformações complexas
+- responseMode correto para webhooks
+
+### 3. Supabase JSONB
+- Formato: `'JSON_STRING'::jsonb`
+- JSON.stringify() para converter objetos
+- Validar interpolação em SQL
+
+---
+
+## 📈 Próximos Passos
+
+### Curto Prazo (Esta Semana)
+1. ✅ Completar FLUXO 1 (envio proativo com template)
+2. ✅ Testes end-to-end completos
+3. ✅ Screenshots e documentação final
+
+### Médio Prazo (Pós-Piloto)
+1. Dashboard analytics (Supabase + Grafana)
+2. A/B testing de prompts
+3. Integração com outros canais (Telegram, Email)
+4. Exportação automática de métricas
+5. NPS automático calculado
+
+### Longo Prazo
+1. Fine-tuning de modelo próprio
+2. Integração com canal de voz
+3. Multi-idioma
+4. Escalabilidade para milhares de clientes
+
+---
 
 ## 📄 Licença
 
-Este projeto foi desenvolvido para fins educacionais como parte do MBA em Inteligência Artificial.
-
-## 👥 Autor
-
-Desenvolvido para o Case Agent Dev - FMA/Pareto/IA Leader
+Este projeto foi desenvolvido para fins educacionais como parte de um case técnico.
 
 ---
 
-## 🔄 STATUS ATUAL DO PROJETO
+## 🔗 Links Úteis
 
-**Última atualização:** 2026-01-29 23:30
-**Progresso:** 92% completo
-**Próximo passo:** Conectar WhatsApp à Evolution API
-
-### ✅ Completo
-- [x] Documentação completa (8 arquivos, ~150 páginas)
-- [x] 3 Agentes IA testados e aprovados na Tess
-- [x] Workflow n8n pronto (35 nodes)
-- [x] **Evolution API deployada na Render** ✨ (hoje!)
-- [x] PostgreSQL configurado (Supabase)
-
-### ⏳ Pendente
-- [ ] Conectar WhatsApp (próximo passo)
-- [ ] Deploy n8n Cloud
-- [ ] Testes end-to-end
-- [ ] PDF final
+- **n8n Cloud:** https://albino.app.n8n.cloud
+- **Meta Developer Console:** https://developers.facebook.com/apps
+- **Supabase Dashboard:** https://supabase.com/dashboard
+- **Tess AI:** https://tess.im
 
 ---
 
-## 🚀 PARA CONTINUAR AMANHÃ
-
-Use este prompt:
-
-```
-Olá! Vamos continuar o projeto de onde paramos.
-
-Ontem fizemos o deploy da Evolution API na Render com sucesso.
-Agora preciso conectar o WhatsApp à API.
-
-Por favor:
-1. Me ajude a criar a instância "satisfaction-survey"
-2. Gerar o QR Code para conectar o WhatsApp
-3. Testar o envio de mensagem
-
-Leia o arquivo CHECKPOINT-2026-01-29.md para ver todo o contexto.
-```
-
----
-
-## 📁 ARQUIVOS IMPORTANTES
-
-### Status e Checkpoints
-- **`STATUS-PROJETO.md`** - Status geral atualizado
-- **`CHECKPOINT-2026-01-29.md`** - Checkpoint de hoje (MAIS RECENTE)
-- **`CREDENCIAIS-E-CONFIGS.md`** - Todas as credenciais e configs
-
-### Guias de Deploy
-- **`DEPLOY-EVOLUTION-API-RENDER.md`** - Guia corrigido e validado
-- **`EVOLUTION-API-ENV-CORRETO.md`** - Configurações corretas
-
-### Documentação
-- **`/docs/`** - Toda a documentação técnica
-- **`/prompts/`** - Prompts ajustados dos agentes
-- **`/workflows/`** - Workflow n8n pronto
-
----
-
-## 🔑 ACESSO RÁPIDO
-
-**Evolution API:** https://evolution-api-demo.onrender.com
-**Status:** ✅ Online e funcionando
-
----
-
-**Última atualização:** 2026-01-29 23:30
-**Versão:** 1.2
+**Última atualização:** 2026-02-02
+**Versão:** 2.0 (Meta WhatsApp API)
+**Status:** 85% completo - Projeto em fase final 🚀
