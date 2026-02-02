@@ -31,6 +31,7 @@ case-agent-dev/
 - **CRM:** HubSpot API v3
 - **Mensageria:** **Meta WhatsApp API (Oficial)** 🆕
 - **Banco de Dados:** Supabase PostgreSQL (Cloud)
+- **Interface:** Chatwoot (Open Source) - *Pendente implementação*
 
 ---
 
@@ -43,11 +44,30 @@ O sistema utiliza 4 agentes especializados:
 | **Agent 1** | - | Data Fetcher (inline n8n) | ✅ Implementado |
 | **Agent 2** | 38717 | Context Analyzer | ✅ Funcionando |
 | **Agent 3** | 38728 | Message Generator | ✅ Funcionando |
-| **Agent 4** | 38733 | Conversation Handler | ✅ Funcionando |
+| **Agent 4** | 38733 | Conversation Handler V2.0 | ✅ Otimizado |
+
+### Agent 4 V2.0 - Melhorias Implementadas 🆕
+
+O Agent 4 foi completamente otimizado para garantir finalização correta de conversas:
+
+**Problema anterior:** Entrava em loop, perguntando a nota repetidamente
+**Solução V2.0:**
+- ✅ 5 regras claras de finalização
+- ✅ Checklist mental para decidir status
+- ✅ Finaliza após coletar nota + feedback (2-3 turnos ideais)
+- ✅ **9 de 9 cenários de teste validados com sucesso**
+- ✅ Fluxo otimizado: antes indefinido, agora 2-3 interações
+
+**Condições de finalização:**
+1. Nota + Feedback coletados ✅
+2. Cliente sinalizou encerramento
+3. Turno 3+ com nota coletada
+4. Turno 5 atingido (limite absoluto)
+5. Cliente não quer participar
 
 ### Fluxo de Processamento
 
-**FLUXO 1 - Envio Proativo:**
+**FLUXO 1 - Envio Proativo (100% FUNCIONAL):** ✅
 ```
 HubSpot CRM → Agent 1 (Data) → Agent 2 (Análise) →
 Agent 3 (Mensagem) → Meta WhatsApp → Supabase
@@ -56,7 +76,7 @@ Agent 3 (Mensagem) → Meta WhatsApp → Supabase
 **FLUXO 2 - Respostas (100% FUNCIONAL):** ✅
 ```
 WhatsApp → Meta Webhook → n8n → Supabase (busca survey) →
-Agent 4 (Conversa) → Meta API (resposta) → Supabase (update)
+Agent 4 V2.0 (Conversa) → Meta API (resposta) → Supabase (update)
 ```
 
 ---
@@ -64,24 +84,29 @@ Agent 4 (Conversa) → Meta API (resposta) → Supabase (update)
 ## 📊 Status Atual
 
 **Última atualização:** 2026-02-02
-**Progresso:** 85% completo ████████████████████░░░░
+**Progresso:** 90% completo ████████████████████░░░░
 
 ### ✅ Completo e Funcionando
 
 - ✅ **Meta WhatsApp API** configurada e verificada
+- ✅ **FLUXO 1** (Envio Proativo) 100% operacional com texto livre (sem templates)
 - ✅ **FLUXO 2** (Recebimento/Resposta) 100% operacional
 - ✅ **Webhook** Meta → n8n funcionando
-- ✅ **Agent 4** (Tess) processando e respondendo
-- ✅ **Supabase** salvando conversações em JSONB
+- ✅ **Agent 4 V2.0** otimizado com finalização inteligente
+- ✅ **Supabase** salvando conversações em JSONB com histórico completo
 - ✅ **n8n Cloud** workflow ativo 24/7
+- ✅ **Testes end-to-end** completos e validados
+- ✅ **Documentação** completa e atualizada
 
-### ⏳ Pendente
+### ⏳ Pendente (Requisito do FMA)
 
-- ⏳ **FLUXO 1** (Envio Proativo) - Template Meta em aprovação
-- ⏳ Testes end-to-end completos
-- ⏳ Documentação final e screenshots
+- ⏳ **Interface de Monitoramento** para Gerentes de Qualidade
+  - Supervisão em tempo real de conversas
+  - Acesso ao histórico completo
+  - Possibilidade de intervenção manual
+  - Assumir controle da conversa quando necessário
 
-**Tempo estimado para conclusão:** ~2 horas
+**Status:** Backend operacional - Falta interface de monitoramento
 
 ---
 
@@ -194,22 +219,28 @@ CREATE TABLE surveys (
 
 ---
 
-## 🧪 Teste Realizado com Sucesso
+## 🧪 Teste End-to-End Completo - APROVADO ✅
 
 **Cliente:** Carlos Mendes (+55 21 98144-4992)
 **Bot:** +55 11 5286-8259
-**Data:** 2026-02-02
+**Data:** 2026-02-02 15:47
 
-**Conversação:**
-1. Cliente: "Gostei muito da velocidade do atendimento!"
-2. Bot: "Que bom ouvir isso! 😊 Se pudesse dar uma nota de 1 a 5, qual seria?"
+**Conversação Completa (5 mensagens):**
+1. **Bot (FLUXO 1):** "Olá Carlos! Notei que você teve uma interação recente com nosso suporte sobre configuração de API..."
+2. **Cliente:** "Oi! Sim, foi resolvido rapidamente"
+3. **Bot:** "Que ótimo ouvir isso! De 1 a 5, como avalia o atendimento?"
+4. **Cliente:** "4 - Gostei do tempo de resposta do suporte"
+5. **Bot:** "Muito obrigado pelo feedback, Carlos! Estamos sempre à disposição."
 
-**Resultado:**
-- ✅ Mensagem recebida via webhook
-- ✅ Agent 4 processou e gerou resposta contextualizada
-- ✅ Resposta enviada via Meta API
-- ✅ Dados salvos no Supabase com sentiment "positive"
-- ✅ Histórico completo registrado
+**Resultado Final:**
+- ✅ **FLUXO 1:** Mensagem inicial enviada com sucesso (texto livre, sem templates)
+- ✅ **FLUXO 2:** Conversa completa processada (5 mensagens)
+- ✅ **Nota coletada:** 4 (Muito bom)
+- ✅ **Feedback:** "Gostei do tempo de resposta do suporte"
+- ✅ **Sentiment:** positive
+- ✅ **Status:** completed (finalizado corretamente)
+- ✅ **Histórico completo:** 5 mensagens preservadas no banco (JSONB)
+- ✅ **Agent 4 V2.0:** Finalizou conversa após coletar nota + feedback
 
 ---
 
@@ -271,16 +302,70 @@ CREATE TABLE surveys (
 - JSON.stringify() para converter objetos
 - Validar interpolação em SQL
 
+### 4. Array Reference vs Copy em JavaScript
+- **Problema crítico:** `history = survey.conversation_transcript` cria referência, não cópia
+- **Solução:** Usar spread operator `history = [...survey.conversation_transcript]`
+- **Impacto:** Histórico sendo sobrescrito causava loops infinitos
+- **Lição:** Sempre fazer cópia de arrays que serão modificados
+
+### 5. Agent Prompt Engineering
+- Prompts claros e específicos são essenciais para finalização correta
+- Checklist mental ajuda o modelo a tomar decisões consistentes
+- Validar com múltiplos cenários de teste (9+ casos)
+- Agent 4 V2.0: Problema de loop resolvido via otimização de prompt
+
 ---
 
 ## 📈 Próximos Passos
 
-### Curto Prazo (Esta Semana)
-1. ✅ Completar FLUXO 1 (envio proativo com template)
-2. ✅ Testes end-to-end completos
-3. ✅ Screenshots e documentação final
+### ✅ Fase 1 - Backend (Completo)
+1. ✅ Completar FLUXO 1 (envio proativo com texto livre)
+2. ✅ Completar FLUXO 2 (recebimento e respostas)
+3. ✅ Otimizar Agent 4 V2.0 (finalização inteligente)
+4. ✅ Testes end-to-end completos e validados
+5. ✅ Documentação completa e atualizada
 
-### Médio Prazo (Pós-Piloto)
+### ⏳ Fase 2 - Interface de Monitoramento (Pendente - Requisito FMA)
+**Solução:** **Chatwoot (Open Source)** - Plataforma completa de helpdesk/live chat
+
+**Por que Chatwoot:**
+- Interface profissional pronta (tipo Intercom/Zendesk)
+- Supervisão em tempo real de conversas
+- Histórico completo com busca e filtros
+- Dashboard com métricas e relatórios
+- **Intervenção manual**: Gerente pode assumir controle da conversa
+- Sistema de tags, notas e atribuições
+- Mobile app nativo (iOS/Android)
+- API REST completa para integração
+- Self-hosted: $0 de custo
+- Reduz tempo de desenvolvimento: 2-3 dias vs 7-10 dias (custom)
+
+**Funcionalidades que serão implementadas:**
+1. **Dashboard Principal**
+   - Lista de conversas ativas/pendentes/concluídas
+   - Filtros por status, data, score
+   - Métricas em tempo real (taxa de resposta, distribuição de scores)
+
+2. **Visualização de Conversa**
+   - Histórico completo da conversa
+   - Contexto do HubSpot
+   - Score de satisfação destacado
+   - Botão "Assumir conversa" para intervenção manual
+
+3. **Relatórios**
+   - Export CSV com todas as pesquisas
+   - Gráficos de tendência (score ao longo do tempo)
+   - Identificação de clientes críticos (score 1-2)
+
+**Implementação:**
+- Deploy Chatwoot (Docker): 1-2h
+- Integração n8n ↔ Chatwoot: 2-3h
+- Configuração Dashboard: 1h
+- **Total: 4-6 horas**
+
+**Documentação:** Ver `docs/01-arquitetura-solucao.md` seção 5
+
+### Fase 3 - Melhorias Futuras (Opcional)
 1. Dashboard analytics (Supabase + Grafana)
 2. A/B testing de prompts
 3. Integração com outros canais (Telegram, Email)
@@ -310,6 +395,6 @@ Este projeto foi desenvolvido para fins educacionais como parte de um case técn
 
 ---
 
-**Última atualização:** 2026-02-02
+**Última atualização:** 2026-02-02 23:55
 **Versão:** 2.0 (Meta WhatsApp API)
-**Status:** 85% completo - Projeto em fase final 🚀
+**Status:** 90% completo - Backend operacional, falta Chatwoot (4-6h)
