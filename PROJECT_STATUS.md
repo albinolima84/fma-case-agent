@@ -151,7 +151,20 @@
 
 **Solução Escolhida:** **Chatwoot (Open Source)**
 
-**Justificativa:**
+**Hospedagem:** **Render.com Free Tier**
+
+**Justificativa da Hospedagem:**
+- ✅ **Projeto piloto** (1 mês de duração)
+- ✅ **Custo:** $0 (free tier adequado para teste)
+- ✅ **Deploy rápido:** Direto do GitHub
+- ✅ **Já possui conta** Render ativa
+- ⚠️ **Limitação conhecida:** Sleep após 15min de inatividade
+  - Warm-up: 30-60 segundos na primeira abertura
+  - Aceitável para piloto (gerentes acessam poucas vezes/dia)
+  - **Dados não são afetados:** Sempre salvos no Supabase
+  - Chatwoot é apenas interface de visualização
+
+**Justificativa do Chatwoot:**
 - ✅ Plataforma madura de helpdesk/live chat com todas as features necessárias
 - ✅ Interface de conversas em tempo real pronta
 - ✅ Histórico completo e busca integrados
@@ -160,7 +173,6 @@
 - ✅ **Intervenção manual**: gerente pode assumir conversa
 - ✅ Múltiplos usuários/equipes
 - ✅ Mobile app (iOS/Android)
-- ✅ Self-hosted: $0 de custo
 - ✅ API REST completa para integração com n8n
 - ✅ Reduz tempo de desenvolvimento de 7-10 dias para 2-3 dias
 
@@ -169,6 +181,16 @@
 - ✅ **Histórico completo** - Inbox com todas as conversas
 - ✅ **Intervenção manual** - Botão "Assumir conversa"
 - ✅ **Visualização clara e organizada** - Interface profissional tipo Intercom/Zendesk
+
+**Arquitetura de Dados (Importante):**
+```
+Cliente WhatsApp → Meta API → n8n Cloud → Supabase (DADOS PRIMÁRIOS)
+                                       └→ Chatwoot (INTERFACE VISUALIZAÇÃO)
+```
+- **Supabase:** Fonte de verdade (sempre ativo, 100% dos dados)
+- **Chatwoot:** Interface secundária para gerentes visualizarem
+- **Impacto do sleep:** Zero na captura de dados, apenas delay na visualização
+- **Sincronização:** Best effort (n8n tenta enviar, mas Supabase é garantido)
 
 **Implementação:**
 1. **Deploy Chatwoot** (Docker Compose)

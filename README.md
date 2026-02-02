@@ -31,7 +31,7 @@ case-agent-dev/
 - **CRM:** HubSpot API v3
 - **Mensageria:** **Meta WhatsApp API (Oficial)** 🆕
 - **Banco de Dados:** Supabase PostgreSQL (Cloud)
-- **Interface:** Chatwoot (Open Source) - *Pendente implementação*
+- **Interface:** Chatwoot (Open Source) no Render.com Free Tier - *Pendente implementação*
 
 ---
 
@@ -326,7 +326,16 @@ CREATE TABLE surveys (
 5. ✅ Documentação completa e atualizada
 
 ### ⏳ Fase 2 - Interface de Monitoramento (Pendente - Requisito FMA)
-**Solução:** **Chatwoot (Open Source)** - Plataforma completa de helpdesk/live chat
+**Solução:** **Chatwoot (Open Source)** no **Render.com Free Tier**
+
+**Decisão de Hospedagem:**
+- **Hospedagem:** Render.com Free Tier
+- **Custo:** $0 (adequado para projeto piloto de 1 mês)
+- **Limitação:** Sleep após 15min de inatividade
+  - Warm-up de 30-60s na primeira abertura
+  - Aceitável para piloto (gerentes acessam poucas vezes/dia)
+- **Dados protegidos:** Sempre salvos no Supabase (fonte primária)
+- **Chatwoot:** Apenas interface de visualização (secundária)
 
 **Por que Chatwoot:**
 - Interface profissional pronta (tipo Intercom/Zendesk)
@@ -337,7 +346,6 @@ CREATE TABLE surveys (
 - Sistema de tags, notas e atribuições
 - Mobile app nativo (iOS/Android)
 - API REST completa para integração
-- Self-hosted: $0 de custo
 - Reduz tempo de desenvolvimento: 2-3 dias vs 7-10 dias (custom)
 
 **Funcionalidades que serão implementadas:**
