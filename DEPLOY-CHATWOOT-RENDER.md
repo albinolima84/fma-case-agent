@@ -46,14 +46,47 @@
 
 ---
 
-## 🚀 Passos para Deploy
+## 🚀 Guia Rápido de Deploy
+
+### Passo-a-Passo Resumido (5 minutos)
+
+1. **Render Dashboard** → New → PostgreSQL
+   - Nome: `chatwoot-postgres`
+   - Database: `chatwoot`
+   - **Copiar Internal Database URL**
+
+2. **Render Dashboard** → New → Redis
+   - Nome: `chatwoot-redis`
+   - **Copiar Internal Redis URL**
+
+3. **Render Dashboard** → New → Web Service → **Existing Image**
+   - Image: `chatwoot/chatwoot:latest`
+   - Nome: `chatwoot-web`
+   - Tier: Free
+
+4. **Environment Variables** (no Web Service)
+   - Colar URLs do PostgreSQL e Redis
+   - Adicionar SECRET_KEY_BASE (gerar novo)
+   - Adicionar FRONTEND_URL (URL do Render)
+
+5. **Deploy** → Aguardar ~5-10 min
+
+6. **Acessar URL** → Criar conta admin
+
+---
+
+## 📝 Passos Detalhados
 
 ### Pré-requisitos
 - [x] Conta Render.com ativa
-- [ ] Repositório GitHub com Chatwoot (fork ou oficial)
 - [ ] Variáveis de ambiente preparadas
 
 ### Etapa 1: Criar Serviços no Render
+
+**Importante: Ordem de criação**
+1. PostgreSQL (primeiro)
+2. Redis (segundo)
+3. Web Service - Chatwoot (terceiro - precisa dos anteriores)
 
 **1.1 PostgreSQL:**
 - Nome: `chatwoot-postgres`
@@ -65,12 +98,83 @@
 - Tier: Free
 
 **1.3 Web Service (Chatwoot):**
+
+**Opção de Deploy (escolha uma):**
+
+Render oferece 3 opções ao criar Web Service:
+
+---
+
+**OPÇÃO A: Existing Image** ⭐ **RECOMENDADO PARA PILOTO**
+
+✅ **Mais rápido** (imagem já compilada)
+✅ **Sem necessidade de fork** no GitHub
+✅ **Oficialmente mantida** pela equipe Chatwoot
+✅ **Ideal para piloto** (deploy em ~5 min)
+
+**Como configurar:**
+```
+Render Dashboard > New > Web Service > Existing Image
+
+Image URL: chatwoot/chatwoot:latest
+Registry: Docker Hub (público)
+
+Nome: chatwoot-web
+Region: Oregon (US West) ou Frankfurt (EU)
+Instance Type: Free (512MB RAM)
+```
+
+---
+
+**OPÇÃO B: Public Git Repository**
+
+✅ **Sem necessidade de fork**
+⚠️ Mais lento (precisa buildar ~15-20 min)
+
+**Como configurar:**
+```
+Render Dashboard > New > Web Service > Public Git Repository
+
+Repository URL: https://github.com/chatwoot/chatwoot
+Branch: main
+
+Build Command: (deixar vazio - usa Dockerfile)
+Start Command: (deixar vazio - usa Dockerfile)
+```
+
+---
+
+**OPÇÃO C: Git Provider (GitHub/GitLab)**
+
+✅ **Permite customização** futura
+⚠️ Requer fork do repositório
+⚠️ Mais trabalho inicial
+
+**Quando usar:** Se planeja customizar Chatwoot no futuro
+
+---
+
+**Configurações comuns (qualquer opção):**
 - Nome: `chatwoot-web`
 - Runtime: Docker
-- Tier: Free (512MB RAM - suficiente para piloto)
+- Tier: **Free** (512MB RAM - suficiente para piloto)
 - Auto-Deploy: Yes
 
-### Etapa 2: Variáveis de Ambiente
+### Etapa 2: Conectar Banco de Dados e Redis
+
+**Importante:** Após criar PostgreSQL e Redis, você receberá as URLs de conexão.
+
+**PostgreSQL:**
+- Internal Database URL: `postgresql://user:pass@host:5432/chatwoot`
+- Copiar e guardar (usar nas variáveis de ambiente)
+
+**Redis:**
+- Internal Redis URL: `redis://host:6379`
+- Copiar e guardar (usar nas variáveis de ambiente)
+
+---
+
+### Etapa 3: Variáveis de Ambiente
 
 ```bash
 # Database (Render fornece automaticamente)
@@ -94,14 +198,23 @@ MAILER_SENDER_EMAIL=noreply@seudominio.com
 TZ=America/Sao_Paulo
 ```
 
-### Etapa 3: Deploy
+### Etapa 4: Deploy
 
-1. Conectar repositório GitHub
-2. Configurar variáveis de ambiente
-3. Deploy automático
-4. Aguardar ~5-10 minutos
+**Se escolheu Opção A (Existing Image):**
+1. Configurar variáveis de ambiente (ver Etapa 3)
+2. Clicar "Create Web Service"
+3. Aguardar ~5-10 minutos (download da imagem + start)
+4. Chatwoot estará disponível na URL fornecida pelo Render
 
-### Etapa 4: Setup Inicial
+**Se escolheu Opção B ou C (Git):**
+1. Conectar repositório (público ou privado)
+2. Configurar variáveis de ambiente (ver Etapa 3)
+3. Clicar "Create Web Service"
+4. Aguardar ~15-20 minutos (build + deploy)
+
+---
+
+### Etapa 5: Setup Inicial
 
 1. Acessar `https://chatwoot-web.onrender.com`
 2. Criar conta de administrador
