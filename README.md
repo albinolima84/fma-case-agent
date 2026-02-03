@@ -31,7 +31,7 @@ case-agent-dev/
 - **CRM:** HubSpot API v3
 - **Mensageria:** **Meta WhatsApp API (Oficial)** 🆕
 - **Banco de Dados:** Supabase PostgreSQL (Cloud)
-- **Interface:** Chatwoot (Open Source) no Render.com Free Tier - *Pendente implementação*
+- **Interface:** Chatwoot Cloud ($19/mês) - *Em implementação*
 
 ---
 

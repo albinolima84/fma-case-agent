@@ -151,18 +151,21 @@
 
 **Solução Escolhida:** **Chatwoot (Open Source)**
 
-**Hospedagem:** **Render.com Free Tier**
+**Hospedagem:** **Chatwoot Cloud** (Decisão Final)
 
 **Justificativa da Hospedagem:**
 - ✅ **Projeto piloto** (1 mês de duração)
-- ✅ **Custo:** $0 (free tier adequado para teste)
-- ✅ **Deploy rápido:** Direto do GitHub
-- ✅ **Já possui conta** Render ativa
-- ⚠️ **Limitação conhecida:** Sleep após 15min de inatividade
-  - Warm-up: 30-60 segundos na primeira abertura
-  - Aceitável para piloto (gerentes acessam poucas vezes/dia)
-  - **Dados não são afetados:** Sempre salvos no Supabase
-  - Chatwoot é apenas interface de visualização
+- ✅ **Custo:** $19/mês (melhor custo-benefício vs Render Standard $25)
+- ✅ **Setup:** 5 minutos (vs 4-6h tentando Render)
+- ✅ **Funciona out-of-the-box:** Zero troubleshooting
+- ✅ **Suporte incluído:** Equipe oficial Chatwoot
+- ✅ **Decisão tomada após:** Render Free tier (512MB RAM) insuficiente - erro "JavaScript heap out of memory"
+
+**Tentativas anteriores:**
+- ❌ Render Free tier: Insuficiente (512MB RAM, erro de memória)
+- ❌ Render com Docker: Problemas de database name e memória
+- ❌ Render com Git: JavaScript heap out of memory
+- ✅ **Chatwoot Cloud:** Funcionou imediatamente
 
 **Justificativa do Chatwoot:**
 - ✅ Plataforma madura de helpdesk/live chat com todas as features necessárias
