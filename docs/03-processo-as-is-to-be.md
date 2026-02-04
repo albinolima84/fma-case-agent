@@ -138,26 +138,23 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 ### Descrição do Fluxo
 
-**Etapa 1: Trigger Automático ou Manual (1s)**
-1. **Opção A:** Cron diário (ex: todo dia 10h da manhã)
-   - Sistema busca automaticamente lista de clientes elegíveis
-2. **Opção B:** Trigger manual
-   - Gerente seleciona clientes específicos no Chatwoot
+**Etapa 1: Trigger (1s)**
+1. Schedule (cron diário) ou execução manual no n8n
+2. Cliente selecionado manualmente pelo ID no workflow
 
 **Etapa 2: Workflow n8n Inicia (1s)**
-3. Para cada cliente, dispara pipeline de agentes
+3. Dispara pipeline de agentes para o cliente selecionado
 
 **Etapa 3: Agente 1 - Data Fetcher (5-8s)**
-4. Faz chamadas paralelas à API do HubSpot:
+4. Faz chamadas à API do HubSpot:
    - GET contact details
    - GET emails últimos 30 dias
    - GET deals/negócios
    - GET tickets de suporte
-   - GET notas e atividades
 5. Consolida tudo em JSON estruturado
 
 **Etapa 4: Agente 2 - Context Analyzer (2-4s)**
-6. Claude 3.5 Sonnet analisa JSON
+6. Tess AI (Agent 2 — ID 38717) analisa JSON
 7. Gera insights:
    - Summary dos eventos relevantes
    - Sentimento (positive/negative/neutral)
@@ -166,13 +163,13 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
    - Pontos de personalização
 
 **Etapa 5: Agente 3 - Message Generator (1-2s)**
-8. Claude 3.5 Sonnet cria mensagem personalizada
+8. Tess AI (Agent 3 — ID 38728) cria mensagem personalizada
 9. Usa contexto específico do cliente
 10. Segue tom sugerido pelo Agente 2
 11. Inclui call-to-action claro (pedir nota 1-5)
 
 **Etapa 6: Envio Automático (1s)**
-12. Evolution API envia via WhatsApp
+12. Meta WhatsApp API envia via WhatsApp
 13. Confirma entrega
 
 **Etapa 7: Registro Automático (1s)**
@@ -180,41 +177,34 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 15. **Chatwoot:** Cria conversa com todo o contexto
 16. Gerente pode acompanhar em tempo real no dashboard
 
-**Etapa 8: Aguarda Resposta (até 24h)**
+**Etapa 8: Aguarda Resposta**
 17. Webhook fica escutando mensagens do cliente
-18. Se timeout de 24h: marca como não_respondeu
 
 **Etapa 9: Agente 4 - Conversation Handler (2-3s por turno)**
-19. Recebe mensagem do cliente via webhook
-20. Claude 3.5 Sonnet analisa resposta:
+18. Recebe mensagem do cliente via webhook
+19. Tess AI (Agent 4 V2.0 — ID 38733) analisa resposta:
     - **Se contém nota 1-5:** Extrai e agradece
     - **Se é feedback:** Responde empaticamente e pede nota
     - **Se é dúvida:** Responde e retorna ao objetivo
-    - **Se pede humano:** Transfere para gerente
-21. Envia resposta via WhatsApp
-22. Atualiza Chatwoot e Supabase
-23. **Loop:** Repete até obter nota ou atingir 5 turnos
+20. Envia resposta via WhatsApp
+21. Atualiza Chatwoot e Supabase
+22. **Loop:** Repete até obter nota ou atingir 5 turnos
 
 **Etapa 10: Finalização (1s)**
-24. Quando nota é extraída:
+23. Quando nota é extraída:
     - Agradece graciosamente
     - Atualiza Supabase com nota, feedback e transcrição
     - Marca conversa como resolvida no Chatwoot
-25. Se score baixo (1-2) ou red flags:
-    - Notifica gerente automaticamente
-    - Prioridade alta para follow-up humano
 
 **Etapa 11: Loop Automático**
-26. Sistema processa próximo cliente automaticamente
-27. No final: relatório consolidado disponível no Chatwoot
+24. Sistema processa próximo cliente automaticamente
 
 ### Monitoramento Paralelo
 
 **Durante todo o processo:**
 - Gerente visualiza conversas em tempo real no Chatwoot
-- Pode **intervir manualmente** a qualquer momento
-- Se assumir conversa: IA para automaticamente
-- Dashboard mostra métricas agregadas (NPS, distribuição de scores)
+- Pode **responder manualmente** a qualquer momento no Chatwoot
+- Nota privada automática com score, sentiment e feedback quando o survey é concluído
 
 ### Benefícios do Processo Otimizado
 
@@ -241,21 +231,14 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 - **Sem fadiga** ou viés humano
 - Usa contexto específico sempre
 
-#### 5. Insights Automáticos
-- **Dashboard em tempo real** no Chatwoot
-- **NPS calculado automaticamente**
-- **Identificação de trends** (satisfação por produto, período)
-- **Alertas proativos** (clientes em risco)
-
-#### 6. Escalabilidade Horizontal
+#### 5. Escalabilidade Horizontal
 - Processar **1000+ clientes/dia** sem contratar mais gerentes
-- Custo marginal por cliente é **apenas API ($0.019)**
+- Custo marginal por cliente é **apenas ~R$ 1.50 (APIs cloud)**
 - Gerentes focam em **casos complexos** e intervenções estratégicas
 
-#### 7. Experiência do Cliente
+#### 6. Experiência do Cliente
 - **Respostas instantâneas** (não aguardar horário comercial)
 - **Contexto preservado** em toda conversa
-- **Possibilidade de escalar** para humano quando necessário
 
 ### Métricas do Processo Otimizado
 
@@ -264,29 +247,29 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 | Tempo médio por cliente | ~2 min | 93% ↓ |
 | Clientes atendidos/dia (1 gerente) | 200+ | 1150% ↑ |
 | Taxa de erro | < 1% | 95% ↓ |
-| Custo por pesquisa (API + infra) | $0.019 (~R$ 0.10) | 99% ↓ |
+| Custo por pesquisa (API + infra) | ~R$ 1.50 | 97% ↓ |
 | Custo gerente (supervisão) | R$ 100/dia | 90% ↓ |
 | Escalabilidade | Muito alta (horizontal) | ∞ |
 | Rastreabilidade | Completa (BD + UI) | 100% ↑ |
-| NPS calculável facilmente? | Sim (automático) | ✅ |
 
 ### Cálculo de Custo Mensal (Processo Automatizado)
 
 **Cenário:** 200 pesquisas/mês
 
-**Custos de Infraestrutura:**
-- VPS (4vCPU, 8GB): R$ 150/mês
-- Claude API (200 × $0.019): $3.80 = R$ 20/mês
+**Custos de Infraestrutura (Cloud):**
+- n8n Cloud: R$ 0 (tier gratuito)
+- Tess AI (créditos — 200 pesquisas): ~R$ 165/mês
 - Supabase: R$ 0 (tier gratuito)
-- Domínio + SSL: R$ 10/mês
-- **Subtotal infra: R$ 180/mês**
+- Chatwoot Cloud: ~R$ 105/mês ($19/mês)
+- Meta WhatsApp API: ~R$ 30/mês
+- **Subtotal infra: ~R$ 300/mês**
 
 **Custos de Supervisão:**
 - Gerente (2h/dia supervisão): 40h/mês × R$ 100/h = R$ 4.000/mês
 
-**Total: R$ 4.180/mês**
+**Total: R$ 4.300/mês**
 
-**Economia vs Manual: R$ 12.000 - R$ 4.180 = R$ 7.820/mês (65% redução)**
+**Economia vs Manual: R$ 12.000 - R$ 4.300 = R$ 7.700/mês (64% redução)**
 
 ---
 
@@ -298,12 +281,10 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 |---------|----------------|------------|-------|
 | **Tempo por cliente** | 30 min | 2 min | 93% ↓ |
 | **Clientes/dia/gerente** | 16 | 200+ | 1150% ↑ |
-| **Custo mensal (200 pesquisas)** | R$ 12.000 | R$ 4.180 | 65% ↓ |
+| **Custo mensal (200 pesquisas)** | R$ 12.000 | R$ 4.300 | 64% ↓ |
 | **Taxa de erro** | 15-20% | < 1% | 95% ↓ |
 | **Personalização** | Inconsistente | Sempre personalizado | 100% ↑ |
 | **Rastreabilidade** | Planilhas dispersas | BD centralizado + UI | Completa |
-| **NPS automático** | Não | Sim | ✅ |
-| **Alertas proativos** | Não | Sim | ✅ |
 | **Escalabilidade** | Linear (headcount) | Exponencial | ∞ |
 | **Disponibilidade** | Horário comercial | 24/7 | ✅ |
 | **Intervenção humana** | Sempre | Quando necessário | Otimizado |
@@ -311,10 +292,9 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 ### Ganhos Estratégicos
 
 #### Curto Prazo (1-3 meses)
-✅ Redução de 65% no custo operacional
+✅ Redução de 64% no custo operacional
 ✅ Aumento de 10x na capacidade de pesquisas
 ✅ Eliminação de 95% dos erros manuais
-✅ Dashboard de NPS em tempo real
 
 #### Médio Prazo (3-6 meses)
 ✅ Identificação proativa de clientes em risco (churn)
@@ -337,48 +317,40 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 | Risco | Probabilidade | Impacto | Mitigação |
 |-------|---------------|---------|-----------|
 | API HubSpot cair | Baixa | Alto | Retry + cache de dados + alertas |
-| API Claude indisponível | Baixa | Alto | Fallback para GPT-4 + retry |
-| Evolution API desconectar | Média | Médio | Monitoramento + reconexão automática |
+| Tess AI indisponível | Baixa | Alto | Retry com backoff + alertas automáticos |
+| Meta WhatsApp API indisponível | Baixa | Médio | Retry automático + monitoramento |
 | Cliente não entender que é IA | Baixa | Baixo | Deixar claro no início ("equipe de relacionamento") |
 | IA não entender contexto | Baixa | Médio | Few-shot examples + validação humana spot |
 | Custo API explodir | Baixa | Médio | Budget limits + alertas + otimização de prompts |
 
 ### Controles de Qualidade
 
+Práticas manuais que o responsável pelo sistema pode executar periodicamente usando as ferramentas já disponíveis (Chatwoot + Supabase).
+
 1. **Amostragem Humana (10%):**
-   - Gerente revisa 10% das conversas aleatoriamente
+   - Gerente revisa 10% das conversas aleatoriamente no Chatwoot
    - Identifica padrões de erro da IA
    - Ajusta prompts conforme necessário
 
-2. **Alertas Automáticos:**
-   - Score muito baixo (1-2): notifica imediatamente
-   - Red flags detectados: prioriza na fila
-   - Taxa de erro > 5%: para sistema e alerta
-
-3. **A/B Testing:**
-   - Testar variações de prompts
-   - Medir taxa de resposta e qualidade
+2. **A/B Testing:**
+   - Testar variações de prompts nos agentes Tess AI
+   - Medir taxa de resposta e qualidade comparando resultados no Supabase
    - Implementar melhor versão
-
-4. **Feedback Loop:**
-   - Gerentes podem marcar "boa conversa" ou "ruim"
-   - Dados usados para melhorar prompts
-   - Evolução contínua
 
 ---
 
 ## Roadmap de Implementação
 
 ### Fase 1: MVP (Semanas 1-2)
-- Setup de infraestrutura (Docker Compose)
+- Setup dos serviços cloud (n8n, Supabase, Tess AI)
 - Integração HubSpot API
-- Desenvolvimento dos 4 agentes
+- Desenvolvimento dos 4 agentes (Tess AI)
 - Workflow n8n básico
 - Teste com 5 clientes piloto
 
 ### Fase 2: Piloto (Semanas 3-4)
-- Configuração Chatwoot
-- Integração Evolution API (WhatsApp)
+- Configuração Chatwoot Cloud
+- Integração Meta WhatsApp API (oficial)
 - Teste com 50 clientes
 - Coleta de feedback dos gerentes
 - Ajustes de prompts
@@ -398,27 +370,49 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 ---
 
+## Propostas Futuras
+
+As funcionalidades abaixo foram identificadas durante o projeto mas não foram implementadas no MVP atual. Podem ser incorporadas em fases subsequentes.
+
+### 1. Busca automática de clientes elegíveis
+Substituir a seleção manual de cliente por uma lógica automática no FLUXO 1 que: (a) busque no HubSpot contactos com atividade nos últimos 30 dias, e (b) filtre no Supabase quem já recebeu pesquisa nos últimos 30 dias (`WHERE customer_phone = X AND created_at > NOW() - INTERVAL '30 days'`). O resultado seria uma lista de clientes elegíveis que o workflow itere automaticamente via loop no n8n.
+
+### 2. Notificação automática para scores baixos
+
+Quando o score coletado for 1 ou 2, ou quando o Agent 2 detectar red flags no contexto do cliente, o sistema notificaria automaticamente a gerente de qualidade para follow-up manual prioritário. Isso exigiria um IF adicional no FLUXO 2, após a atualização do Supabase, que verifique o valor de `satisfaction_score` e dispare uma notificação (ex: mensagem no Chatwoot, email ou Slack).
+
+### 3. Relatório consolidado de satisfação
+Geração automática de um relatório agregado com métricas como distribuição de scores, NPS, sentiment por período e taxa de conclusão. Candidatos de implementação: dashboard no Supabase (com Grafana ou Metabase apontando para a tabela `surveys`), ou um node n8n agendado que consolida os dados e publica no Chatwoot ou em uma ferramenta de BI.
+
+### 4. IA parar automaticamente quando gerente assume a conversa *(requisito FMA)*
+O FMA exige que o gerente possa "assumir o controle da conversa". Atualmente o gerente pode responder manualmente no Chatwoot, mas o bot continua a processar mensagens subsequentes do cliente via webhook Meta independentemente. Para resolver isto, o FLUXO 2 precisaria verificar, antes de chamar o Agent 4, se a conversa no Chatwoot foi atribuída a um agente humano ou se o gerente já respondeu manualmente. Se sim, o fluxo deve parar sem enviar resposta do bot. Isso exigiria uma chamada à API do Chatwoot para consultar o estado da conversa em cada iteração do webhook.
+
+### 5. Feedback Loop de qualidade das conversas
+Permitir que o gerente marque conversas como "boa" ou "ruim" no Chatwoot, e usar esse sinal para guiar a optimização dos prompts dos agentes. Exigiria um campo ou label custom no Chatwoot para classificação, e uma forma de exportar essa informação para análise periódica.
+
+---
+
 ## Conclusão
 
 A migração do processo manual (AS-IS) para o processo automatizado com IA (TO-BE) representa uma transformação fundamental na forma como a Pareto mede satisfação de clientes:
 
 ### Ganhos Quantificáveis
 - **93% redução** no tempo por cliente
-- **65% redução** no custo operacional
+- **64% redução** no custo operacional
 - **1150% aumento** na capacidade de atendimento
 - **95% redução** na taxa de erros
 
 ### Ganhos Qualitativos
 - Personalização consistente e garantida
 - Rastreabilidade completa de todas interações
-- Insights em tempo real (NPS, trends, alertas)
+- Dados estruturados por survey (score, sentiment, feedback) no banco
 - Escalabilidade exponencial
 - Experiência do cliente melhorada (respostas instantâneas)
 
 ### ROI Estimado
-- **Payback:** < 1 mês
-- **Economia anual:** R$ 93.840 (200 pesquisas/mês)
-- **ROI:** ~400-600% no primeiro ano
+- **Payback:** 8 meses
+- **Economia anual:** R$ 91.080 (200 pesquisas/mês)
+- **ROI Ano 1:** 66% | **ROI 3 Anos:** 497%
 
 O processo TO-BE não substitui completamente o humano, mas **potencializa** a capacidade dos gerentes de qualidade, permitindo que foquem em casos complexos, análise estratégica e relacionamento de alto valor, enquanto a IA cuida da execução repetitiva e análise de dados em escala.
 
@@ -426,4 +420,4 @@ O processo TO-BE não substitui completamente o humano, mas **potencializa** a c
 
 **Documento elaborado para:** Case Agent Dev - FMA/Pareto/IA Leader
 **Data:** Janeiro 2026
-**Versão:** 1.0
+**Versão:** 2.0 (Meta WhatsApp API + Tess AI + Chatwoot Cloud)

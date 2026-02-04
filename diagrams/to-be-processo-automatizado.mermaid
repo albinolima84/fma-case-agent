@@ -1,153 +1,82 @@
-flowchart TD
-    Start([Início: Trigger Automático<br/>ou Manual]) --> B1{Tipo de<br/>trigger?}
-
-    B1 -->|Cron diário| B1a[📅 10h da manhã<br/>lista automática]
-    B1 -->|Manual| B1b[👤 Gerente seleciona<br/>clientes específicos]
-
-    B1a --> B2
-    B1b --> B2
-
-    B2[🤖 n8n Workflow inicia<br/>para cada cliente]
-
-    %% AGENTE 1
-    B2 --> B3[🤖 AGENTE 1: Data Fetcher<br/>Busca dados HubSpot API]
-
-    B3 --> B3a[📥 GET contact details]
-    B3 --> B3b[📥 GET emails últimos 30 dias]
-    B3 --> B3c[📥 GET deals/negócios]
-    B3 --> B3d[📥 GET tickets suporte]
-    B3 --> B3e[📥 GET notas/atividades]
-
-    B3a --> B4
+---
+config:
+  layout: fixed
+---
+flowchart TB
+    Start(["Início: Schedule ou Manual"]) --> B2["🤖 n8n Workflow inicia<br>Cliente selecionado pelo ID"]
+    B2 --> B3["🤖 AGENTE 1: Data Fetcher<br>Busca dados HubSpot API"]
+    B3 --> B3a["📥 GET contact details"] & B3b["📥 GET emails últimos 30 dias"] & B3c["📥 GET deals/negócios"] & B3d["📥 GET tickets suporte"]
+    B3a --> B4["Consolida dados em JSON estruturado"]
     B3b --> B4
     B3c --> B4
     B3d --> B4
-    B3e --> B4
-
-    B4[Consolida dados em JSON estruturado]
-
-    %% AGENTE 2
-    B4 --> B5[🤖 AGENTE 2: Context Analyzer<br/>Claude 3.5 Sonnet]
-
-    B5 --> B5a[Analisa eventos-chave]
-    B5 --> B5b[Identifica sentimento]
-    B5 --> B5c[Detecta red flags]
-    B5 --> B5d[Sugere tom da mensagem]
-
-    B5a --> B6
+    B4 --> B5["🤖 AGENTE 2: Context Analyzer<br>Tess AI — Agent 38717"]
+    B5 --> B5a["Analisa eventos-chave"] & B5b["Identifica sentimento"] & B5c["Detecta red flags"] & B5d["Sugere tom da mensagem"]
+    B5a --> B6["Output: Summary + Insights JSON"]
     B5b --> B6
     B5c --> B6
     B5d --> B6
-
-    B6[Output: Summary + Insights JSON]
-
-    %% AGENTE 3
-    B6 --> B7[🤖 AGENTE 3: Message Generator<br/>Claude 3.5 Sonnet]
-
-    B7 --> B8[Gera mensagem personalizada<br/>com contexto específico]
-
-    %% ENVIO
-    B8 --> B9[📤 Evolution API<br/>Envia via WhatsApp]
-
-    B9 --> B10[✅ Mensagem enviada]
-
-    %% REGISTRO SIMULTÂNEO
-    B10 --> B11a[💾 Registra no Supabase<br/>Status: 'sent']
-    B10 --> B11b[📊 Cria conversa no Chatwoot<br/>+ contexto do cliente]
-
-    B11a --> B12
+    B6 --> B7["🤖 AGENTE 3: Message Generator<br>Tess AI — Agent 38728"]
+    B7 --> B8["Gera mensagem personalizada<br>com contexto específico"]
+    B8 --> B9["📤 Meta WhatsApp API<br>Envia via WhatsApp"]
+    B9 --> B10["✅ Mensagem enviada"]
+    B10 --> B11a["💾 Registra no Supabase<br>Status: active"] & B11b["📊 Cria conversa no Chatwoot<br>+ contexto do cliente"]
+    B11a --> B12["⏳ Aguarda resposta do cliente<br>via Webhook"]
     B11b --> B12
-
-    B12[⏳ Aguarda resposta do cliente<br/>via Webhook]
-
-    %% WEBHOOK RESPOSTA
-    B12 --> B13{Cliente<br/>respondeu?}
-
-    B13 -->|Timeout 24h| B13a[⏰ Marca como não_respondeu<br/>Notifica gerente]
-    B13a --> B30
-
-    B13 -->|Sim| B14[📨 Webhook recebe mensagem]
-
-    B14 --> B15[🤖 AGENTE 4: Conversation Handler<br/>Claude 3.5 Sonnet]
-
-    %% LÓGICA DO AGENTE 4
-    B15 --> B16{Mensagem<br/>contém nota<br/>1-5?}
-
-    B16 -->|Sim| B17[Extrai nota<br/>Agradece]
-    B16 -->|Não| B18{É feedback<br/>ou dúvida?}
-
-    B18 -->|Feedback| B19[Responde empaticamente<br/>Pede nota]
-    B18 -->|Dúvida| B20[Responde útil<br/>Retorna ao objetivo]
-
-    B19 --> B21
+    B12 --> B14["📨 Webhook recebe mensagem"]
+    B14 --> B15["🤖 AGENTE 4: Conversation Handler<br>Tess AI — Agent 38733 V2.0"]
+    B15 --> B16{"Mensagem<br>contém nota<br>1-5?"}
+    B16 -- Sim --> B17["Extrai nota<br>Agradece"]
+    B16 -- Não --> B18{"É feedback<br>ou dúvida?"}
+    B18 -- Feedback --> B19["Responde empaticamente<br>Pede nota"]
+    B18 -- Dúvida --> B20["Responde útil<br>Retorna ao objetivo"]
+    B17 --> B22{"Nota<br>extraída?"}
+    B19 --> B21["Envia resposta via WhatsApp"]
     B20 --> B21
+    B21 --> B24["Atualiza Chatwoot + Supabase"]
+    B24 --> B25{"Turno<br>&lt; 5?"}
+    B25 -- Sim --> B12
+    B25 -- Não --> B26["⚠️ Limite de turnos<br>Finaliza conversa"]
+    B26 --> End["End"]
+    B23["Status: completed"] --> B27["Agradece e finaliza<br>graciosamente"]
+    B27 --> B28["📊 Atualiza Supabase:<br>- satisfaction_score<br>- feedback<br>- transcript<br>- status: completed"]
+    B28 --> B29["✅ Marca conversa resolvida<br>no Chatwoot + Nota privada"]
+    B29 --> End
+    B11b -. Tempo real .-> Monitor["👁️ Gerente monitora<br>no Chatwoot"]
+    B3 -. "⏱️ 5-8s" .-> B4
+    B5 -. "⏱️ 2-4s" .-> B6
+    B7 -. "⏱️ 1-2s" .-> B8
+    B8 -. ⏱️ 1s .-> B10
+    B22 -- Sim --> B23
+    B22 -- Não --> B21
 
-    B17 --> B22{Nota<br/>extraída?}
-
-    B22 -->|Não| B21[Envia resposta via WhatsApp]
-    B22 -->|Sim| B23
-
-    B21 --> B24[Atualiza Chatwoot + Supabase]
-
-    B24 --> B25{Turno<br/>< 5?}
-
-    B25 -->|Sim| B12
-    B25 -->|Não| B26[⚠️ Limite de turnos<br/>Finaliza conversa]
-    B26 --> B30
-
-    %% FINALIZAÇÃO COM NOTA
-    B23 --> B27[Agradece e finaliza<br/>graciosamente]
-
-    B27 --> B28[📊 Atualiza Supabase:<br/>- satisfaction_score<br/>- feedback<br/>- transcript<br/>- status: completed]
-
-    B28 --> B29[✅ Marca conversa<br/>resolvida no Chatwoot]
-
-    B29 --> B30{Red flags<br/>ou score<br/>baixo?}
-
-    B30 -->|Sim| B31[🚨 Notifica gerente<br/>Prioridade alta]
-    B30 -->|Não| B32
-
-    B31 --> B32
-
-    B32{Mais<br/>clientes?}
-
-    B32 -->|Sim| B2
-    B32 -->|Não| End([Fim: Relatório consolidado<br/>disponível no Chatwoot])
-
-    %% ESCALAÇÃO
-    B15 --> B33{Cliente pediu<br/>humano?}
-    B33 -->|Sim| B34[🔄 Transfer para gerente<br/>Notificação imediata]
-    B34 --> B35[Gerente assume no Chatwoot<br/>Vê todo contexto]
-    B35 --> B30
-
-    %% MONITORAMENTO PARALELO
-    B11b -.->|Tempo real| Monitor[👁️ Gerente monitora<br/>no Chatwoot Dashboard]
-    Monitor -.->|Pode intervir| B35
-
-    %% Métricas
-    B3 -.->|⏱️ 5-8s| B4
-    B5 -.->|⏱️ 2-4s| B6
-    B7 -.->|⏱️ 1-2s| B8
-    B8 -.->|⏱️ 1s| B10
-    B15 -.->|⏱️ 2-3s/turno| B24
-
-    %% Tempo total estimado
-    B2 -.->|⏱️ Total: ~2 min/cliente| End
-
-    %% Styling
+     B2:::auto
+     B3:::ai
+     B4:::auto
+     B5:::ai
+     B6:::auto
+     B7:::ai
+     B8:::auto
+     B9:::auto
+     B10:::auto
+     B11a:::data
+     B11b:::data
+     B14:::auto
+     B15:::ai
+     B16:::decision
+     B18:::decision
+     B22:::decision
+     B21:::auto
+     B24:::auto
+     B25:::decision
+     B26:::alert
+     B27:::auto
+     B28:::auto
+     B29:::auto
+     Monitor:::human
     classDef ai fill:#ccffcc,stroke:#00cc00,stroke-width:3px
     classDef auto fill:#cce5ff,stroke:#0066cc,stroke-width:2px
     classDef data fill:#ffffcc,stroke:#cccc00,stroke-width:2px
     classDef human fill:#ffccff,stroke:#cc00cc,stroke-width:2px
     classDef alert fill:#ffcccc,stroke:#cc0000,stroke-width:2px
     classDef decision fill:#e6e6e6,stroke:#666666,stroke-width:2px
-
-    class B3,B5,B7,B15 ai
-    class B2,B4,B6,B8,B9,B10,B14,B21,B24,B27,B28,B29 auto
-    class B11a,B11b,B28,B29 data
-    class Monitor,B35 human
-    class B13a,B26,B31,B34 alert
-    class B1,B13,B16,B18,B22,B25,B30,B32,B33 decision
-
-    %% Notas
-    note2[✨ Processo Otimizado - IA<br/>⏱️ Tempo médio: ~2 min/cliente 93% ↓<br/>✅ Consistência garantida<br/>📈 Rastreabilidade completa<br/>👥 200+ clientes/dia/gerente<br/>💰 Custo: $0.019/pesquisa]
