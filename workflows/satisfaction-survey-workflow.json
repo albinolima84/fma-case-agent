@@ -12,13 +12,13 @@
           ]
         }
       },
-      "id": "schedule-trigger",
+      "id": "59698601-734a-41e1-8c14-427adc28a930",
       "name": "Schedule - Enviar Pesquisas",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [
-        -448,
-        112
+        4944,
+        1312
       ],
       "notes": "Executa diariamente às 10h"
     },
@@ -28,13 +28,13 @@
         "jsonOutput": "{\n  \"hubspot_contact_id\": \"198003468904\"\n}\n",
         "options": {}
       },
-      "id": "set-contact-id",
+      "id": "87fd6eb1-a28c-4e0c-b241-00742e86a89f",
       "name": "Set Contact ID",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.2,
       "position": [
-        -224,
-        112
+        5168,
+        1312
       ],
       "notes": "ID do contato HubSpot para testar"
     },
@@ -54,13 +54,13 @@
         },
         "options": {}
       },
-      "id": "hubspot-get-contact",
+      "id": "83803c33-e26d-4a45-811a-063b35547022",
       "name": "HubSpot - Get Contact",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        0,
-        112
+        5392,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -80,13 +80,13 @@
         "jsonBody": "={\n  \"filterGroups\": [\n    {\n      \"filters\": [\n        {\n          \"propertyName\": \"associations.contact\",\n          \"operator\": \"EQ\",\n          \"value\": \"{{$node['HubSpot - Get Contact'].json.id}}\"\n        },\n        {\n          \"propertyName\": \"hs_timestamp\",\n          \"operator\": \"GTE\",\n          \"value\": \"{{$now.minus({days: 30}).toMillis()}}\"\n        }\n      ]\n    }\n  ],\n  \"sorts\": [{\"propertyName\": \"hs_timestamp\", \"direction\": \"DESCENDING\"}],\n  \"limit\": 20\n}",
         "options": {}
       },
-      "id": "hubspot-get-emails",
+      "id": "cd9c0612-86bc-441a-b7f0-acf59d2d1830",
       "name": "HubSpot - Get Emails",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        224,
-        112
+        5616,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -106,13 +106,13 @@
         "jsonBody": "={\n  \"filterGroups\": [\n    {\n      \"filters\": [\n        {\n          \"propertyName\": \"associations.contact\",\n          \"operator\": \"EQ\",\n          \"value\": \"{{$node['HubSpot - Get Contact'].json.id}}\"\n        }\n      ]\n    }\n  ]\n}",
         "options": {}
       },
-      "id": "hubspot-get-deals",
+      "id": "4d876762-29b1-4fcd-88d2-28ff8568a2d5",
       "name": "HubSpot - Get Deals",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        448,
-        112
+        5840,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -132,13 +132,13 @@
         "jsonBody": "={\n  \"filterGroups\": [\n    {\n      \"filters\": [\n        {\n          \"propertyName\": \"associations.contact\",\n          \"operator\": \"EQ\",\n          \"value\": \"{{$node['HubSpot - Get Contact'].json.id}}\"\n        }\n      ]\n    }\n  ]\n}",
         "options": {}
       },
-      "id": "hubspot-get-tickets",
+      "id": "fb4c212a-011e-45f5-b678-12bcf03582a1",
       "name": "HubSpot - Get Tickets",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        672,
-        112
+        6064,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -151,13 +151,13 @@
       "parameters": {
         "jsCode": "// Consolida dados do HubSpot em JSON estruturado\nconst contact = $node['HubSpot - Get Contact'].json;\nconst emailsResponse = $node['HubSpot - Get Emails'].json;\nconst dealsResponse = $node['HubSpot - Get Deals'].json;\nconst ticketsResponse = $node['HubSpot - Get Tickets'].json;\n\nconst emails = emailsResponse.results || [];\nconst deals = dealsResponse.results || [];\nconst tickets = ticketsResponse.results || [];\n\nconst consolidatedData = {\n  contact: {\n    id: contact.id,\n    name: `${contact.properties.firstname} ${contact.properties.lastname}`,\n    email: contact.properties.email,\n    phone: contact.properties.phone,\n    company: contact.properties.company || 'N/A',\n    created_date: contact.properties.createdate\n  },\n  summary: {\n    total_emails: emails.length,\n    total_deals: deals.length,\n    total_tickets: tickets.length\n  },\n  deals: deals.slice(0, 5).map(d => ({\n    id: d.id,\n    name: d.properties.dealname || 'Sem nome',\n    stage: d.properties.dealstage || 'unknown',\n    amount: d.properties.amount || '0',\n    close_date: d.properties.closedate || null\n  })),\n  emails: emails.slice(0, 10).map(e => ({\n    subject: e.properties?.hs_email_subject || 'Sem assunto',\n    direction: e.properties?.hs_email_direction || 'UNKNOWN',\n    timestamp: e.properties?.hs_timestamp || null\n  })),\n  tickets: tickets.slice(0, 5).map(t => ({\n    id: t.id,\n    subject: t.properties?.subject || 'Sem assunto',\n    status: t.properties?.hs_ticket_priority || 'unknown',\n    created_date: t.properties?.createdate || null\n  }))\n};\n\nreturn {\n  json: {\n    hubspot_data: consolidatedData,\n    customer_phone: contact.properties.phone,\n    customer_name: `${contact.properties.firstname} ${contact.properties.lastname}`\n  }\n};"
       },
-      "id": "consolidate-hubspot-data",
+      "id": "cb8d5ea7-05fe-4f9d-b9a6-5a47bb44e2ad",
       "name": "Consolidate HubSpot Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        896,
-        112
+        6288,
+        1312
       ],
       "notes": "Agente 1 - Data Fetcher (inline)"
     },
@@ -172,13 +172,13 @@
         "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"temperature\": \"1\",\n  \"tools\": \"no-tools\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.hubspot_data).toJsonString() }}\n    }\n  ],\n  \"wait_execution\": true\n}",
         "options": {}
       },
-      "id": "tess-agent-2",
+      "id": "0a743c34-bcc7-4b14-9abd-8083ecc50407",
       "name": "Tess - Agent 2 (Context)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1120,
-        112
+        6512,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -191,13 +191,13 @@
       "parameters": {
         "jsCode": "// Parse resposta do Agente 2 (Context Analyzer)\nconst tessResponse = $input.first().json;\nconst output = tessResponse.responses?.[0]?.output || '';\n\ntry {\n  const analysis = JSON.parse(output);\n  \n  if (!analysis.summary || !analysis.sentiment) {\n    throw new Error('Análise incompleta');\n  }\n  \n  return {\n    json: {\n      analysis: analysis,\n      customer_phone: $node['Consolidate HubSpot Data'].json.customer_phone,\n      customer_name: $node['Consolidate HubSpot Data'].json.customer_name,\n      tess_credits_agent2: tessResponse.responses?.[0]?.credits\n    }\n  };\n  \n} catch (error) {\n  console.error('Erro ao parsear Agente 2:', error);\n  \n  return {\n    json: {\n      analysis: {\n        summary: 'Análise automática não disponível',\n        sentiment: 'neutral',\n        suggested_tone: 'curious',\n        key_events: [],\n        red_flags: [],\n        personalization_points: []\n      },\n      customer_phone: $node['Consolidate HubSpot Data'].json.customer_phone,\n      customer_name: $node['Consolidate HubSpot Data'].json.customer_name\n    }\n  };\n}"
       },
-      "id": "parse-agent-2",
+      "id": "b9aae96d-0986-4f28-9d30-1f5e54bd79ab",
       "name": "Parse Agent 2 Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1344,
-        112
+        6736,
+        1312
       ]
     },
     {
@@ -211,13 +211,13 @@
         "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"temperature\": \"1\",\n  \"tools\": \"no-tools\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify({contact_name: $json.customer_name, analysis: $json.analysis}).toJsonString() }}\n    }\n  ],\n  \"wait_execution\": true\n}",
         "options": {}
       },
-      "id": "tess-agent-3",
+      "id": "c6e53afe-0d43-4bb8-bd99-48a93f1da269",
       "name": "Tess - Agent 3 (Message)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1568,
-        112
+        6960,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -230,13 +230,13 @@
       "parameters": {
         "jsCode": "// Parse resposta do Agente 3 (Message Generator)\nconst tessResponse = $input.first().json;\nconst message = tessResponse.responses?.[0]?.output || '';\n\nif (!message || message.length < 10) {\n  throw new Error('Mensagem inválida ou vazia');\n}\n\nif (message.length > 500) {\n  console.warn('Mensagem muito longa:', message.length);\n}\n\nreturn {\n  json: {\n    message: message.trim(),\n    customer_phone: $node['Parse Agent 2 Response'].json.customer_phone,\n    customer_name: $node['Parse Agent 2 Response'].json.customer_name,\n    analysis: $node['Parse Agent 2 Response'].json.analysis,\n    tess_credits_agent3: tessResponse.responses?.[0]?.credits\n  }\n};"
       },
-      "id": "parse-agent-3",
+      "id": "70d3f141-7cae-4ffa-8c54-f34216d6d821",
       "name": "Parse Agent 3 Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1792,
-        112
+        7152,
+        1312
       ]
     },
     {
@@ -250,13 +250,13 @@
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json.customer_phone.replace('+', '') }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $json.message }}\"\n  }\n}",
         "options": {}
       },
-      "id": "send-initial-whatsapp",
+      "id": "a7ca9fc7-796d-4352-b733-4425897abc87",
       "name": "Send Initial WhatsApp (Meta API)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        2016,
-        112
+        7360,
+        1312
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -272,13 +272,13 @@
         "query": "=INSERT INTO surveys (\n  customer_phone,\n  customer_name,\n  context_summary,\n  conversation_transcript,\n  status\n) VALUES (\n  '{{ $node['Parse Agent 3 Response'].json.customer_phone }}',\n  '{{ $node['Parse Agent 3 Response'].json.customer_name }}',\n  '{{ $node['Parse Agent 3 Response'].json.analysis.summary }}',\n  '[{\"role\": \"assistant\", \"content\": {{ $node['Parse Agent 3 Response'].json.message.toJsonString() }}}]'::jsonb,\n  'active'\n)\nRETURNING *",
         "options": {}
       },
-      "id": "supabase-create-survey",
+      "id": "3082574b-3b1f-4925-a068-fdb312c58a45",
       "name": "Supabase - Create Survey",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        2240,
-        112
+        7568,
+        1312
       ],
       "credentials": {
         "postgres": {
@@ -293,16 +293,15 @@
         "httpMethod": "GET, POST",
         "path": "whatsapp-meta",
         "responseMode": "responseNode",
-        "responseNode": "respond-webhook",
         "options": {}
       },
-      "id": "webhook-meta-whatsapp",
+      "id": "4e6d6fd6-2d4a-4091-af2f-187aa5fa525f",
       "name": "Webhook Meta WhatsApp",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -400,
-        600
+        4992,
+        1808
       ],
       "webhookId": "whatsapp-meta-webhook"
     },
@@ -333,15 +332,16 @@
             }
           ],
           "combinator": "and"
-        }
+        },
+        "options": {}
       },
-      "id": "check-verification",
+      "id": "09a985e2-4ae8-4cfc-b450-4f737612ca5b",
       "name": "Check Verification",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        -200,
-        600
+        5200,
+        1808
       ]
     },
     {
@@ -360,26 +360,26 @@
           }
         }
       },
-      "id": "respond-verification",
+      "id": "7c97e865-50ef-4067-9f52-f7011a3bbb2b",
       "name": "Respond Verification",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        0,
-        500
+        5392,
+        1712
       ]
     },
     {
       "parameters": {
         "jsCode": "// Parse mensagem da API Meta WhatsApp\nconst body = $input.first().json.body || $input.first().json;\n\nconst entry = body.entry?.[0];\nconst changes = entry?.changes?.[0];\nconst value = changes?.value;\nconst messages = value?.messages?.[0];\nconst contacts = value?.contacts?.[0];\n\nif (!messages) {\n  return { json: { skip: true } };\n}\n\nconst phoneNumber = messages.from;\nconst messageText = messages.text?.body || '';\nconst messageId = messages.id;\nconst timestamp = messages.timestamp;\n\nreturn {\n  json: {\n    phone: '+' + phoneNumber,\n    message: messageText,\n    message_id: messageId,\n    from_me: false,\n    timestamp: new Date(parseInt(timestamp) * 1000).toISOString(),\n    contact_name: contacts?.profile?.name || 'Cliente'\n  }\n};"
       },
-      "id": "parse-meta-message",
+      "id": "e0c39554-61be-490c-9025-8dbf12ca3ceb",
       "name": "Parse Meta Message",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        0,
-        700
+        5392,
+        1904
       ]
     },
     {
@@ -392,15 +392,16 @@
               "value2": true
             }
           ]
-        }
+        },
+        "options": {}
       },
-      "id": "filter-valid-messages",
+      "id": "372c689f-43df-4643-afdf-8fff11b35298",
       "name": "Filter Valid Messages",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2,
       "position": [
-        200,
-        700
+        5616,
+        1904
       ]
     },
     {
@@ -409,13 +410,13 @@
         "query": "=SELECT * FROM surveys WHERE customer_phone = '{{$json.phone}}' AND status = 'active' ORDER BY created_at DESC LIMIT 1",
         "options": {}
       },
-      "id": "supabase-get-survey",
+      "id": "bd6c8a83-019c-4339-b2dc-badc89f3c693",
       "name": "Supabase - Get Survey",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        400,
-        700
+        5808,
+        1904
       ],
       "credentials": {
         "postgres": {
@@ -428,13 +429,13 @@
       "parameters": {
         "jsCode": "// Prepara input para Agente 4 (Tess)\n// Sintaxe moderna do n8n\nconst survey = $('Supabase - Get Survey').first().json;\nconst newMessage = $('Parse Meta Message').first().json.message;\n\n// Parse conversation_transcript do banco e FAZER CÓPIA\nlet history = [];\nif (survey.conversation_transcript) {\n  if (typeof survey.conversation_transcript === 'string') {\n    history = [...JSON.parse(survey.conversation_transcript)];\n  } else if (Array.isArray(survey.conversation_transcript)) {\n    history = [...survey.conversation_transcript];  // CÓPIA do array!\n  }\n}\n\n// Adiciona mensagem do cliente ao histórico\nhistory.push({\n  role: 'user',\n  content: newMessage\n});\n\nconst turnCount = Math.floor(history.length / 2) + 1;\nconst contextSummary = survey.context_summary || 'Cliente respondendo pesquisa de satisfação';\n\nconst inputForTess = {\n  conversation_history: history,\n  turn_count: turnCount,\n  context_summary: contextSummary\n};\n\nreturn {\n  json: {\n    survey_id: survey.id,\n    phone: $('Parse Meta Message').first().json.phone,\n    tess_input: inputForTess,\n    conversation_history: history,\n    current_score: survey.satisfaction_score,\n    current_sentiment: survey.sentiment,\n    current_feedback: survey.main_feedback\n  }\n};"
       },
-      "id": "prepare-tess-input",
+      "id": "cc834017-c88a-4cbd-93bd-f54f4b21a4d8",
       "name": "Prepare Tess Input",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        600,
-        700
+        6224,
+        1904
       ]
     },
     {
@@ -448,13 +449,13 @@
         "jsonBody": "={\n  \"model\": \"gpt-4o-mini\",\n  \"temperature\": \"1\",\n  \"tools\": \"no-tools\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.tess_input).toJsonString() }}\n    }\n  ],\n  \"wait_execution\": true\n}",
         "options": {}
       },
-      "id": "tess-agent-4",
+      "id": "1ad019fd-0d89-4a52-9bd8-18184ff0aeba",
       "name": "Tess - Agent 4",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        800,
-        700
+        6416,
+        1904
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -465,15 +466,15 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse resposta da Tess\nconst tessResponse = $input.first().json;\nconst output = tessResponse.responses?.[0]?.output || '';\n\ntry {\n  const parsed = JSON.parse(output);\n  \n  if (!parsed.response || !parsed.status || !parsed.extracted_data) {\n    throw new Error('JSON incompleto');\n  }\n  \n  if (!parsed.extracted_data.sentiment && parsed.extracted_data.satisfaction_score) {\n    const score = parsed.extracted_data.satisfaction_score;\n    parsed.extracted_data.sentiment = score >= 4 ? 'positive' : score === 3 ? 'neutral' : 'negative';\n  }\n  \n  return { \n    json: {\n      ...parsed,\n      tess_response_id: tessResponse.responses?.[0]?.id,\n      tess_credits: tessResponse.responses?.[0]?.credits\n    }\n  };\n  \n} catch (error) {\n  console.error('Erro ao parsear resposta Tess:', error);\n  \n  if (output && typeof output === 'string') {\n    return {\n      json: {\n        response: output,\n        status: 'continue',\n        extracted_data: {\n          satisfaction_score: null,\n          main_feedback: null,\n          sentiment: null\n        },\n        tess_response_id: tessResponse.responses?.[0]?.id\n      }\n    };\n  }\n  \n  return {\n    json: {\n      response: 'Obrigada pelo contato!',\n      status: 'escalate',\n      extracted_data: {\n        satisfaction_score: null,\n        main_feedback: 'Erro ao processar resposta',\n        sentiment: 'neutral'\n      }\n    }\n  };\n}"
+        "jsCode": "// Parse resposta da Tess\nconst tessResponse = $input.first().json;\nconst rawOutput = tessResponse.responses?.[0]?.output || '';\n// Remove marcações markdown se presentes (```json ... ```)\nconst output = rawOutput.replace(/^```json\\n?/, '').replace(/\\n?```$/, '').trim();\n\ntry {\n  const parsed = JSON.parse(output);\n  \n  if (!parsed.response || !parsed.status || !parsed.extracted_data) {\n    throw new Error('JSON incompleto');\n  }\n  \n  if (!parsed.extracted_data.sentiment && parsed.extracted_data.satisfaction_score) {\n    const score = parsed.extracted_data.satisfaction_score;\n    parsed.extracted_data.sentiment = score >= 4 ? 'positive' : score === 3 ? 'neutral' : 'negative';\n  }\n  \n  return { \n    json: {\n      ...parsed,\n      tess_response_id: tessResponse.responses?.[0]?.id,\n      tess_credits: tessResponse.responses?.[0]?.credits\n    }\n  };\n  \n} catch (error) {\n  console.error('Erro ao parsear resposta Tess:', error);\n  \n  if (output && typeof output === 'string') {\n    return {\n      json: {\n        response: output,\n        status: 'continue',\n        extracted_data: {\n          satisfaction_score: null,\n          main_feedback: null,\n          sentiment: null\n        },\n        tess_response_id: tessResponse.responses?.[0]?.id\n      }\n    };\n  }\n  \n  return {\n    json: {\n      response: 'Obrigada pelo contato!',\n      status: 'escalate',\n      extracted_data: {\n        satisfaction_score: null,\n        main_feedback: 'Erro ao processar resposta',\n        sentiment: 'neutral'\n      }\n    }\n  };\n}"
       },
-      "id": "parse-tess-response",
+      "id": "09b6e301-118c-42bb-96a1-bcc429eca4a0",
       "name": "Parse Tess Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1000,
-        700
+        6624,
+        1904
       ]
     },
     {
@@ -487,13 +488,13 @@
         "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $node['Prepare Tess Input'].json.phone.replace('+', '') }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"{{ $json.response }}\"\n  }\n}",
         "options": {}
       },
-      "id": "send-meta-whatsapp",
+      "id": "7a707907-1820-49bc-8557-dd4cd5d18908",
       "name": "Send Meta WhatsApp",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1200,
-        700
+        6832,
+        1904
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -506,28 +507,28 @@
       "parameters": {
         "jsCode": "// Preparar dados para update no Supabase\n// Sintaxe moderna do n8n\nconst survey = $('Supabase - Get Survey').first().json;\nconst tessResponse = $('Parse Tess Response').first().json;\nconst prepareData = $('Prepare Tess Input').first().json;\n\n// Fazer CÓPIA do histórico antes de modificar\nconst conversationHistory = [...prepareData.conversation_history];\n\n// Adicionar resposta do bot ao histórico\nconversationHistory.push({\n  role: 'assistant',\n  content: tessResponse.response\n});\n\n// Preservar dados já extraídos (não sobrescrever com null)\nconst finalScore = tessResponse.extracted_data.satisfaction_score || prepareData.current_score || null;\nconst finalSentiment = tessResponse.extracted_data.sentiment || prepareData.current_sentiment || null;\nconst finalFeedback = tessResponse.extracted_data.main_feedback || prepareData.current_feedback || null;\n\nreturn {\n  json: {\n    survey_id: survey.id,\n    conversation_transcript: JSON.stringify(conversationHistory),\n    satisfaction_score: finalScore,\n    main_feedback: finalFeedback,\n    sentiment: finalSentiment,\n    status: tessResponse.status === 'completed' ? 'completed' : 'active'\n  }\n};"
       },
-      "id": "prepare-update-data",
+      "id": "8d0f1fab-51ab-4a9e-8f77-29f8566a8acd",
       "name": "Prepare Update Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1400,
-        700
+        8528,
+        1904
       ]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "=UPDATE surveys SET \n  conversation_transcript = '{{ $json.conversation_transcript }}'::jsonb,\n  satisfaction_score = {{ $json.satisfaction_score || 'NULL' }},\n  main_feedback = {{ $json.main_feedback ? \"'\" + $json.main_feedback + \"'\" : 'NULL' }},\n  sentiment = {{ $json.sentiment ? \"'\" + $json.sentiment + \"'\" : 'NULL' }},\n  status = '{{ $json.status }}',\n  updated_at = NOW()\nWHERE id = {{ $json.survey_id }}",
+        "query": "=UPDATE surveys SET \n  conversation_transcript = '{{ $json.conversation_transcript.replace(/'/g, \"''\") }}'::jsonb,\n  satisfaction_score = {{ $json.satisfaction_score || 'NULL' }},\n  main_feedback = {{ $json.main_feedback ? \"'\" + $json.main_feedback.replace(/'/g, \"''\") + \"'\" : 'NULL' }},\n  sentiment = {{ $json.sentiment ? \"'\" + $json.sentiment + \"'\" : 'NULL' }},\n  status = '{{ $json.status }}',\n  updated_at = NOW()\nWHERE id = {{ $json.survey_id }}",
         "options": {}
       },
-      "id": "supabase-update-survey",
+      "id": "fa2f05e2-bcbc-4ac3-82e6-94588534ca83",
       "name": "Supabase - Update Survey",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        1600,
-        700
+        8752,
+        1904
       ],
       "credentials": {
         "postgres": {
@@ -544,16 +545,493 @@
           "responseCode": 200
         }
       },
-      "id": "respond-webhook",
+      "id": "0de46ac7-ba1b-4dd3-8634-b81ba8e45028",
       "name": "Respond Webhook",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        1800,
-        700
+        8976,
+        1904
       ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.chatwoot.com/api/v1/accounts/150655/contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"inbox_id\": 94417,\n    \"name\": \"{{ $('Consolidate HubSpot Data').first().json.customer_name }}\",\n    \"phone_number\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"hubspot_id\": \"{{ $('Consolidate HubSpot Data').first().json.hubspot_data.contact.id }}\",\n      \"context_summary\": \"{{ JSON.parse($('Tess - Agent 2 (Context)').first().json.responses[0].output).summary }}\",\n      \"survey_id\": {{ $('Supabase - Create Survey').first().json.id }}\n    }\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8224,
+        1392
+      ],
+      "id": "bfd6f59c-ab52-419a-a9f1-53cbf9507a78",
+      "name": "Create Contact",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://app.chatwoot.com/api/v1/accounts/150655/conversations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"inbox_id\": 94417,\n    \"contact_id\": {{ $json.contact_id }},\n    \"source_id\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"survey_id\": \"{{ $('Supabase - Create Survey').first().json.id }}\",\n      \"type\": \"satisfaction_survey\"\n    }\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8848,
+        1280
+      ],
+      "id": "491c49d1-69e8-4311-b8ec-6e44f024b2b2",
+      "name": "Create Conversation",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Create Conversation').first().json.id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"content\": \"{{ $('Parse Agent 3 Response').first().json.message }}\",\n    \"message_type\": \"outgoing\",\n    \"private\": false\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        9248,
+        1280
+      ],
+      "id": "7a63e7af-096b-4219-851a-a187805924c4",
+      "name": "Send Message",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c5d0af78-03b0-4a4d-9290-33c1e31970cd",
+              "leftValue": "={{ $('Parse Tess Response').first().json.status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7328,
+        1904
+      ],
+      "id": "138ba924-fdfd-4a99-9950-4a198ebb95d2",
+      "name": "Check Status Completed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "553b645d-e4f4-4fff-aad5-9261c051b185",
+              "leftValue": "={{ $('Supabase - Get Survey').item.json.chatwoot_conversation_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7584,
+        1776
+      ],
+      "id": "14033222-09e0-42a1-9586-530898aad0ef",
+      "name": "Check Chatwoot ID Exists"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a0bc579d-e72e-40c9-be7e-e03c143a8e82",
+              "leftValue": "={{ $json.meta.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        7984,
+        1312
+      ],
+      "id": "43fdfc7e-1496-41a5-9fce-c7ca9d132547",
+      "name": "Contact Exists"
+    },
+    {
+      "parameters": {
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/contacts/search?q={{ $('Consolidate HubSpot Data').first().json.customer_phone }}&page=1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7776,
+        1312
+      ],
+      "id": "5a18c40c-2fe4-4e7a-bee9-46d9416a0e44",
+      "name": "Search Contact",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        8432,
+        1280
+      ],
+      "id": "6c8a7f1f-1086-4c5f-99cf-a30e2dd921fe",
+      "name": "Merge",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE surveys\n  SET chatwoot_conversation_id = {{ $('Create Conversation').first().json.id }}\n  WHERE id = {{ $('Supabase - Create Survey').first().json.id }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        9056,
+        1280
+      ],
+      "id": "176bd4a4-1b4c-4ee7-99ed-ef09d1f5a009",
+      "name": "Supabase - Save Chatwoot Conversation ID",
+      "credentials": {
+        "postgres": {
+          "id": "K9Jh4091LikXxxxv",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const searchPayload = $('Search Contact').first().json.payload;\n\nif (searchPayload && searchPayload.length > 0) {\n  // Contato já existia — veio do Search\n  return [{ json: { contact_id: searchPayload[0].id } }];\n} else {\n  // Contato foi criado agora — veio do Create\n  return [{ json: { contact_id: $('Create Contact').first().json.payload.contact.id } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        8640,
+        1280
+      ],
+      "id": "ab42ad5b-3627-4f97-acd3-c41fca5effe8",
+      "name": "Parse Contact ID"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"📊 Survey Concluído\\n\\n✅ Nota: {{ $('Parse Tess Response').first().json.extracted_data.satisfaction_score }}/5\\n✅ Sentiment: {{ $('Parse Tess Response').first().json.extracted_data.sentiment }}\\n✅ Feedback: {{ $('Parse Tess Response').first().json.extracted_data.main_feedback }}\",\n  \"message_type\": \"outgoing\",\n  \"private\": true\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7824,
+        1728
+      ],
+      "id": "8a8f8518-8eec-4a43-89c5-db175eac92d5",
+      "name": "Add Private Note",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"status\": \"resolved\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        8064,
+        1728
+      ],
+      "id": "58ab3af1-5684-40ab-8e64-250e6e6e26b0",
+      "name": "Mark Conversation Resolved",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        8320,
+        1904
+      ],
+      "id": "a41f7286-02f5-4f47-96c1-4b65d37d8c19",
+      "name": "Merge1",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"content\": \"{{ $('Parse Meta Message').first().json.message }}\",\n    \"message_type\": \"incoming\",\n    \"private\": false\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        6016,
+        1904
+      ],
+      "id": "7330e8fa-c7bc-403d-9233-84dd02f03934",
+      "name": "Send User Message to Chatwoot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"content\": \"{{ $('Parse Tess Response').first().json.response }}\",\n    \"message_type\": \"outgoing\",\n    \"private\": false\n  }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        7072,
+        1904
+      ],
+      "id": "c2fdd447-f25f-485b-a04b-4a80abebc9de",
+      "name": "Send Bot Response to Chatwoot",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "9FqN57FTIiolQYsc",
+          "name": "Chatwoot Cloud API"
+        }
+      }
     }
   ],
+  "pinData": {
+    "Schedule - Enviar Pesquisas": [
+      {
+        "json": {
+          "timestamp": "2026-02-03T14:56:15.344-03:00",
+          "Readable date": "February 3rd 2026, 2:56:15 pm",
+          "Readable time": "2:56:15 pm",
+          "Day of week": "Tuesday",
+          "Year": "2026",
+          "Month": "February",
+          "Day of month": "03",
+          "Hour": "14",
+          "Minute": "56",
+          "Second": "15",
+          "Timezone": "America/Sao_Paulo (UTC-03:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Webhook Meta WhatsApp": [
+      {
+        "json": {
+          "headers": {
+            "host": "albino.app.n8n.cloud",
+            "user-agent": "facebookexternalua",
+            "content-length": "504",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2a03:2880:10ff:74::",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9c848993113caf10-DFW",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "2a03:2880:10ff:74::, 162.159.104.8",
+            "x-forwarded-host": "albino.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-96-57f65f45bd-mctl7",
+            "x-hub-signature": "sha1=6d5fb053140f7ebfd4bd2826a901bcebd52e08d6",
+            "x-hub-signature-256": "sha256=1a599e552adc67ae7433db6983364f1d0e5216ce59a23487413b815e2796987b",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2a03:2880:10ff:74::"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "object": "whatsapp_business_account",
+            "entry": [
+              {
+                "id": "1255054259608433",
+                "changes": [
+                  {
+                    "value": {
+                      "messaging_product": "whatsapp",
+                      "metadata": {
+                        "display_phone_number": "551152868259",
+                        "phone_number_id": "674094992450703"
+                      },
+                      "contacts": [
+                        {
+                          "profile": {
+                            "name": "Albino Lima"
+                          },
+                          "wa_id": "5521981444992"
+                        }
+                      ],
+                      "messages": [
+                        {
+                          "from": "5521981444992",
+                          "id": "wamid.HBgNNTUyMTk4MTQ0NDk5MhUCABIYFjNFQjAzNjE5NjFDQUI0MkNBQURDMDAA",
+                          "timestamp": "1770149065",
+                          "text": {
+                            "body": "Gostei muito do atendimento"
+                          },
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "field": "messages"
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://albino.app.n8n.cloud/webhook/whatsapp-meta",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
   "connections": {
     "Schedule - Enviar Pesquisas": {
       "main": [
@@ -742,7 +1220,7 @@
       "main": [
         [
           {
-            "node": "Prepare Tess Input",
+            "node": "Send User Message to Chatwoot",
             "type": "main",
             "index": 0
           }
@@ -786,7 +1264,7 @@
       "main": [
         [
           {
-            "node": "Prepare Update Data",
+            "node": "Send Bot Response to Chatwoot",
             "type": "main",
             "index": 0
           }
@@ -814,12 +1292,209 @@
           }
         ]
       ]
+    },
+    "Create Contact": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create Conversation": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Save Chatwoot Conversation ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message": {
+      "main": [
+        []
+      ]
+    },
+    "Check Status Completed": {
+      "main": [
+        [
+          {
+            "node": "Check Chatwoot ID Exists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Check Chatwoot ID Exists": {
+      "main": [
+        [
+          {
+            "node": "Add Private Note",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Create Survey": {
+      "main": [
+        [
+          {
+            "node": "Search Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Contact": {
+      "main": [
+        [
+          {
+            "node": "Contact Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Parse Contact ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contact Exists": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Save Chatwoot Conversation ID": {
+      "main": [
+        [
+          {
+            "node": "Send Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Contact ID": {
+      "main": [
+        [
+          {
+            "node": "Create Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Private Note": {
+      "main": [
+        [
+          {
+            "node": "Mark Conversation Resolved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Conversation Resolved": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Update Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send User Message to Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Prepare Tess Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Bot Response to Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Check Status Completed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-  "active": false,
+  "active": true,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "availableInMCP": false
   },
-  "versionId": "complete-meta-api-v1",
+  "versionId": "92cf72f2-624d-4e7f-a840-c7710d3a0881",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "92d6759b0d5abe55175188fd74828c8fd26c59a4c86569a664d3b739d352e946"
+  },
+  "id": "OGo7ZY_sH3UTLb08hf9fb",
   "tags": []
 }
