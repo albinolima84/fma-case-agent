@@ -12,84 +12,83 @@ Reduzir de **30 minutos para ~2 minutos** o processo de análise e contato com c
 ## 2. Stack Tecnológica
 
 ### 2.1 Orquestração e Automação
-**Ferramenta:** n8n (Open Source)
+**Ferramenta:** n8n Cloud
 
 **Justificativa:**
-- Open-source: redução de custos operacionais (ROI +40%)
-- Self-hosted: controle total sobre dados sensíveis do CRM
 - Integração nativa com HubSpot, APIs de IA e webhooks
-- Suporte a código customizado (JavaScript/Python) para lógica complexa
+- Suporte a código customizado (JavaScript) para lógica complexa
 - Interface visual para manutenção futura pela equipe técnica
 - Sistema robusto de logs e retry em caso de falhas
-- Comunidade ativa com templates prontos
+- Webhook URL pública sem necessidade de servidor próprio
+- Tier gratuito suficiente para o volume atual
 
 **Alternativas descartadas:**
-- Make: Custo ~$300/mês em escala (vs $0 n8n self-hosted)
+- Make: Custo ~$300/mês em escala
 - Zapier: Limitado para lógica multi-step complexa
 
 ---
 
 ### 2.2 Motor de IA (LLM)
-**Ferramenta:** Claude 3.5 Sonnet (Anthropic API)
+**Ferramenta:** Tess AI (gpt-4o-mini)
 
 **Justificativa:**
-- Context window de 200k tokens: analisa histórico completo de 30 dias sem truncar
-- Excelente em conversas empáticas e naturais (essencial para satisfação)
-- Seguimento preciso de instruções estruturadas (system prompts)
-- Custo-benefício: ~$3 por milhão de tokens de input vs $10 GPT-4
-- Latência baixa (~2-3s para respostas complexas)
-- API estável e confiável
+- Modelo gpt-4o-mini: excelente custo-benefício para tarefas de análise e geração de texto
+- Suporte a agentes especializados com prompts configuráveis na plataforma Tess
+- Latência baixa (~1-3s por resposta)
+- API REST simples: execute via endpoint `/agents/{id}/execute`
+- Integração direta com n8n via HTTP Request
 
-**Configuração sugerida:**
-- Model: `claude-3-5-sonnet-20241022`
-- Temperature: 0.7 (equilíbrio entre criatividade e consistência)
-- Max tokens: 1024 (mensagens concisas)
+**Configuração (por agente):**
+- Agente 2 (Context Analyzer): ID `38717`, Temperature `1`
+- Agente 3 (Message Generator): ID `38728`, Temperature `1`
+- Agente 4 (Conversation Handler): ID `38733`, Temperature `1`
 
-**Alternativa:** GPT-4o (custo maior, mas bom fallback)
+**Formato de resposta:** `responses[0].output` — string que pode conter marcações ````json``` ` (tratamento de sanitização aplicado no workflow)
 
 ---
 
 ### 2.3 Canal de Mensageria
-**Ferramenta:** Evolution API + WhatsApp Business
+**Ferramenta:** Meta WhatsApp Business API (oficial)
 
 **Justificativa:**
-- Evolution API: open-source, self-hosted, gratuita
-- Integração completa com WhatsApp (não oficial mas estável)
-- Suporte a webhooks bidirecionais (envio + recebimento)
-- Rastreamento de status: enviado, entregue, lido
-- Permite múltiplas instâncias (escalabilidade)
-- API REST simples para integração com n8n
+- API oficial da Meta: máxima estabilidade e confiabilidade
+- Webhooks 100% confiáveis para recebimento de mensagens
+- Envio de mensagens de texto livre (sem necessidade de templates pré-aprovados para sessões abertas)
+- Infraestrutura robusta da Meta com SLA garantido
+- Sem custos por mensagem no volume atual (taxa de plataforma aplicável)
 
-**Alternativas consideradas:**
-- Twilio WhatsApp Business API: custo ~$0.005/msg + setup complexo
-- Telegram Bot API: gratuito, mas menor adoção no Brasil
-- SMS via Twilio: custo alto (~$0.02/SMS)
+**Credenciais do ambiente:**
+- Phone Number ID: `674094992450703`
+- Número do Bot: `+55 11 5286-8259`
+- API Version: `v21.0`
+- Webhook: `https://albino.app.n8n.cloud/webhook/whatsapp-meta`
 
-**Para voz (opcional):**
-- Vapi.ai ou Bland.ai: APIs de conversação por voz com IA
-- Custo: ~$0.10-0.15/minuto
+**Alternativas descartadas:**
+- Evolution API: não oficial, risco de bloqueio pela Meta
+- Twilio WhatsApp: custo adicional por mensagem (~$0.005/msg)
+- Telegram Bot API: menor adoção no Brasil
 
 ---
 
 ### 2.4 Interface de Monitoramento
-**Ferramenta:** Chatwoot (Open Source)
+**Ferramenta:** Chatwoot Cloud ($19/mês)
 
 **Justificativa:**
 - Plataforma madura de helpdesk/live chat com todas as features necessárias:
   - Interface de conversas em tempo real
   - Histórico completo e busca
   - Dashboard com métricas e relatórios
-  - Sistema de tags e notas
-  - **Intervenção manual**: gerente pode assumir conversa
+  - Sistema de tags e notas privadas
+  - **Intervenção manual**: gerente pode assumir conversa a qualquer momento
   - Múltiplos usuários/equipes
   - Mobile app (iOS/Android)
-- Self-hosted: $0 de custo
 - API REST completa para integração com n8n
-- Reduz tempo de desenvolvimento de 7-10 dias para 2-3 dias
+- Sem necessidade de deploy próprio (Cloud gerenciado)
+- Reduz tempo de desenvolvimento de 7-10 dias para integração direta
 
 **Alternativas descartadas:**
+- Chatwoot self-hosted: heap out of memory no tier gratuito (512MB RAM insuficiente)
 - Desenvolvimento custom (Next.js): 7-10 dias, alto custo
-- Appsmith/Budibase: requer desenvolvimento, sem features de chat
 - n8n interface nativa: muito técnica para gerentes de qualidade
 
 ---
@@ -188,7 +187,7 @@ O sistema utiliza **4 agentes especializados** trabalhando em pipeline sequencia
 - Avaliar nível de engajamento
 - Sugerir tom da mensagem (empático, celebratório, investigativo)
 
-**Tecnologia:** Claude 3.5 Sonnet com prompt especializado
+**Tecnologia:** Tess AI — Agente 2 (Context Analyzer, ID `38717`)
 
 **Output:**
 ```json
@@ -213,7 +212,7 @@ O sistema utiliza **4 agentes especializados** trabalhando em pipeline sequencia
 - Call-to-action claro (responder sobre satisfação)
 - Brevidade (máximo 3-4 linhas)
 
-**Tecnologia:** Claude 3.5 Sonnet com few-shot examples
+**Tecnologia:** Tess AI — Agente 3 (Message Generator, ID `38728`)
 
 **Output:** Mensagem pronta para envio (texto)
 
@@ -239,7 +238,7 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
 - Detectar quando conversa foi concluída
 - Saber quando escalar para humano (se solicitado)
 
-**Tecnologia:** Claude 3.5 Sonnet em modo conversacional (mantém contexto)
+**Tecnologia:** Tess AI — Agente 4 (Conversation Handler V2.0, ID `38733`)
 
 **Output:**
 - Nota de satisfação (1-5)
@@ -278,7 +277,7 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
                          │
                          ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│           2. AGENTE CONTEXT ANALYZER (Claude 3.5 Sonnet)        │
+│           2. AGENTE CONTEXT ANALYZER (Tess AI — Agent 2)       │
 │                                                                  │
 │  Input: Raw customer data (JSON, até 20kb)                     │
 │                                                                  │
@@ -297,7 +296,7 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
                          │
                          ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│        3. AGENTE MESSAGE GENERATOR (Claude 3.5 Sonnet)          │
+│        3. AGENTE MESSAGE GENERATOR (Tess AI — Agent 3)         │
 │                                                                  │
 │  Input: Context analysis + contact name                         │
 │                                                                  │
@@ -311,18 +310,19 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
                          │
                          ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│              4. ENVIO VIA EVOLUTION API (WhatsApp)              │
+│         4. ENVIO VIA META WHATSAPP API (oficial)                │
 │                                                                  │
-│  POST /message/sendText                                         │
+│  POST /v21.0/{phone_number_id}/messages                         │
 │  {                                                              │
-│    "number": "5511999999999",                                   │
-│    "textMessage": {                                             │
-│      "text": "[mensagem gerada]"                                │
-│    }                                                            │
+│    "messaging_product": "whatsapp",                             │
+│    "recipient_type": "individual",                              │
+│    "to": "5521981444992",                                       │
+│    "type": "text",                                              │
+│    "text": { "body": "[mensagem gerada]" }                     │
 │  }                                                              │
 │                                                                  │
 │  ✓ Mensagem enviada                                            │
-│  ✓ Status: delivered / read (webhook)                          │
+│  ✓ Webhook dispara na resposta do cliente                      │
 └────────────────────────┬────────────────────────────────────────┘
                          │
                          ↓
@@ -341,21 +341,26 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
                          │
                          ↓ (cliente responde)
 ┌─────────────────────────────────────────────────────────────────┐
-│           6. WEBHOOK RECEBE RESPOSTA (Evolution API)            │
+│          6. WEBHOOK RECEBE RESPOSTA (Meta WhatsApp API)         │
 │                                                                  │
-│  POST /webhook/n8n-receiver                                     │
+│  POST /webhook/whatsapp-meta                                    │
 │  {                                                              │
-│    "event": "messages.upsert",                                  │
-│    "data": {                                                    │
-│      "key": { "remoteJid": "5511999999999@s.whatsapp.net" },   │
-│      "message": { "conversation": "Muito bom! Dou nota 5!" }   │
-│    }                                                            │
+│    "entry": [{                                                  │
+│      "changes": [{                                              │
+│        "value": {                                               │
+│          "messages": [{                                         │
+│            "from": "5521981444992",                             │
+│            "text": { "body": "Muito bom! Dou nota 5!" }       │
+│          }]                                                     │
+│        }                                                        │
+│      }]                                                         │
+│    }]                                                           │
 │  }                                                              │
 └────────────────────────┬────────────────────────────────────────┘
                          │
                          ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│      7. AGENTE CONVERSATION HANDLER (Claude 3.5 Sonnet)         │
+│      7. AGENTE CONVERSATION HANDLER (Tess AI — Agent 4 V2.0)   │
 │                                                                  │
 │  Input:                                                         │
 │  - Contexto anterior (histórico da conversa)                   │
@@ -431,9 +436,8 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
 
 **Intervenção Manual:**
 - Gerente pode assumir conversa a qualquer momento
-- IA detecta e para de responder automaticamente
 - Gerente vê todo o contexto antes de assumir
-- Pode retornar para IA depois (se desejar)
+- **Nota:** a IA não para automaticamente quando o gerente intervém — o bot continua processando mensagens do cliente via webhook. Parar a IA na intervenção é uma proposta futura (ver doc 03, Propostas Futuras item 4)
 
 **Relatórios:**
 - Export CSV com todas as pesquisas
@@ -447,133 +451,62 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
 
 ```javascript
 // n8n node: Chatwoot - Create Conversation
-POST https://chatwoot.seudominio.com/api/v1/accounts/{account_id}/conversations
+POST https://app.chatwoot.com/api/v1/accounts/150655/conversations
 Headers: {
-  "api_access_token": "{{$env.CHATWOOT_API_TOKEN}}"
+  "api_access_token": "{CHATWOOT_API_TOKEN}"
 }
 Body: {
-  "inbox_id": 1,
-  "contact_id": "{{$node.CreateContact.json.id}}",
+  "inbox_id": 94417,
+  "contact_id": "{contact_id}",
+  "source_id": "{customer_phone}",
   "additional_attributes": {
-    "hubspot_contact_id": "{{$json.hubspot_id}}",
-    "context_summary": "{{$json.context.summary}}",
-    "survey_id": "{{$json.survey_id}}"
+    "hubspot_contact_id": "{hubspot_id}",
+    "context_summary": "{context_summary}",
+    "survey_id": "{survey_id}"
   }
 }
 ```
 
 **Sincronização de mensagens:**
-- Webhook do Evolution API → n8n → Chatwoot API
-- Cada mensagem (enviada/recebida) registrada no Chatwoot
-- Tags automáticas: `ai-agent`, `satisfacao`, `score-{1-5}`
+- Webhook Meta → n8n → Chatwoot API
+- Cada mensagem do cliente registrada como `incoming`
+- Cada resposta do bot registrada como `outgoing`
+- Nota privada automática com score/sentiment/feedback quando survey é concluído
+- Conversa marcada como resolvida automaticamente após conclusão
 
 ---
 
 ## 6. Infraestrutura e Deploy
 
-### 6.1 Servidores Necessários
+### 6.1 Serviços Utilizados (todos Cloud/gerenciados)
 
-**Opção 1: VPS Único (Recomendado para piloto)**
-- Provedor: DigitalOcean / Hetzner / Contabo
-- Specs: 4 vCPU, 8GB RAM, 160GB SSD
-- Custo: ~$20-40/mês
-- Serviços instalados:
-  - n8n (Docker)
-  - Evolution API (Docker)
-  - Chatwoot (Docker)
-  - PostgreSQL (Docker)
-  - Nginx (reverse proxy)
+| Serviço | Plano | Custo |
+|---------|-------|-------|
+| n8n Cloud | Free tier | $0 |
+| Supabase | Free tier | $0 |
+| Chatwoot Cloud | Pro | $19/mês |
+| Tess AI | Créditos | variável |
+| Meta WhatsApp API | Plataforma | variável |
+| HubSpot | Existente | $0 adicional |
 
-**Opção 2: Serviços Gerenciados (Produção)**
-- n8n: n8n Cloud ($50/mês) ou self-hosted
-- Supabase: Tier gratuito ou Pro ($25/mês)
-- Evolution API: Self-hosted
-- Chatwoot: Self-hosted ou Cloud ($19/mês)
-- Custo total: ~$50-100/mês
+**Vantagem:** Zero servidores próprios. Todo o sistema opera em serviços gerenciados na nuvem.
 
-### 6.2 Docker Compose Setup
+### 6.2 Credenciais no n8n
 
-```yaml
-# docker-compose.yml (simplificado)
-version: '3.8'
+As credenciais são configuradas diretamente no n8n Cloud:
+- **Chatwoot Cloud API** — Header Auth com `api_access_token`
+- **Tess AI** — HTTP Request com bearer token
+- **Supabase** — Postgres Execute com connection string
+- **Meta WhatsApp API** — HTTP Request com token de acesso permanente
+- **HubSpot** — HTTP Request com API key
 
-services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_DB: n8n
-      POSTGRES_USER: n8n
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+### 6.3 Webhook Meta → n8n
 
-  n8n:
-    image: n8nio/n8n:latest
-    ports:
-      - "5678:5678"
-    environment:
-      - DB_TYPE=postgresdb
-      - DB_POSTGRESDB_HOST=postgres
-      - N8N_BASIC_AUTH_USER=${N8N_USER}
-      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD}
-      - WEBHOOK_URL=https://n8n.seudominio.com/
-    volumes:
-      - n8n_data:/home/node/.n8n
-    depends_on:
-      - postgres
-
-  evolution-api:
-    image: atendai/evolution-api:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - DATABASE_ENABLED=true
-      - DATABASE_PROVIDER=postgresql
-      - DATABASE_CONNECTION_URI=postgresql://postgres:${DB_PASSWORD}@postgres:5432/evolution
-    volumes:
-      - evolution_data:/evolution/instances
-
-  chatwoot:
-    image: chatwoot/chatwoot:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - POSTGRES_HOST=postgres
-      - POSTGRES_DATABASE=chatwoot
-      - POSTGRES_USERNAME=chatwoot
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - REDIS_URL=redis://redis:6379
-      - SECRET_KEY_BASE=${CHATWOOT_SECRET}
-    depends_on:
-      - postgres
-      - redis
-
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  n8n_data:
-  evolution_data:
-  redis_data:
 ```
-
-### 6.3 Variáveis de Ambiente Necessárias
-
-```bash
-# .env
-DB_PASSWORD=senha_segura_aqui
-N8N_USER=admin
-N8N_PASSWORD=senha_n8n
-CHATWOOT_SECRET=$(openssl rand -hex 64)
-
-# APIs externas
-HUBSPOT_API_KEY=pat-na-...
-ANTHROPIC_API_KEY=sk-ant-...
-SUPABASE_URL=https://xxx.supabase.co
-SUPABASE_ANON_KEY=eyJ...
+URL: https://albino.app.n8n.cloud/webhook/whatsapp-meta
+Verify Token: satisfaction-survey-2026
+Subscription: messages
+Status: Verificado e ativo
 ```
 
 ---
@@ -624,15 +557,16 @@ SUPABASE_ANON_KEY=eyJ...
 ### 8.2 Métricas Técnicas (n8n + Logs)
 - Taxa de sucesso de workflows (%)
 - Latência média de cada agente
-- Erros de API (HubSpot, Claude, Evolution)
+- Erros de API (HubSpot, Meta WhatsApp, Tess AI)
 - Uptime dos serviços
-- Uso de tokens da API Claude (controle de custo)
+- Uso de créditos Tess AI (controle de custo)
 
-### 8.3 Alertas
+### 8.3 Alertas *(não implementado — proposta futura)*
+Alertas automáticos não existem no MVP atual. Possibilidades para implementação futura:
 - Email/Slack se taxa de erro > 5%
-- Notificação se cliente dá score 1-2 (NPS detractor)
-- Alerta se Evolution API cair (WhatsApp offline)
-- Warning se uso de tokens Claude exceder budget diário
+- Notificação se cliente dá score 1-2
+- Alerta se webhook Meta parar de funcionar
+- Warning se créditos Tess AI ficarem baixos
 
 ---
 
@@ -644,17 +578,18 @@ SUPABASE_ANON_KEY=eyJ...
 - 1 gerente de qualidade monitorando
 
 ### Escalabilidade Técnica
-- n8n: suporta 1000+ execuções/dia em VPS básica
-- Evolution API: múltiplas instâncias do WhatsApp (1 por número)
-- Claude API: rate limit 50 req/min (3000/hora)
-- Chatwoot: suporta 10k+ conversas sem degradação
+- n8n Cloud: suporta 1000+ execuções/dia
+- Meta WhatsApp API: rate limit alto, suporta múltiplos números de negócio
+- Tess AI: escalabilidade gerenciada pela plataforma
+- Chatwoot Cloud: suporta 10k+ conversas sem degradação
+- Supabase: escala automática do banco de dados
 
 ### Plano de Escala (se piloto funcionar)
-1. Adicionar mais números de WhatsApp (Evolution multi-instance)
-2. Upgrade VPS (8 vCPU, 16GB RAM)
-3. Separar serviços em VMs dedicadas
-4. Implementar cache (Redis) para dados do HubSpot
-5. Load balancer para n8n (múltiplos workers)
+1. Adicionar mais números WhatsApp no Meta Business
+2. Upgrade Supabase para Pro ($25/mês)
+3. Upgrade n8n Cloud para plano com mais execuções
+4. Implementar cache para dados do HubSpot
+5. Dashboard analytics via Grafana + Supabase
 
 ---
 
@@ -664,51 +599,54 @@ SUPABASE_ANON_KEY=eyJ...
 
 | Item | Custo |
 |------|-------|
-| VPS (4vCPU, 8GB) | $30 |
-| Claude API (150k tokens/dia) | $15 |
-| Domínio + SSL | $2 |
-| Backup (S3) | $3 |
-| **Total** | **$50/mês** |
+| n8n Cloud | $0 (free tier) |
+| Supabase | $0 (free tier) |
+| Chatwoot Cloud | $19 |
+| Tess AI (créditos) | ~$5-10 |
+| Meta WhatsApp API | variável |
+| **Total** | **~$25-30/mês** |
 
 ### Produção (200 pesquisas/dia)
 
 | Item | Custo |
 |------|-------|
-| VPS (8vCPU, 16GB) | $60 |
-| Claude API (600k tokens/dia) | $60 |
+| n8n Cloud (Pro) | $25 |
 | Supabase Pro | $25 |
-| Domínio + SSL | $2 |
-| Backup + CDN | $10 |
-| **Total** | **$157/mês** |
+| Chatwoot Cloud | $19 |
+| Tess AI (créditos) | ~$20-40 |
+| Meta WhatsApp API | variável |
+| **Total** | **~$90-110/mês** |
 
-**Nota:** Twilio WhatsApp seria +$30-60/mês. Evolution API = $0.
+**Nota:** Todos os serviços são gerenciados na nuvem. Sem servidores próprios ou VPS necessários.
 
 ---
 
 ## 11. Diferenciais Competitivos desta Arquitetura
 
-1. **Open-source first:** Reduz custos em 70% vs soluções proprietárias
-2. **Multi-agent pattern:** Cada agente especializado = melhor qualidade
-3. **Rastreabilidade completa:** Tudo registrado (compliance + insights)
-4. **Interface profissional:** Chatwoot = UX enterprise sem custo de dev
-5. **Escalável:** De 50 para 1000 pesquisas/dia sem reescrever código
-6. **Flexível:** Fácil adicionar novos canais (SMS, Telegram, voz)
-7. **Manutenível:** Visual workflow (n8n) + código versionado (git)
+1. **Cloud-first:** Zero servidores próprios, custo operacional mínimo (~$25-30/mês piloto)
+2. **Multi-agent pattern:** 4 agentes especializados via Tess AI = melhor qualidade e manutenibilidade
+3. **API oficial da Meta:** WhatsApp Business API oficial — máxima estabilidade e sem risco de bloqueio
+4. **Rastreabilidade completa:** Histórico em PostgreSQL (Supabase) + monitoramento em tempo real (Chatwoot)
+5. **Interface profissional:** Chatwoot Cloud = UX enterprise com intervenção manual pelo gerente
+6. **Escalável:** De 50 para 1000 pesquisas/dia sem reescrever código
+7. **Flexível:** Fácil adicionar novos canais (SMS, Telegram, voz)
+8. **Manutenível:** Visual workflow (n8n) + prompts versionados (git)
 
 ---
 
 ## Próximos Passos
 
-1. ✅ Arquitetura definida
-2. ⏳ Criar fluxogramas AS-IS e TO-BE
-3. ⏳ Desenvolver prompts dos 4 agentes
-4. ⏳ Implementar workflow n8n funcional
-5. ⏳ Configurar ambiente de teste
-6. ⏳ Executar pesquisa piloto com 1 cliente
-7. ⏳ Documentar resultados e ROI
+1. ✅ Arquitetura definida e implementada
+2. ✅ Fluxogramas AS-IS e TO-BE criados
+3. ✅ Prompts dos 4 agentes desenvolvidos e otimizados
+4. ✅ Workflow n8n funcional (FLUXO 1 + FLUXO 2)
+5. ✅ Ambiente configurado (Meta API, Chatwoot Cloud, Supabase)
+6. ✅ Pesquisa piloto executada e validada end-to-end
+7. ✅ Resultados e ROI documentados
+8. ⏳ Dashboard analytics (Fase 3 — opcional)
 
 ---
 
 **Documento elaborado para:** Case Agent Dev - FMA/Pareto/IA Leader
-**Data:** Janeiro 2026
-**Versão:** 1.0
+**Data:** Fevereiro 2026
+**Versão:** 2.0
