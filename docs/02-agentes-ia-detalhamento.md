@@ -105,28 +105,13 @@ Body:
 }
 ```
 
-**Node 5: Get Notes/Activities**
-```http
-GET https://api.hubapi.com/crm/v3/objects/notes/search
-Body:
-{
-  "filterGroups": [{
-    "filters": [
-      { "propertyName": "associations.contact", "operator": "EQ", "value": "{contact_id}" },
-      { "propertyName": "hs_timestamp", "operator": "GTE", "value": "{30_days_ago_timestamp}" }
-    ]
-  }]
-}
-```
-
-**Node 6: Merge and Structure Data** (Function node - JavaScript)
+**Node 5: Merge and Structure Data** (Function node - JavaScript)
 ```javascript
 // Consolida todos os dados em JSON estruturado
 const contact = $node["Get Contact"].json;
 const deals = $node["Get Deals"].json.results;
 const emails = $node["Get Emails"].json.results;
 const tickets = $node["Get Tickets"].json.results;
-const notes = $node["Get Notes"].json.results;
 
 return {
   contact: {
@@ -140,8 +125,7 @@ return {
   summary: {
     total_emails: emails.length,
     total_deals: deals.length,
-    total_tickets: tickets.length,
-    total_notes: notes.length
+    total_tickets: tickets.length
   },
   deals: deals.map(d => ({
     id: d.id,
@@ -164,12 +148,7 @@ return {
     category: t.properties.hs_ticket_category, // churn, downgrade, support, etc
     created_date: t.properties.createdate,
     closed_date: t.properties.closed_date
-  })),
-  notes: notes.map(n => ({
-    body: n.properties.hs_note_body,
-    timestamp: n.properties.hs_timestamp
-  })),
-  products: [] // TODO: se HubSpot tiver produtos associados
+  }))
 };
 ```
 
@@ -187,8 +166,7 @@ return {
   "summary": {
     "total_emails": 12,
     "total_deals": 2,
-    "total_tickets": 1,
-    "total_notes": 3
+    "total_tickets": 1
   },
   "deals": [
     {
@@ -217,14 +195,7 @@ return {
       "created_date": "2025-01-18T09:00:00Z",
       "closed_date": "2025-01-18T15:00:00Z"
     }
-  ],
-  "notes": [
-    {
-      "body": "Cliente demonstrou interesse em features avançadas",
-      "timestamp": "2025-01-12T16:00:00Z"
-    }
-  ],
-  "products": []
+  ]
 }
 ```
 
@@ -236,7 +207,7 @@ return {
 
 ### Performance
 - **Tempo médio de execução:** 5-8 segundos
-- **Paralelização:** Chamadas de API podem ser feitas em paralelo (n8n suporta)
+- **Chamadas sequenciais:** Get Contact → Get Emails → Get Deals → Get Tickets
 - **Cache:** Considerar cache de 1h para contatos que não mudaram (otimização futura)
 
 ---
@@ -247,7 +218,7 @@ return {
 Analisar dados brutos do HubSpot e gerar insights focados em satisfação do cliente, identificando eventos-chave e determinando o tom adequado para a abordagem.
 
 ### Tipo de Agente
-**LLM** - Claude 3.5 Sonnet via Anthropic API
+**LLM** - Tess AI (gpt-4o-mini) — Agente ID `38717`
 
 ### Input
 Output completo do Agente 1 (JSON com ~5-20kb)
@@ -346,7 +317,6 @@ Retorne APENAS um JSON válido, sem markdown nem explicações adicionais:
     "total_emails": 12,
     "total_deals": 2,
     "total_tickets": 1,
-    "total_notes": 3
   },
   "deals": [
     {
@@ -381,12 +351,6 @@ Retorne APENAS um JSON válido, sem markdown nem explicações adicionais:
       "created_date": "2025-01-18T09:00:00Z",
       "closed_date": "2025-01-18T15:00:00Z"
     }
-  ],
-  "notes": [
-    {
-      "body": "Cliente demonstrou interesse em features avançadas durante call de onboarding",
-      "timestamp": "2025-01-12T16:00:00Z"
-    }
   ]
 }
 ```
@@ -412,13 +376,13 @@ Retorne APENAS um JSON válido, sem markdown nem explicações adicionais:
 }
 ```
 
-### Parâmetros de Configuração (Anthropic API)
+### Parâmetros de Configuração (Tess AI)
 ```javascript
-{
-  model: "claude-3-5-sonnet-20241022",
-  max_tokens: 1024,
-  temperature: 0.3, // Baixa para consistência e objetividade
-  system: "{PROMPT_SYSTEM_ACIMA}",
+// HTTP Request para Tess AI
+POST https://api.tess.im/agents/38717/execute
+Headers: { Authorization: "Bearer {TESS_TOKEN}" }
+Body: {
+  temperature: "1",
   messages: [
     {
       role: "user",
@@ -430,11 +394,14 @@ Retorne APENAS um JSON válido, sem markdown nem explicações adicionais:
 
 ### Tratamento de Resposta
 ```javascript
-// n8n Function node para validar output
-const response = $node["Claude_Analyzer"].json.content[0].text;
+// n8n Code node para validar output do Tess
+const rawOutput = $('Tess - Agent 2 (Context)').first().json.responses[0].output;
+
+// Tess pode retornar output com ou sem marcações ```json``` — sanitizar antes de parsear
+const cleaned = rawOutput.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
 
 try {
-  const analysis = JSON.parse(response);
+  const analysis = JSON.parse(cleaned);
 
   // Validações
   const validSentiments = ["very_positive", "positive", "neutral", "negative", "very_negative"];
@@ -448,25 +415,25 @@ try {
     throw new Error(`Invalid tone: ${analysis.suggested_tone}`);
   }
 
-  return analysis;
+  return [{ json: analysis }];
 
 } catch (error) {
   // Fallback: se parsing falhar, usar valores default
-  return {
+  return [{ json: {
     summary: "Erro ao analisar contexto. Prosseguindo com abordagem neutra.",
     sentiment: "neutral",
     key_events: [],
     suggested_tone: "curious",
     red_flags: ["Erro na análise automática"],
     personalization_points: []
-  };
+  }}];
 }
 ```
 
 ### Performance
 - **Tempo médio:** 2-4 segundos
-- **Tokens consumidos:** ~1500 input + 400 output = 1900 tokens/análise
-- **Custo:** ~$0.006 por análise ($3 por milhão de tokens input, $15 por milhão output)
+- **Modelo:** gpt-4o-mini via Tess AI
+- **Custo:** baseado em créditos Tess AI
 
 ---
 
@@ -476,7 +443,7 @@ try {
 Criar mensagem personalizada de abertura para iniciar a conversa de satisfação via WhatsApp.
 
 ### Tipo de Agente
-**LLM** - Claude 3.5 Sonnet via Anthropic API
+**LLM** - Tess AI (gpt-4o-mini) — Agente ID `38728`
 
 ### Input
 ```json
@@ -598,13 +565,13 @@ A mensagem deve estar pronta para ser enviada via WhatsApp.
 Oi João! Vi que você fez upgrade para o Plano Pro recentemente. Como está sendo a experiência com as funcionalidades avançadas? De 1 a 5, como você avalia nosso serviço?
 ```
 
-### Parâmetros de Configuração
+### Parâmetros de Configuração (Tess AI)
 ```javascript
-{
-  model: "claude-3-5-sonnet-20241022",
-  max_tokens: 256,
-  temperature: 0.7, // Moderada para criatividade natural
-  system: "{PROMPT_SYSTEM_ACIMA}",
+// HTTP Request para Tess AI
+POST https://api.tess.im/agents/38728/execute
+Headers: { Authorization: "Bearer {TESS_TOKEN}" }
+Body: {
+  temperature: "1",
   messages: [
     {
       role: "user",
@@ -619,27 +586,24 @@ Oi João! Vi que você fez upgrade para o Plano Pro recentemente. Como está sen
 
 ### Validação de Output
 ```javascript
-// n8n Function node
-const message = $node["Claude_MessageGen"].json.content[0].text.trim();
+// n8n Code node — Parse Agent 3 Response
+const rawOutput = $('Tess - Agent 3 (Message)').first().json.responses[0].output;
+
+// Sanitizar marcações ```json``` se presentes
+const message = rawOutput.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
 
 // Validações
 if (message.length > 400) {
-  // Mensagem muito longa, truncar ou regenerar
   console.warn("Mensagem muito longa:", message.length);
 }
 
-if (!message.includes("1 a 5") && !message.includes("1-5")) {
-  // Não solicitou nota explicitamente
-  console.warn("Mensagem não solicita nota de 1-5");
-}
-
-return { message };
+return [{ json: { message } }];
 ```
 
 ### Performance
 - **Tempo médio:** 1-2 segundos
-- **Tokens:** ~600 input + 100 output = 700 tokens
-- **Custo:** ~$0.003 por mensagem
+- **Modelo:** gpt-4o-mini via Tess AI
+- **Custo:** baseado em créditos Tess AI
 
 ---
 
@@ -649,7 +613,7 @@ return { message };
 Conduzir conversa bidirecional com o cliente, responder perguntas, extrair nota de satisfação e finalizar graciosamente.
 
 ### Tipo de Agente
-**LLM Stateful** - Claude 3.5 Sonnet com histórico de conversa (mensagens anteriores mantidas)
+**LLM Stateful** - Tess AI (gpt-4o-mini) — Agente ID `38733` (Conversation Handler V2.0)
 
 ### Input
 ```json
@@ -811,106 +775,92 @@ Retorne um JSON com:
 ```
 ```
 
-### Parâmetros de Configuração
+### Parâmetros de Configuração (Tess AI)
 ```javascript
-{
-  model: "claude-3-5-sonnet-20241022",
-  max_tokens: 256,
-  temperature: 0.8, // Mais alta para naturalidade conversacional
-  system: "{PROMPT_SYSTEM_ACIMA}",
-  messages: conversationHistory // Array completo de mensagens anteriores
+// HTTP Request para Tess AI
+POST https://api.tess.im/agents/38733/execute
+Headers: { Authorization: "Bearer {TESS_TOKEN}" }
+Body: {
+  temperature: "1",
+  messages: conversationHistory // Array completo: [{ role, content }, ...]
 }
 ```
 
-### Lógica de Loop (n8n)
+### Lógica de Processamento (n8n)
 ```javascript
-// n8n Function node - Conversation Loop Logic
-const response = JSON.parse($node["Claude_Conversation"].json.content[0].text);
+// n8n Code node — Parse Tess Response
+const rawOutput = $('Tess - Agent 4 (Conversation)').first().json.responses[0].output;
 
-// Tracking
-const currentTurn = $json.turn_count || 1;
-const maxTurns = 5;
+// Sanitizar marcações ```json``` (não-determinístico no Tess)
+const cleaned = rawOutput.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim();
+const response = JSON.parse(cleaned);
 
-// Decisão de continuar ou parar
-if (response.status === "completed" || response.status === "escalate") {
-  // Finalizar
-  return {
-    ...response,
-    should_continue: false,
-    final_status: response.status
-  };
-}
+// O status retornado pelo Agent 4 V2.0 decide o fluxo:
+// "completed" → finaliza, salva score/feedback, marca resolvido no Chatwoot
+// "continue"  → envia resposta e aguarda próxima mensagem do cliente
+// "escalate"  → transfere para gerente no Chatwoot
 
-if (currentTurn >= maxTurns) {
-  // Limite de turnos atingido, finalizar mesmo sem nota
-  return {
-    response: "Obrigada pelo seu tempo! Qualquer coisa, estamos à disposição. 😊",
-    status: "completed",
-    extracted_data: response.extracted_data,
-    should_continue: false,
-    final_status: "timeout"
-  };
-}
-
-// Continuar conversa
-return {
-  ...response,
-  should_continue: true,
-  turn_count: currentTurn + 1
-};
+return [{ json: response }];
 ```
 
-### Tratamento de Escalação
-```javascript
-// Se status === "escalate"
-if (response.status === "escalate") {
-  // 1. Atualizar Chatwoot para marcar conversa como "aguardando humano"
-  // 2. Notificar gerente via Chatwoot (assignee)
-  // 3. Parar o loop de IA
-  // 4. Registrar no Supabase: status = "escalated"
-}
-```
+**Condições de finalização (Agent 4 V2.0):**
+1. Nota + Feedback coletados
+2. Cliente sinalizou encerramento
+3. Turno 3+ com nota já coletada
+4. Turno 5 atingido (limite absoluto)
+5. Cliente não quer participar
+
+### Tratamento de Escalação *(não implementado — proposta futura)*
+O Agent 4 pode retornar `status: "escalate"` (ex: erro de parse no catch do Code node), mas não existe IF no workflow que aja com base nesse status. Nenhuma notificação, atribuição ou parada do bot é executada. Ver doc 03, Propostas Futuras item 4.
 
 ### Performance
 - **Tempo médio por resposta:** 2-3 segundos
-- **Tokens por turno:** ~800 input + 100 output
 - **Turnos médios por conversa:** 2-3
-- **Custo por conversa completa:** ~$0.008-0.012
+- **Custo:** baseado em créditos Tess AI
+- **Agent 4 V2.0:** 9 de 9 cenários de teste validados com sucesso
 
 ---
 
-## Resumo: Custos por Pesquisa Completa
+## Resumo: Custo por Pesquisa Completa
 
-| Agente | Tokens | Custo/pesquisa |
-|--------|--------|----------------|
-| Agente 1 (Data Fetcher) | N/A (API calls) | $0 |
-| Agente 2 (Context Analyzer) | ~1900 | $0.006 |
-| Agente 3 (Message Generator) | ~700 | $0.003 |
-| Agente 4 (Conversation) | ~2500 (média 3 turnos) | $0.010 |
-| **TOTAL** | **~5100** | **$0.019** |
+| Agente | Plataforma | Função |
+|--------|------------|--------|
+| Agente 1 (Data Fetcher) | n8n (inline) | Coleta HubSpot — $0 |
+| Agente 2 (Context Analyzer) | Tess AI ID 38717 | Análise de contexto |
+| Agente 3 (Message Generator) | Tess AI ID 38728 | Geração de mensagem |
+| Agente 4 (Conversation Handler) | Tess AI ID 38733 | Gerenciamento de conversa |
 
-### Escala de Custos
-- **50 pesquisas/dia:** $0.95/dia = $28/mês
-- **200 pesquisas/dia:** $3.80/dia = $114/mês
-- **1000 pesquisas/dia:** $19/dia = $570/mês
+**Custo total estimado:** ~$5-10/mês para volume de 50-200 pesquisas/dia (baseado em créditos Tess AI).
 
-**Importante:** Custos de API Claude são variáveis. Valores baseados em:
-- Input: $3 por 1M tokens
-- Output: $15 por 1M tokens
-- Modelo: claude-3-5-sonnet-20241022 (Janeiro 2025)
+---
+
+## Teste End-to-End Validado
+
+**Cliente:** Carlos Mendes (+55 21 98144-4992)
+**Bot:** +55 11 5286-8259
+**Data:** 2026-02-02
+
+| Etapa | Status | Detalhes |
+|-------|--------|----------|
+| FLUXO 1 — Envio proativo | ✅ | Mensagem personalizada enviada via Meta API |
+| FLUXO 2 — Resposta cliente | ✅ | Webhook Meta → n8n processou corretamente |
+| Agent 4 V2.0 — Conversa | ✅ | Nota 4 coletada em 2-3 turnos |
+| Supabase — Persistência | ✅ | Score, feedback e histórico JSONB salvos |
+| Chatwoot — Monitoramento | ✅ | Mensagens registradas, nota privada e resolução automática |
 
 ---
 
 ## Próximos Passos
 
 1. ✅ Agentes definidos com responsabilidades claras
-2. ⏳ Implementar prompts completos (pasta /prompts)
-3. ⏳ Criar workflow n8n integrando os 4 agentes
-4. ⏳ Testar com dados reais de um cliente
-5. ⏳ Ajustar prompts baseado em resultados
+2. ✅ Prompts implementados e otimizados (pasta `/prompts`)
+3. ✅ Workflow n8n integrando os 4 agentes (FLUXO 1 + FLUXO 2)
+4. ✅ Testado com dados reais (Carlos Mendes)
+5. ✅ Prompts ajustados — Agent 4 V2.0 validado com 9 cenários
+6. ⏳ Dashboard analytics (Fase 3 — opcional)
 
 ---
 
 **Documento elaborado para:** Case Agent Dev - FMA/Pareto/IA Leader
-**Data:** Janeiro 2026
-**Versão:** 1.0
+**Data:** Fevereiro 2026
+**Versão:** 2.0
