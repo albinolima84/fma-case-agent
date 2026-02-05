@@ -614,10 +614,10 @@ Alertas automáticos não existem no MVP atual. Possibilidades para implementaç
 |------|-------|
 | n8n Cloud (Pro) | $25 |
 | Supabase Pro | $25 |
-| Chatwoot Cloud | $0 |
+| Chatwoot Cloud | $19 (Pro — necessário para retenção > 30 dias) |
 | Tess AI (créditos) | ~$20-40 |
 | Meta WhatsApp API | variável |
-| **Total** | **~$70-90/mês** |
+| **Total** | **~$90-110/mês** |
 
 **Nota:** Todos os serviços são gerenciados na nuvem. Sem servidores próprios ou VPS necessários.
 

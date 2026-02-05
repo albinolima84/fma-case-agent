@@ -261,9 +261,9 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 - n8n Cloud: R$ 0 (tier gratuito)
 - Tess AI (créditos — 200 pesquisas): ~R$ 165/mês
 - Supabase: R$ 0 (tier gratuito)
-- Chatwoot Cloud: R$ 0 (Plano Hacker — gratuito)
+- Chatwoot Cloud: ~R$ 105/mês ($19/mês — Plano Pro)
 - Meta WhatsApp API: ~R$ 30/mês
-- **Subtotal infra: ~R$ 195/mês**
+- **Subtotal infra: ~R$ 300/mês**
 
 **Custos de Supervisão:**
 - Gerente (2h/dia supervisão): 40h/mês × R$ 100/h = R$ 4.000/mês
@@ -271,9 +271,11 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 **Custos de Manutenção:**
 - Manutenção (5% do custo de desenvolvimento/mês): R$ 210/mês
 
-**Total: R$ 4.405/mês**
+**Total: R$ 4.510/mês**
 
-**Economia vs Manual: R$ 12.100 - R$ 4.405 = R$ 7.695/mês (64% redução)**
+**Economia vs Manual: R$ 12.100 - R$ 4.510 = R$ 7.590/mês (63% redução)**
+
+> **Nota:** Durante o piloto (Fase 1–2), o Chatwoot opera no Plano Hacker (gratuito, R$ 0). O upgrade para Plano Pro é necessário a partir da Fase 3 (produção), devido à limitação de retenção de dados de 30 dias no plano gratuito.
 
 ---
 
@@ -285,7 +287,7 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 |---------|----------------|------------|-------|
 | **Tempo por cliente** | 30 min | 2 min | 93% ↓ |
 | **Clientes/dia/gerente** | 16 | 200+ | 1150% ↑ |
-| **Custo mensal (200 pesquisas)** | R$ 12.100 | R$ 4.405 | 64% ↓ |
+| **Custo mensal (200 pesquisas)** | R$ 12.100 | R$ 4.510 | 63% ↓ |
 | **Taxa de erro** | 15-20% | < 1% | 95% ↓ |
 | **Personalização** | Inconsistente | Sempre personalizado | 100% ↑ |
 | **Rastreabilidade** | Planilhas dispersas | BD centralizado + UI | Completa |
@@ -296,7 +298,7 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 ### Ganhos Estratégicos
 
 #### Curto Prazo (1-3 meses)
-✅ Redução de 64% no custo operacional
+✅ Redução de 63% no custo operacional
 ✅ Aumento de 10x na capacidade de pesquisas
 ✅ Eliminação de 95% dos erros manuais
 
@@ -402,7 +404,7 @@ A migração do processo manual (AS-IS) para o processo automatizado com IA (TO-
 
 ### Ganhos Quantificáveis
 - **93% redução** no tempo por cliente
-- **64% redução** no custo operacional
+- **63% redução** no custo operacional
 - **1150% aumento** na capacidade de atendimento
 - **95% redução** na taxa de erros
 
@@ -415,8 +417,8 @@ A migração do processo manual (AS-IS) para o processo automatizado com IA (TO-
 
 ### ROI Estimado
 - **Payback:** 8 meses
-- **Economia anual:** R$ 92.340 (200 pesquisas/mês)
-- **ROI Ano 1:** 68% | **ROI 3 Anos:** 504%
+- **Economia anual:** R$ 91.080 (200 pesquisas/mês)
+- **ROI Ano 1:** 66% | **ROI 3 Anos:** 497%
 
 O processo TO-BE não substitui completamente o humano, mas **potencializa** a capacidade dos gerentes de qualidade, permitindo que foquem em casos complexos, análise estratégica e relacionamento de alto valor, enquanto a IA cuida da execução repetitiva e análise de dados em escala.
 
