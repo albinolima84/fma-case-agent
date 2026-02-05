@@ -10,11 +10,11 @@
 
 **Objetivo:** Reduzir em 93% o tempo de execução de pesquisas de satisfação, garantindo personalização, consistência e rastreabilidade completa através de agentes de IA integrados ao CRM HubSpot.
 
-**Investimento Total:** R$ 15.000 (implementação) + R$ 180-620/mês (operação)
+**Investimento Total:** R$ 55.000 (desenvolvimento + setup) + R$ 195-500/mês (operação)
 
-**Economia Anual:** R$ 93.840 (cenário 200 pesquisas/mês)
+**Economia Anual:** R$ 92.340 (cenário 200 pesquisas/mês)
 
-**ROI Ano 1:** 525% | **Payback:** < 1 mês
+**ROI Ano 1:** 68% | **Payback:** 8 meses
 
 **Status:** Plano aprovado para execução
 
@@ -32,11 +32,11 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 
 | # | Atividade | Responsável | Esforço | Entregáveis |
 |---|-----------|-------------|---------|-------------|
-| 1.1 | Setup de infraestrutura (VPS + Docker) | DevOps | 8h | Servidor configurado, Docker Compose rodando |
-| 1.2 | Instalação e configuração n8n | Dev Backend | 4h | n8n acessível, autenticação configurada |
-| 1.3 | Instalação e configuração Supabase | Dev Backend | 4h | Database criado, schema implementado |
+| 1.1 | Setup de infraestrutura (Cloud) | DevOps | 4h | Serviços cloud configurados (n8n, Supabase, Chatwoot) |
+| 1.2 | Configuração n8n Cloud | Dev Backend | 4h | n8n acessível, autenticação configurada |
+| 1.3 | Configuração Supabase | Dev Backend | 4h | Database criado, schema implementado |
 | 1.4 | Integração HubSpot API | Dev Backend | 8h | Agente 1 funcional (Data Fetcher) |
-| 1.5 | Integração Claude API | Dev Backend | 6h | Agentes 2, 3, 4 funcionais |
+| 1.5 | Integração Tess AI | Dev Backend | 6h | Agentes 2, 3, 4 funcionais |
 | 1.6 | Desenvolvimento workflow n8n básico | Dev Backend | 12h | Workflow completo dos 4 agentes |
 | 1.7 | Testes unitários dos agentes | QA | 6h | Suite de testes automatizados |
 | 1.8 | Teste end-to-end com 5 clientes piloto | QA + Product | 4h | Relatório de testes, bugs identificados |
@@ -46,9 +46,9 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 **Total Fase 1:** 64 horas (8 dias úteis com 1 dev full-time)
 
 **Entregáveis Principais:**
-- ✅ Infraestrutura operacional (VPS + serviços)
+- ✅ Infraestrutura operacional (Cloud)
 - ✅ Workflow n8n funcional com 4 agentes
-- ✅ Integração HubSpot + Claude API funcionando
+- ✅ Integração HubSpot + Tess AI funcionando
 - ✅ Database Supabase com schema completo
 - ✅ Testes com 5 clientes reais
 - ✅ Documentação técnica completa
@@ -69,9 +69,9 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 
 | # | Atividade | Responsável | Esforço | Entregáveis |
 |---|-----------|-------------|---------|-------------|
-| 2.1 | Instalação e configuração Evolution API | Dev Backend | 6h | WhatsApp conectado, webhooks configurados |
-| 2.2 | Instalação e configuração Chatwoot | Dev Backend | 8h | Interface de monitoramento funcional |
-| 2.3 | Integração n8n ↔ Evolution API | Dev Backend | 6h | Envio/recebimento de mensagens WhatsApp |
+| 2.1 | Configuração Meta WhatsApp API | Dev Backend | 6h | WhatsApp conectado, webhook verificado pela Meta |
+| 2.2 | Configuração Chatwoot Cloud | Dev Backend | 4h | Interface de monitoramento funcional |
+| 2.3 | Integração n8n ↔ Meta WhatsApp API | Dev Backend | 6h | Envio/recebimento de mensagens WhatsApp |
 | 2.4 | Integração n8n ↔ Chatwoot | Dev Backend | 6h | Conversas sincronizadas no dashboard |
 | 2.5 | Treinamento de gerentes de qualidade | Product Manager | 4h | Gerentes capacitados no Chatwoot |
 | 2.6 | Seleção de 50 clientes para piloto | Product Manager | 2h | Lista aprovada de clientes |
@@ -85,20 +85,19 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 **Total Fase 2:** 76 horas (9.5 dias úteis)
 
 **Entregáveis Principais:**
-- ✅ Evolution API integrada (WhatsApp funcionando)
+- ✅ Meta WhatsApp API integrada e verificada
 - ✅ Chatwoot configurado e funcional
 - ✅ 50 pesquisas de satisfação completadas
 - ✅ Relatório de análise de resultados
 - ✅ Feedback estruturado dos gerentes
 - ✅ Prompts otimizados (v1.1)
-- ✅ Dashboard de métricas no Chatwoot
+- ✅ Monitoramento via Chatwoot
 
 **Critérios de Sucesso:**
 - Taxa de resposta >= 60% (30+ clientes responderam)
 - Taxa de extração de nota >= 85%
 - Satisfação dos gerentes >= 4/5
 - Tempo médio por pesquisa < 2.5 minutos
-- Taxa de escalação para humano < 15%
 
 **Métricas a Coletar:**
 - Tempo médio por pesquisa
@@ -106,7 +105,6 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 - Distribuição de notas (1-5)
 - Taxa de extração de nota
 - Número de turnos por conversa
-- Taxa de escalação para humano
 - Satisfação dos gerentes com o sistema
 
 ---
@@ -120,7 +118,7 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 | # | Atividade | Responsável | Esforço | Entregáveis |
 |---|-----------|-------------|---------|-------------|
 | 3.1 | Otimização de performance (queries, cache) | Dev Backend | 8h | Sistema 30% mais rápido |
-| 3.2 | Implementação de monitoring (logs, alertas) | DevOps | 8h | Dashboard de monitoring, alertas configurados |
+| 3.2 | Implementação de monitoring (logs) | DevOps | 8h | Logs estruturados configurados |
 | 3.3 | Setup de backups automáticos | DevOps | 4h | Backup diário configurado |
 | 3.4 | Implementação de retry e fallbacks | Dev Backend | 6h | Resiliência a falhas de API |
 | 3.5 | Criação de runbook operacional | DevOps | 4h | Documentação de troubleshooting |
@@ -136,13 +134,16 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 
 **Entregáveis Principais:**
 - ✅ Sistema otimizado para performance
-- ✅ Monitoring e alertas configurados
+- ✅ Monitoring de logs configurado
 - ✅ Backups automáticos funcionando
 - ✅ 200 pesquisas em produção completadas
 - ✅ Runbook operacional
 - ✅ Audit de segurança concluído
 - ✅ SOPs documentados
 - ✅ Relatório de custos operacionais
+
+**Enhancements Considerados:**
+- Alertas automáticos (Email/Slack) — proposta futura, ver doc 03
 
 **Critérios de Sucesso:**
 - Uptime >= 99% (máximo 7h de downtime/mês)
@@ -166,7 +167,7 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 | 4.2 | A/B testing de prompts | Dev Backend | 12h | Prompts otimizados (v1.2) |
 | 4.3 | Implementação de NPS automático | Dev Backend | 6h | Cálculo e dashboard de NPS |
 | 4.4 | Criação de relatórios executivos | Data Analyst | 6h | Templates de relatórios mensais |
-| 4.5 | Identificação de clientes em risco (churn) | Data Analyst | 6h | Algoritmo de detecção de risco |
+| 4.5 | Identificação de clientes em risco | Data Analyst | 6h | Algoritmo de detecção de risco |
 | 4.6 | Otimização de custos de API | Dev Backend | 4h | Redução de 15-20% nos custos |
 | 4.7 | Planejamento de expansão (novos canais) | Product Manager | 6h | Roadmap de SMS, Telegram, Voz |
 | 4.8 | Documentação de lições aprendidas | Product Manager | 4h | Documento de retrospectiva |
@@ -178,17 +179,17 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 **Entregáveis Principais:**
 - ✅ Relatório de análise de 1 mês
 - ✅ Prompts otimizados com A/B testing
-- ✅ NPS calculado automaticamente
 - ✅ Templates de relatórios executivos
-- ✅ Algoritmo de detecção de churn
 - ✅ Roadmap de expansão
 - ✅ Cálculo de ROI real
 - ✅ Apresentação executiva
 
+**Enhancements Considerados:**
+- NPS automático — proposta futura, ver doc 03
+- Detecção de churn — proposta futura, ver doc 03
+
 **Critérios de Sucesso:**
-- ROI >= 400% (ano 1)
 - Redução de custos de API >= 15%
-- NPS da solução (gerentes) >= 8/10
 - Roadmap aprovado para próximas fases
 
 ---
@@ -199,23 +200,23 @@ O projeto está estruturado em **4 fases principais** ao longo de 8 semanas, com
 
 | Semana | Fase | Atividades Principais | Marcos |
 |--------|------|----------------------|--------|
-| 1 | MVP | Infraestrutura + Integrações | Servidor configurado |
+| 1 | MVP | Infraestrutura + Integrações | Serviços cloud configurados |
 | 2 | MVP | Workflow n8n + Testes | 5 testes bem-sucedidos ✅ |
-| 3 | Piloto | Evolution API + Chatwoot | Interface funcional |
+| 3 | Piloto | Meta WhatsApp API + Chatwoot Cloud | Interface funcional |
 | 4 | Piloto | 50 pesquisas + Análise | Feedback coletado ✅ |
 | 5 | Produção | Otimização + Monitoring | Sistema otimizado |
 | 6 | Produção | 200 pesquisas + Estabilização | Produção estável ✅ |
-| 7 | Otimização | A/B testing + NPS | Prompts v1.2 |
+| 7 | Otimização | A/B testing *(+ NPS: proposta futura)* | Prompts v1.2 |
 | 8 | Otimização | ROI + Apresentação | Projeto concluído ✅ |
 
 ### Timeline Detalhada
 
 ```
 Semana 1 (Dias 1-5)
-├─ D1: Setup VPS, Docker Compose
-├─ D2: Instalação n8n, Supabase
+├─ D1: Setup serviços cloud (n8n, Supabase)
+├─ D2: Configuração n8n, Supabase
 ├─ D3: Integração HubSpot API
-├─ D4: Integração Claude API
+├─ D4: Integração Tess AI
 └─ D5: Workflow básico n8n
 
 Semana 2 (Dias 6-10)
@@ -226,9 +227,9 @@ Semana 2 (Dias 6-10)
     └─ MARCO 1: MVP Funcional ✅
 
 Semana 3 (Dias 11-15)
-├─ D11: Instalação Evolution API
-├─ D12: Instalação Chatwoot
-├─ D13: Integrações (n8n ↔ Evolution ↔ Chatwoot)
+├─ D11: Configuração Meta WhatsApp API
+├─ D12: Configuração Chatwoot Cloud
+├─ D13: Integrações (n8n ↔ Meta API ↔ Chatwoot Cloud)
 ├─ D14: Treinamento gerentes
 └─ D15: Preparação piloto (seleção clientes)
 
@@ -253,7 +254,7 @@ Semana 6 (Dias 26-30)
 Semana 7 (Dias 31-35)
 ├─ D31-32: Análise de dados (1 mês)
 ├─ D33-34: A/B testing de prompts
-└─ D35: Implementação NPS + Churn detection
+└─ D35: Enhancements futuros *(NPS, Churn — propostas futuras)*
 
 Semana 8 (Dias 36-40)
 ├─ D36: Otimização de custos
@@ -297,7 +298,7 @@ Semana 8 (Dias 36-40)
 
 | Item | Quantidade | Custo Unitário | Total |
 |------|------------|----------------|-------|
-| VPS Setup (configuração inicial) | 1x | R$ 0 | R$ 0 |
+| Cloud Setup (configuração inicial) | 1x | R$ 0 | R$ 0 |
 | Domínio (.com.br) | 1 ano | R$ 40 | R$ 40 |
 | SSL Certificate (Let's Encrypt) | 1x | R$ 0 | R$ 0 |
 | **TOTAL CAPEX** | | | **R$ 40** |
@@ -306,11 +307,10 @@ Semana 8 (Dias 36-40)
 
 | Item | Custo/Mês | Observação |
 |------|-----------|------------|
-| VPS (4vCPU, 8GB RAM, 160GB SSD) | R$ 150 | Hetzner/DigitalOcean |
+| n8n Cloud | R$ 0 | Tier gratuito (5.000 execuções/mês) |
 | Supabase (tier gratuito) | R$ 0 | Até 500MB |
-| Domínio (amortizado) | R$ 3 | R$ 40/ano |
-| Backup Storage (S3) | R$ 10 | ~50GB |
-| **TOTAL OPEX INFRA** | **R$ 163/mês** | |
+| Chatwoot Cloud | R$ 0 | Plano Hacker (gratuito) — 1 inbox, 2 agentes |
+| **TOTAL OPEX INFRA** | **R$ 0/mês** | |
 
 ### APIs e Serviços (OPEX - Mensal)
 
@@ -318,23 +318,22 @@ Semana 8 (Dias 36-40)
 
 | Serviço | Uso | Custo/Mês |
 |---------|-----|-----------|
-| Claude API (Anthropic) | 200 × ~5100 tokens | R$ 60 |
+| Tess AI (créditos) | 200 pesquisas × agentes 2, 3, 4 | R$ 165 |
 | HubSpot API | Incluído no plano | R$ 0 |
-| Evolution API (self-hosted) | Ilimitado | R$ 0 |
-| Chatwoot (self-hosted) | Ilimitado | R$ 0 |
-| **TOTAL OPEX APIs** | | **R$ 60/mês** |
+| Meta WhatsApp API | 200 mensagens | R$ 30 |
+| **TOTAL OPEX APIs** | | **R$ 195/mês** |
 
 ### Custo Operacional Total (Mensal)
 
 | Item | Custo/Mês (200 pesquisas) | Custo/Mês (1000 pesquisas) |
 |------|---------------------------|----------------------------|
-| Infraestrutura | R$ 163 | R$ 300 (VPS maior) |
-| APIs (Claude) | R$ 60 | R$ 300 |
-| **TOTAL** | **R$ 223/mês** | **R$ 600/mês** |
+| Infraestrutura (Cloud) | R$ 0 | R$ 0 (serviços gerenciados) |
+| APIs (Tess AI + Meta) | R$ 195 | R$ 500 |
+| **TOTAL** | **R$ 195/mês** | **R$ 500/mês** |
 
 **Custo adicional:** Supervisão por gerente de qualidade (~2h/dia) = R$ 4.000/mês
 
-**Custo Total Operacional:** R$ 4.223/mês (200 pesquisas)
+**Custo Total Operacional:** R$ 4.195/mês (200 pesquisas)
 
 ---
 
@@ -370,22 +369,22 @@ Semana 8 (Dias 36-40)
 
 | Item | Cálculo | Custo/Mês |
 |------|---------|-----------|
-| Infraestrutura + APIs | Conforme tabela anterior | R$ 223 |
+| Infraestrutura + APIs | Conforme tabela anterior | R$ 195 |
 | Supervisão gerente (2h/dia) | 40h × R$ 100/h | R$ 4.000 |
 | Manutenção (5% do dev/mês) | R$ 50.200 ÷ 12 × 5% | R$ 210 |
-| **TOTAL PROCESSO OTIMIZADO** | | **R$ 4.433/mês** |
+| **TOTAL PROCESSO OTIMIZADO** | | **R$ 4.405/mês** |
 
-**Anual:** R$ 53.196
+**Anual:** R$ 52.860
 
 ### 4.4 Economia Mensal e Anual
 
 | Métrica | Valor |
 |---------|-------|
 | Custo Atual (AS-IS) | R$ 12.100/mês |
-| Custo Otimizado (TO-BE) | R$ 4.433/mês |
-| **Economia Mensal** | **R$ 7.667/mês** |
-| **Economia Anual** | **R$ 92.004/ano** |
-| **% Redução de Custo** | **63%** |
+| Custo Otimizado (TO-BE) | R$ 4.405/mês |
+| **Economia Mensal** | **R$ 7.695/mês** |
+| **Economia Anual** | **R$ 92.340/ano** |
+| **% Redução de Custo** | **64%** |
 
 ### 4.5 Cálculo do ROI
 
@@ -393,29 +392,29 @@ Semana 8 (Dias 36-40)
 
 **Ano 1:**
 - Investimento: R$ 55.000
-- Economia anual: R$ 92.004
-- Ganho líquido: R$ 92.004 - R$ 55.000 = R$ 37.004
+- Economia anual: R$ 92.340
+- Ganho líquido: R$ 92.340 - R$ 55.000 = R$ 37.340
 
-**ROI Ano 1:** (R$ 37.004 / R$ 55.000) × 100 = **67%**
+**ROI Ano 1:** (R$ 37.340 / R$ 55.000) × 100 = **68%**
 
 **Ano 2 em diante:**
 - Investimento: R$ 0 (já amortizado)
-- Economia anual: R$ 92.004
+- Economia anual: R$ 92.340
 - Custo operacional já está incluso no cálculo de economia
 
-**ROI Ano 2:** (R$ 92.004 / R$ 55.000) × 100 = **167%**
+**ROI Ano 2:** (R$ 92.340 / R$ 55.000) × 100 = **168%**
 
 **ROI Acumulado 3 Anos:**
-- Ganho total: R$ 92.004 × 3 = R$ 276.012
+- Ganho total: R$ 92.340 × 3 = R$ 277.020
 - Investimento: R$ 55.000
 
-**ROI 3 Anos:** (R$ 276.012 / R$ 55.000) × 100 = **502%**
+**ROI 3 Anos:** (R$ 277.020 / R$ 55.000) × 100 = **504%**
 
 ### 4.6 Payback Period
 
 **Payback:** Investimento / Economia Mensal
 
-R$ 55.000 / R$ 7.667 = **7.2 meses**
+R$ 55.000 / R$ 7.695 = **7.1 meses**
 
 Com arredondamento conservador: **8 meses**
 
@@ -423,14 +422,14 @@ Com arredondamento conservador: **8 meses**
 
 ```
 Mês 0: -R$ 55.000 (investimento)
-Mês 1: -R$ 55.000 + R$ 7.667 = -R$ 47.333
-Mês 2: -R$ 47.333 + R$ 7.667 = -R$ 39.666
-Mês 3: -R$ 39.666 + R$ 7.667 = -R$ 31.999
-Mês 4: -R$ 31.999 + R$ 7.667 = -R$ 24.332
-Mês 5: -R$ 24.332 + R$ 7.667 = -R$ 16.665
-Mês 6: -R$ 16.665 + R$ 7.667 = -R$ 8.998
-Mês 7: -R$ 8.998 + R$ 7.667 = -R$ 1.331
-Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
+Mês 1: -R$ 55.000 + R$ 7.695 = -R$ 47.305
+Mês 2: -R$ 47.305 + R$ 7.695 = -R$ 39.610
+Mês 3: -R$ 39.610 + R$ 7.695 = -R$ 31.915
+Mês 4: -R$ 31.915 + R$ 7.695 = -R$ 24.220
+Mês 5: -R$ 24.220 + R$ 7.695 = -R$ 16.525
+Mês 6: -R$ 16.525 + R$ 7.695 = -R$ 8.830
+Mês 7: -R$ 8.830 + R$ 7.695 = -R$ 1.135
+Mês 8: -R$ 1.135 + R$ 7.695 = +R$ 6.560 ✅ BREAK-EVEN
 ```
 
 **Break-Even Point:** Mês 8
@@ -460,12 +459,12 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 | Métrica | Valor |
 |---------|-------|
 | Custo Atual | R$ 12.100/mês |
-| Custo Otimizado | R$ 4.433/mês |
-| Economia Mensal | R$ 7.667/mês |
-| Economia Anual | R$ 92.004/ano |
-| ROI Ano 1 | 67% |
-| ROI Ano 2 | 167% |
-| ROI Ano 3 | 267% |
+| Custo Otimizado | R$ 4.405/mês |
+| Economia Mensal | R$ 7.695/mês |
+| Economia Anual | R$ 92.340/ano |
+| ROI Ano 1 | 68% |
+| ROI Ano 2 | 168% |
+| ROI Ano 3 | 268% |
 | Payback | 8 meses |
 
 **Conclusão:** Cenário ideal para piloto. ROI excelente e payback rápido.
@@ -517,14 +516,14 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 
 **Insight:** Taxa de resposta >= 60% é crítica para viabilidade no curto prazo (Ano 1).
 
-### 6.2 Impacto do Custo de Claude API
+### 6.2 Impacto do Custo de Tess AI
 
 | Variação Preço | Custo API/Mês | Custo Total/Mês | Economia Anual | ROI Ano 1 |
 |----------------|---------------|-----------------|----------------|-----------|
-| -50% (promoção) | R$ 30 | R$ 4.193 | R$ 94.884 | 72% |
-| Atual (baseline) | R$ 60 | R$ 4.433 | R$ 92.004 | 67% |
-| +50% (aumento) | R$ 90 | R$ 4.673 | R$ 89.124 | 62% |
-| +100% (dobro) | R$ 120 | R$ 4.913 | R$ 86.244 | 57% |
+| -50% (promoção) | R$ 98 | R$ 4.323 | R$ 93.324 | 70% |
+| Atual (baseline) | R$ 195 | R$ 4.405 | R$ 92.340 | 68% |
+| +50% (aumento) | R$ 293 | R$ 4.503 | R$ 91.164 | 66% |
+| +100% (dobro) | R$ 390 | R$ 4.600 | R$ 90.000 | 64% |
 
 **Insight:** ROI é robusto mesmo com aumento de 100% no custo da API. Risco baixo.
 
@@ -532,10 +531,10 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 
 | Variação Dev | Investimento | Economia Anual | ROI Ano 1 | Payback |
 |--------------|--------------|----------------|-----------|---------|
-| -30% (eficiência) | R$ 38.500 | R$ 92.004 | 139% | 5 meses |
-| Atual (baseline) | R$ 55.000 | R$ 92.004 | 67% | 8 meses |
-| +30% (atraso) | R$ 71.500 | R$ 92.004 | 29% | 10 meses |
-| +50% (retrabalho) | R$ 82.500 | R$ 92.004 | 12% | 12 meses |
+| -30% (eficiência) | R$ 38.500 | R$ 92.340 | 140% | 5 meses |
+| Atual (baseline) | R$ 55.000 | R$ 92.340 | 68% | 8 meses |
+| +30% (atraso) | R$ 71.500 | R$ 92.340 | 29% | 10 meses |
+| +50% (retrabalho) | R$ 82.500 | R$ 92.340 | 12% | 11 meses |
 
 **Insight:** Projeto permanece viável mesmo com 50% de estouro no desenvolvimento.
 
@@ -566,14 +565,19 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 
 | Benefício | Impacto |
 |-----------|---------|
+| Feedback estruturado | Melhoria contínua de produto |
+
+**Propostas futuras** *(não implementadas no MVP — ver doc 03):*
+
+| Benefício | Impacto |
+|-----------|---------|
 | NPS calculado automaticamente | Decisões data-driven |
 | Detecção proativa de churn | Redução de 10-15% em churn |
 | Trends de satisfação por produto | Priorização de roadmap |
-| Feedback estruturado | Melhoria contínua de produto |
 
-**Valor estimado de redução de churn:** 10% de 200 clientes × R$ 1.000 MRR médio × 12 meses = **R$ 240.000/ano**
+**Valor estimado de redução de churn (condicional):** 10% de 200 clientes × R$ 1.000 MRR médio × 12 meses = **R$ 240.000/ano**
 
-*Este benefício não está contabilizado no ROI acima (conservadorismo)*
+*Este benefício não está contabilizado no ROI acima e depende da implementação de detecção de churn.*
 
 ---
 
@@ -583,9 +587,9 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 
 | Risco | Probabilidade | Impacto | Mitigação |
 |-------|---------------|---------|-----------|
-| API Claude indisponível | Baixa | Alto | Fallback para GPT-4, retry com backoff |
+| Tess AI indisponível | Baixa | Alto | Retry com backoff + monitoramento manual |
 | HubSpot API rate limit | Média | Médio | Cache de dados, throttling, upgrade de tier |
-| Evolution API desconectar | Média | Médio | Monitoring, auto-reconexão, alertas |
+| Meta WhatsApp API indisponível | Baixa | Médio | Retry automático + monitoramento |
 | Erros de IA (respostas inadequadas) | Média | Médio | Validação, fallback para humano, amostragem |
 
 ### 8.2 Riscos de Negócio
@@ -630,6 +634,11 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 |-----|------------|------------|------------|
 | Economia mensal | R$ 5.000+ | R$ 7.000+ | R$ 7.500+ |
 | Taxa de resposta | 50%+ | 65%+ | 75%+ |
+
+**KPIs Futuros** *(dependem de enhancements não implementados no MVP):*
+
+| KPI | Meta Mês 1 | Meta Mês 3 | Meta Mês 6 |
+|-----|------------|------------|------------|
 | NPS do processo (gerentes) | 6+ | 7+ | 8+ |
 | Churn detectado proativamente | 5 clientes | 10 clientes | 20 clientes |
 
@@ -641,17 +650,21 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 | Tempo médio por pesquisa | <= 2 minutos |
 | Taxa de extração de nota | >= 90% |
 | Taxa de erro | < 2% |
-| Taxa de escalação para humano | < 15% |
 | Latência média de resposta | < 5 segundos |
 
 ### 9.3 KPIs de Qualidade
 
 | KPI | Meta |
 |-----|------|
-| Satisfação dos clientes (NPS) | >= 40 (promotores) |
 | Personalização efetiva | 100% (todas mensagens contextualizadas) |
 | Acurácia do sentiment analysis | >= 85% (validação manual) |
 | Conversas sem intervenção humana | >= 85% |
+
+**KPIs Futuros** *(dependem de enhancements não implementados no MVP):*
+
+| KPI | Meta |
+|-----|------|
+| Satisfação dos clientes (NPS) | >= 40 (promotores) |
 
 ---
 
@@ -663,35 +676,37 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 
 **Investimento:** R$ 55.000 (desenvolvimento + setup)
 
-**Retorno Anual:** R$ 92.004 em economia operacional (cenário 200 pesquisas/mês)
+**Retorno Anual:** R$ 92.340 em economia operacional (cenário 200 pesquisas/mês)
 
-**ROI Ano 1:** 67% | **ROI Ano 2:** 167% | **ROI 3 Anos:** 502%
+**ROI Ano 1:** 68% | **ROI Ano 2:** 168% | **ROI 3 Anos:** 504%
 
 **Payback:** 8 meses | **Break-Even:** Mês 8
 
 #### Detalhamento
 
-**Economia Mensal:** R$ 7.667
+**Economia Mensal:** R$ 7.695
 
 - Redução de 100h → 40h de trabalho de gerente (60h economizadas × R$ 100/h = R$ 6.000)
 - Eliminação de erros e retrabalho (R$ 2.000 → R$ 200 = R$ 1.800 economizados)
 - Redução de custo de ferramentas (planilhas) (R$ 100 → R$ 0 = R$ 100)
-- Custo novo de infraestrutura e APIs: -R$ 223/mês
+- Custo novo de infraestrutura e APIs (cloud): -R$ 195/mês
 - Custo novo de manutenção: -R$ 210/mês
 
 **Benefícios Não-Financeiros (Não contabilizados no ROI):**
-- Detecção proativa de churn → economia estimada de R$ 240.000/ano
-- NPS calculado automaticamente → decisões baseadas em dados
 - Rastreabilidade completa → compliance e auditoria
 - Disponibilidade 24/7 → melhor experiência do cliente
 - Escalabilidade exponencial → crescimento sem custo linear
+
+**Benefícios condicionais** *(dependem de enhancements futuros, ver doc 03 Propostas Futuras):*
+- Detecção proativa de churn → economia estimada de R$ 240.000/ano
+- NPS calculado automaticamente → decisões baseadas em dados
 
 #### Cenários
 
 | Volume | ROI Ano 1 | Payback | Viabilidade |
 |--------|-----------|---------|-------------|
 | 100 pesquisas/mês | -18% | 15 meses | Viável a médio prazo |
-| **200 pesquisas/mês** | **67%** | **8 meses** | **Recomendado ⭐** |
+| **200 pesquisas/mês** | **68%** | **8 meses** | **Recomendado ⭐** |
 | 500 pesquisas/mês | 437% | 2.5 meses | Excelente |
 | 1000 pesquisas/mês | 1.032% | 1 mês | Extraordinário |
 
@@ -703,13 +718,13 @@ Mês 8: -R$ 1.331 + R$ 7.667 = +R$ 6.336 ✅ BREAK-EVEN
 ✅ **Payback rápido** (< 1 ano)
 ✅ **Escalável** (ROI aumenta com volume)
 ✅ **Baixo risco** (ROI positivo mesmo com variações de +50% em custos)
-✅ **Benefícios estratégicos** (churn, NPS, dados) não contabilizados
+✅ **Benefícios estratégicos** (rastreabilidade, disponibilidade, escalabilidade)
 
 **Recomendação:** APROVAR E EXECUTAR o projeto imediatamente.
 
 O investimento de R$ 55.000 se paga em 8 meses e gera economia de R$ 92.000/ano recorrente, além de benefícios estratégicos estimados em R$ 240.000/ano adicionais.
 
-**ROI total estimado (incluindo churn prevention):** ~700% no primeiro ano.
+**ROI total estimado (incluindo churn prevention condicional):** ~700% no primeiro ano *(condicional à implementação de detecção de churn).*
 
 ---
 
@@ -753,7 +768,7 @@ O investimento de R$ 55.000 se paga em 8 meses e gera economia de R$ 92.000/ano 
 ### B. Referências
 
 - HubSpot API Documentation: https://developers.hubspot.com/
-- Anthropic Claude API Pricing: https://www.anthropic.com/pricing
+- Tess AI: https://tess.im
 - n8n Documentation: https://docs.n8n.io/
 - Chatwoot Documentation: https://www.chatwoot.com/docs/
 
@@ -762,10 +777,11 @@ O investimento de R$ 55.000 se paga em 8 meses e gera economia de R$ 92.000/ano 
 | Versão | Data | Autor | Mudanças |
 |--------|------|-------|----------|
 | 1.0 | 2026-01-27 | IA Agent | Criação inicial do documento |
+| 2.0 | 2026-02-04 | IA Agent | Atualização: Evolution API → Meta WhatsApp API, Claude → Tess AI, VPS → Cloud, custos recalculados |
 
 ---
 
 **Documento elaborado para:** Case Agent Dev - FMA/Pareto/IA Leader
 **Data:** Janeiro 2026
-**Versão:** 1.0
+**Versão:** 2.0
 **Status:** APROVADO PARA EXECUÇÃO

@@ -71,7 +71,7 @@ Reduzir de **30 minutos para ~2 minutos** o processo de análise e contato com c
 ---
 
 ### 2.4 Interface de Monitoramento
-**Ferramenta:** Chatwoot Cloud ($19/mês)
+**Ferramenta:** Chatwoot Cloud (Plano Hacker — gratuito)
 
 **Justificativa:**
 - Plataforma madura de helpdesk/live chat com todas as features necessárias:
@@ -85,6 +85,8 @@ Reduzir de **30 minutos para ~2 minutos** o processo de análise e contato com c
 - API REST completa para integração com n8n
 - Sem necessidade de deploy próprio (Cloud gerenciado)
 - Reduz tempo de desenvolvimento de 7-10 dias para integração direta
+
+**Limitações do Plano Hacker (gratuito):** 1 inbox e 2 agentes. Suficiente para o MVP atual (apenas 1 inbox utilizado, sem agentes humanos — todas as operações são feitas via API). Upgrade para plano pago necessário se houver necessidade de mais inboxes ou agentes.
 
 **Alternativas descartadas:**
 - Chatwoot self-hosted: heap out of memory no tier gratuito (512MB RAM insuficiente)
@@ -484,7 +486,7 @@ Body: {
 |---------|-------|-------|
 | n8n Cloud | Free tier | $0 |
 | Supabase | Free tier | $0 |
-| Chatwoot Cloud | Pro | $19/mês |
+| Chatwoot Cloud | Hacker (free) | $0 |
 | Tess AI | Créditos | variável |
 | Meta WhatsApp API | Plataforma | variável |
 | HubSpot | Existente | $0 adicional |
@@ -601,10 +603,10 @@ Alertas automáticos não existem no MVP atual. Possibilidades para implementaç
 |------|-------|
 | n8n Cloud | $0 (free tier) |
 | Supabase | $0 (free tier) |
-| Chatwoot Cloud | $19 |
+| Chatwoot Cloud | $0 |
 | Tess AI (créditos) | ~$5-10 |
 | Meta WhatsApp API | variável |
-| **Total** | **~$25-30/mês** |
+| **Total** | **~$6-11/mês** |
 
 ### Produção (200 pesquisas/dia)
 
@@ -612,10 +614,10 @@ Alertas automáticos não existem no MVP atual. Possibilidades para implementaç
 |------|-------|
 | n8n Cloud (Pro) | $25 |
 | Supabase Pro | $25 |
-| Chatwoot Cloud | $19 |
+| Chatwoot Cloud | $0 |
 | Tess AI (créditos) | ~$20-40 |
 | Meta WhatsApp API | variável |
-| **Total** | **~$90-110/mês** |
+| **Total** | **~$70-90/mês** |
 
 **Nota:** Todos os serviços são gerenciados na nuvem. Sem servidores próprios ou VPS necessários.
 
@@ -623,7 +625,7 @@ Alertas automáticos não existem no MVP atual. Possibilidades para implementaç
 
 ## 11. Diferenciais Competitivos desta Arquitetura
 
-1. **Cloud-first:** Zero servidores próprios, custo operacional mínimo (~$25-30/mês piloto)
+1. **Cloud-first:** Zero servidores próprios, custo operacional mínimo (~$6-11/mês piloto)
 2. **Multi-agent pattern:** 4 agentes especializados via Tess AI = melhor qualidade e manutenibilidade
 3. **API oficial da Meta:** WhatsApp Business API oficial — máxima estabilidade e sem risco de bloqueio
 4. **Rastreabilidade completa:** Histórico em PostgreSQL (Supabase) + monitoramento em tempo real (Chatwoot)

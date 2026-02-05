@@ -127,7 +127,8 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 - Tempo total: 200 × 30 min = **100 horas/mês**
 - Custo gerente (R$ 100/h): **R$ 10.000/mês**
 - Erros e retrabalho (+20%): **+R$ 2.000/mês**
-- **Total: R$ 12.000/mês**
+- Ferramentas (planilhas, etc): **+R$ 100/mês**
+- **Total: R$ 12.100/mês**
 
 ---
 
@@ -260,16 +261,19 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 - n8n Cloud: R$ 0 (tier gratuito)
 - Tess AI (créditos — 200 pesquisas): ~R$ 165/mês
 - Supabase: R$ 0 (tier gratuito)
-- Chatwoot Cloud: ~R$ 105/mês ($19/mês)
+- Chatwoot Cloud: R$ 0 (Plano Hacker — gratuito)
 - Meta WhatsApp API: ~R$ 30/mês
-- **Subtotal infra: ~R$ 300/mês**
+- **Subtotal infra: ~R$ 195/mês**
 
 **Custos de Supervisão:**
 - Gerente (2h/dia supervisão): 40h/mês × R$ 100/h = R$ 4.000/mês
 
-**Total: R$ 4.300/mês**
+**Custos de Manutenção:**
+- Manutenção (5% do custo de desenvolvimento/mês): R$ 210/mês
 
-**Economia vs Manual: R$ 12.000 - R$ 4.300 = R$ 7.700/mês (64% redução)**
+**Total: R$ 4.405/mês**
+
+**Economia vs Manual: R$ 12.100 - R$ 4.405 = R$ 7.695/mês (64% redução)**
 
 ---
 
@@ -281,7 +285,7 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 |---------|----------------|------------|-------|
 | **Tempo por cliente** | 30 min | 2 min | 93% ↓ |
 | **Clientes/dia/gerente** | 16 | 200+ | 1150% ↑ |
-| **Custo mensal (200 pesquisas)** | R$ 12.000 | R$ 4.300 | 64% ↓ |
+| **Custo mensal (200 pesquisas)** | R$ 12.100 | R$ 4.405 | 64% ↓ |
 | **Taxa de erro** | 15-20% | < 1% | 95% ↓ |
 | **Personalização** | Inconsistente | Sempre personalizado | 100% ↑ |
 | **Rastreabilidade** | Planilhas dispersas | BD centralizado + UI | Completa |
@@ -411,8 +415,8 @@ A migração do processo manual (AS-IS) para o processo automatizado com IA (TO-
 
 ### ROI Estimado
 - **Payback:** 8 meses
-- **Economia anual:** R$ 91.080 (200 pesquisas/mês)
-- **ROI Ano 1:** 66% | **ROI 3 Anos:** 497%
+- **Economia anual:** R$ 92.340 (200 pesquisas/mês)
+- **ROI Ano 1:** 68% | **ROI 3 Anos:** 504%
 
 O processo TO-BE não substitui completamente o humano, mas **potencializa** a capacidade dos gerentes de qualidade, permitindo que foquem em casos complexos, análise estratégica e relacionamento de alto valor, enquanto a IA cuida da execução repetitiva e análise de dados em escala.
 
