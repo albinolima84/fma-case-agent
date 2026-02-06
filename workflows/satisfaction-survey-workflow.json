@@ -17,7 +17,7 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.1,
       "position": [
-        4944,
+        4704,
         1312
       ],
       "notes": "Executa diariamente às 10h"
@@ -33,14 +33,15 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.2,
       "position": [
-        5168,
-        1312
+        5152,
+        1104
       ],
+      "disabled": true,
       "notes": "ID do contato HubSpot para testar"
     },
     {
       "parameters": {
-        "url": "=https://api.hubapi.com/crm/v3/objects/contacts/{{$json.hubspot_contact_id}}",
+        "url": "=https://api.hubapi.com/crm/v3/objects/contacts/{{ $('Extract Contact Data').first().json.hubspot_contact_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendQuery": true,
@@ -59,8 +60,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5392,
-        1312
+        6400,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -85,8 +86,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5616,
-        1312
+        6608,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -111,8 +112,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        5840,
-        1312
+        6800,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -137,8 +138,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6064,
-        1312
+        7008,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -149,15 +150,15 @@
     },
     {
       "parameters": {
-        "jsCode": "// Consolida dados do HubSpot em JSON estruturado\nconst contact = $node['HubSpot - Get Contact'].json;\nconst emailsResponse = $node['HubSpot - Get Emails'].json;\nconst dealsResponse = $node['HubSpot - Get Deals'].json;\nconst ticketsResponse = $node['HubSpot - Get Tickets'].json;\n\nconst emails = emailsResponse.results || [];\nconst deals = dealsResponse.results || [];\nconst tickets = ticketsResponse.results || [];\n\nconst consolidatedData = {\n  contact: {\n    id: contact.id,\n    name: `${contact.properties.firstname} ${contact.properties.lastname}`,\n    email: contact.properties.email,\n    phone: contact.properties.phone,\n    company: contact.properties.company || 'N/A',\n    created_date: contact.properties.createdate\n  },\n  summary: {\n    total_emails: emails.length,\n    total_deals: deals.length,\n    total_tickets: tickets.length\n  },\n  deals: deals.slice(0, 5).map(d => ({\n    id: d.id,\n    name: d.properties.dealname || 'Sem nome',\n    stage: d.properties.dealstage || 'unknown',\n    amount: d.properties.amount || '0',\n    close_date: d.properties.closedate || null\n  })),\n  emails: emails.slice(0, 10).map(e => ({\n    subject: e.properties?.hs_email_subject || 'Sem assunto',\n    direction: e.properties?.hs_email_direction || 'UNKNOWN',\n    timestamp: e.properties?.hs_timestamp || null\n  })),\n  tickets: tickets.slice(0, 5).map(t => ({\n    id: t.id,\n    subject: t.properties?.subject || 'Sem assunto',\n    status: t.properties?.hs_ticket_priority || 'unknown',\n    created_date: t.properties?.createdate || null\n  }))\n};\n\nreturn {\n  json: {\n    hubspot_data: consolidatedData,\n    customer_phone: contact.properties.phone,\n    customer_name: `${contact.properties.firstname} ${contact.properties.lastname}`\n  }\n};"
+        "jsCode": "// Consolida dados do HubSpot em JSON estruturado\nconst contact = $node['HubSpot - Get Contact'].json;\nconst emailsResponse = $node['HubSpot - Get Emails'].json;\nconst dealsResponse = $node['HubSpot - Get Deals'].json;\nconst ticketsResponse = $node['HubSpot - Get Tickets'].json;\n\nconst emails = emailsResponse.results || [];\nconst deals = dealsResponse.results || [];\nconst tickets = ticketsResponse.results || [];\n\nconst consolidatedData = {\n  contact: {\n    id: contact.id,\n    name: `customer_name: $('Extract Contact Data').first().json.customer_name`,\n    email: contact.properties.email,\n    customer_phone: $('Extract Contact Data').first().json.customer_phone,\n    company: contact.properties.company || 'N/A',\n    created_date: contact.properties.createdate\n  },\n  summary: {\n    total_emails: emails.length,\n    total_deals: deals.length,\n    total_tickets: tickets.length\n  },\n  deals: deals.slice(0, 5).map(d => ({\n    id: d.id,\n    name: d.properties.dealname || 'Sem nome',\n    stage: d.properties.dealstage || 'unknown',\n    amount: d.properties.amount || '0',\n    close_date: d.properties.closedate || null\n  })),\n  emails: emails.slice(0, 10).map(e => ({\n    subject: e.properties?.hs_email_subject || 'Sem assunto',\n    direction: e.properties?.hs_email_direction || 'UNKNOWN',\n    timestamp: e.properties?.hs_timestamp || null\n  })),\n  tickets: tickets.slice(0, 5).map(t => ({\n    id: t.id,\n    subject: t.properties?.subject || 'Sem assunto',\n    status: t.properties?.hs_ticket_priority || 'unknown',\n    created_date: t.properties?.createdate || null\n  }))\n};\n\nreturn {\n  json: {\n    hubspot_data: consolidatedData,\n    customer_phone: contact.properties.phone,\n    customer_name: `${contact.properties.firstname} ${contact.properties.lastname}`\n  }\n};"
       },
       "id": "cb8d5ea7-05fe-4f9d-b9a6-5a47bb44e2ad",
       "name": "Consolidate HubSpot Data",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6288,
-        1312
+        7248,
+        1264
       ],
       "notes": "Agente 1 - Data Fetcher (inline)"
     },
@@ -177,8 +178,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6512,
-        1312
+        7472,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -196,8 +197,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6736,
-        1312
+        7680,
+        1264
       ]
     },
     {
@@ -216,8 +217,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6960,
-        1312
+        7888,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -235,8 +236,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7152,
-        1312
+        8080,
+        1264
       ]
     },
     {
@@ -255,8 +256,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7360,
-        1312
+        8288,
+        1264
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -277,8 +278,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        7568,
-        1312
+        8496,
+        1264
       ],
       "credentials": {
         "postgres": {
@@ -301,7 +302,7 @@
       "typeVersion": 2,
       "position": [
         4992,
-        1808
+        2000
       ],
       "webhookId": "whatsapp-meta-webhook"
     },
@@ -341,7 +342,7 @@
       "typeVersion": 2,
       "position": [
         5200,
-        1808
+        2000
       ]
     },
     {
@@ -366,7 +367,7 @@
       "typeVersion": 1.1,
       "position": [
         5392,
-        1712
+        1904
       ]
     },
     {
@@ -379,7 +380,7 @@
       "typeVersion": 2,
       "position": [
         5392,
-        1904
+        2096
       ]
     },
     {
@@ -401,7 +402,7 @@
       "typeVersion": 2,
       "position": [
         5616,
-        1904
+        2096
       ]
     },
     {
@@ -415,8 +416,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        5808,
-        1904
+        5856,
+        2080
       ],
       "credentials": {
         "postgres": {
@@ -434,8 +435,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6224,
-        1904
+        6272,
+        2080
       ]
     },
     {
@@ -454,8 +455,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6416,
-        1904
+        6464,
+        2080
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -473,8 +474,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        6624,
-        1904
+        6672,
+        2080
       ]
     },
     {
@@ -493,8 +494,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6832,
-        1904
+        6880,
+        2080
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -512,8 +513,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8528,
-        1904
+        8544,
+        2080
       ]
     },
     {
@@ -527,8 +528,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        8752,
-        1904
+        8768,
+        2080
       ],
       "credentials": {
         "postgres": {
@@ -550,8 +551,8 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
       "position": [
-        8976,
-        1904
+        8992,
+        2080
       ]
     },
     {
@@ -571,8 +572,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8224,
-        1392
+        9152,
+        1344
       ],
       "id": "bfd6f59c-ab52-419a-a9f1-53cbf9507a78",
       "name": "Create Contact",
@@ -600,8 +601,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8848,
-        1280
+        9744,
+        1264
       ],
       "id": "491c49d1-69e8-4311-b8ec-6e44f024b2b2",
       "name": "Create Conversation",
@@ -629,8 +630,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        9248,
-        1280
+        10144,
+        1264
       ],
       "id": "7a63e7af-096b-4219-851a-a187805924c4",
       "name": "Send Message",
@@ -669,8 +670,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        7328,
-        1904
+        7376,
+        2080
       ],
       "id": "138ba924-fdfd-4a99-9950-4a198ebb95d2",
       "name": "Check Status Completed"
@@ -703,8 +704,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        7584,
-        1776
+        7616,
+        1920
       ],
       "id": "14033222-09e0-42a1-9586-530898aad0ef",
       "name": "Check Chatwoot ID Exists"
@@ -736,8 +737,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        7984,
-        1312
+        8912,
+        1264
       ],
       "id": "43fdfc7e-1496-41a5-9fce-c7ca9d132547",
       "name": "Contact Exists"
@@ -752,8 +753,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7776,
-        1312
+        8704,
+        1264
       ],
       "id": "5a18c40c-2fe4-4e7a-bee9-46d9416a0e44",
       "name": "Search Contact",
@@ -769,8 +770,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        8432,
-        1280
+        9328,
+        1264
       ],
       "id": "6c8a7f1f-1086-4c5f-99cf-a30e2dd921fe",
       "name": "Merge",
@@ -785,8 +786,8 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        9056,
-        1280
+        9952,
+        1264
       ],
       "id": "176bd4a4-1b4c-4ee7-99ed-ef09d1f5a009",
       "name": "Supabase - Save Chatwoot Conversation ID",
@@ -804,8 +805,8 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8640,
-        1280
+        9536,
+        1264
       ],
       "id": "ab42ad5b-3627-4f97-acd3-c41fca5effe8",
       "name": "Parse Contact ID"
@@ -827,8 +828,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7824,
-        1728
+        7872,
+        1904
       ],
       "id": "8a8f8518-8eec-4a43-89c5-db175eac92d5",
       "name": "Add Private Note",
@@ -856,8 +857,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8064,
-        1728
+        8080,
+        1904
       ],
       "id": "58ab3af1-5684-40ab-8e64-250e6e6e26b0",
       "name": "Mark Conversation Resolved",
@@ -873,8 +874,8 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        8320,
-        1904
+        8336,
+        2080
       ],
       "id": "a41f7286-02f5-4f47-96c1-4b65d37d8c19",
       "name": "Merge1",
@@ -895,8 +896,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        6016,
-        1904
+        6064,
+        2080
       ],
       "id": "7330e8fa-c7bc-403d-9233-84dd02f03934",
       "name": "Send User Message to Chatwoot",
@@ -921,8 +922,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        7072,
-        1904
+        7120,
+        2080
       ],
       "id": "c2fdd447-f25f-485b-a04b-4a80abebc9de",
       "name": "Send Bot Response to Chatwoot",
@@ -932,29 +933,146 @@
           "name": "Chatwoot Cloud API"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"filterGroups\": [\n    {\n      \"filters\": [\n        {\n          \"propertyName\": \"lastmodifieddate\",\n          \"operator\": \"GTE\",\n          \"value\": \"{{ $now.minus({days: 30}).toMillis() }}\"\n        }\n      ]\n    }\n  ],\n  \"properties\": [\"firstname\", \"lastname\", \"email\", \"phone\"],\n  \"limit\": 5\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4912,
+        1312
+      ],
+      "id": "6c4233f8-e27a-4b37-b9b0-f7a70150f8c1",
+      "name": "HubSpot - Search Active Contacts",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "21esDWcnl6rnIkQX",
+          "name": "HubSpot API Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        5312,
+        1312
+      ],
+      "id": "49ad02c2-efc9-4741-9ee7-1a788264b488",
+      "name": "Loop Through Contacts",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const contact = $input.first().json;\n\nif (!contact || !contact.properties || !contact.properties.phone) {\n  return { json: { skip: true } };\n}\n\nreturn {\n  json: {\n    hubspot_contact_id: contact.id,\n    customer_phone: contact.properties.phone,\n    customer_name: `${contact.properties.firstname || ''} ${contact.properties.lastname || ''}`.trim(),\n    customer_email: contact.properties.email || ''\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5536,
+        1328
+      ],
+      "id": "1cda12ee-0b01-440b-8be5-dad12e27d5bf",
+      "name": "Extract Contact Data"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT id, created_at, customer_phone\nFROM surveys\nWHERE customer_phone = '{{ $json.customer_phone }}'\n  AND created_at > NOW() - INTERVAL '30 days'\nORDER BY created_at DESC\nLIMIT 1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        5728,
+        1328
+      ],
+      "id": "90a37cea-5af3-4983-8df4-9abce63eeb3a",
+      "name": "Supabase - Check Recent Survey",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "K9Jh4091LikXxxxv",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f0fccdd8-f894-47f9-82b3-c39cc63af39d",
+              "leftValue": "={{ $json.is_eligible }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        6144,
+        1328
+      ],
+      "id": "a8f43ff3-12ac-459c-828b-004022273637",
+      "name": "Is Eligible?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst contacts = response.results || [];\n\nif (!contacts || contacts.length === 0) {\n  console.log('Nenhum contato encontrado');\n  return [];\n}\n\nconsole.log(`Encontrados ${contacts.length} contatos para processar`);\n\n// Retorna cada contato como um item separado\nreturn contacts.map(contact => ({ json: contact }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5120,
+        1312
+      ],
+      "id": "c8097386-d796-41bb-ad77-b7632bb4098f",
+      "name": "Extract Results Array"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Pega dados do contato atual\nconst contactData = $('Extract Contact Data').first().json;\n\n// Pega resultado da query Supabase\nconst supabaseResults = $('Supabase - Check Recent Survey').all();\n\n// Verifica se realmente encontrou um survey (não apenas um item vazio)\nconst firstResult = supabaseResults[0]?.json;\nconst hasRecentSurvey = firstResult && firstResult.id !== undefined && firstResult.id !== null;\n\n// Se NÃO encontrou survey válido, é elegível\nconst isEligible = !hasRecentSurvey;\n\nconsole.log(`Contato ${contactData.customer_name}: ${isEligible ? 'ELEGÍVEL ?' : 'JÁ TEM SURVEY RECENTE ?'}`);\nif (hasRecentSurvey) {\n  console.log(`  ? Última survey: ${firstResult.created_at}`);\n}\n\nreturn {\n  json: {\n    ...contactData,\n    is_eligible: isEligible,\n    last_survey_date: hasRecentSurvey ? firstResult.created_at : null\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5936,
+        1328
+      ],
+      "id": "07c6e11b-ddd7-4e72-90ea-18d9bbbda25b",
+      "name": "Mark Eligibility"
     }
   ],
   "pinData": {
-    "Schedule - Enviar Pesquisas": [
-      {
-        "json": {
-          "timestamp": "2026-02-03T14:56:15.344-03:00",
-          "Readable date": "February 3rd 2026, 2:56:15 pm",
-          "Readable time": "2:56:15 pm",
-          "Day of week": "Tuesday",
-          "Year": "2026",
-          "Month": "February",
-          "Day of month": "03",
-          "Hour": "14",
-          "Minute": "56",
-          "Second": "15",
-          "Timezone": "America/Sao_Paulo (UTC-03:00)"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ],
     "Webhook Meta WhatsApp": [
       {
         "json": {
@@ -1037,7 +1155,7 @@
       "main": [
         [
           {
-            "node": "Set Contact ID",
+            "node": "HubSpot - Search Active Contacts",
             "type": "main",
             "index": 0
           }
@@ -1046,13 +1164,7 @@
     },
     "Set Contact ID": {
       "main": [
-        [
-          {
-            "node": "HubSpot - Get Contact",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "HubSpot - Get Contact": {
@@ -1317,7 +1429,13 @@
     },
     "Send Message": {
       "main": [
-        []
+        [
+          {
+            "node": "Loop Through Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     },
     "Check Status Completed": {
@@ -1483,6 +1601,91 @@
           }
         ]
       ]
+    },
+    "HubSpot - Search Active Contacts": {
+      "main": [
+        [
+          {
+            "node": "Extract Results Array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Through Contacts": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Extract Contact Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Contact Data": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Check Recent Survey",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Check Recent Survey": {
+      "main": [
+        [
+          {
+            "node": "Mark Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Eligible?": {
+      "main": [
+        [
+          {
+            "node": "HubSpot - Get Contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Through Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Results Array": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Is Eligible?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1490,7 +1693,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "92cf72f2-624d-4e7f-a840-c7710d3a0881",
+  "versionId": "0b5da967-9436-4994-ab25-7e1731ed396c",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "92d6759b0d5abe55175188fd74828c8fd26c59a4c86569a664d3b739d352e946"
