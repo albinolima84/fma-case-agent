@@ -28,11 +28,13 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 ### Descrição do Fluxo
 
 **Etapa 1: Acesso Manual ao CRM (5 min)**
+
 1. Gerente de Qualidade acessa HubSpot
 2. Busca manualmente o cliente na interface
 3. Abre histórico dos últimos 30 dias
 
 **Etapa 2: Revisão Manual de Dados (10 min)**
+
 4. Lê emails trocados (um por um)
 5. Verifica negócios/deals criados ou fechados
 6. Analisa tickets de suporte (status, categoria)
@@ -40,18 +42,21 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 8. Confere produtos contratados pelo cliente
 
 **Etapa 3: Análise Mental (5 min)**
+
 9. Gerente processa mentalmente todas as informações
 10. Identifica eventos relevantes
 11. Decide tom da abordagem
 12. Formula mensagem personalizada na cabeça
 
 **Etapa 4: Envio Manual (3 min)**
+
 13. Abre canal de mensageria (WhatsApp Web, Telegram, etc.)
 14. Digita ou copy/paste mensagem personalizada
 15. Envia mensagem
 16. Verifica se foi entregue
 
 **Etapa 5: Acompanhamento Manual (variável)**
+
 17. Aguarda resposta do cliente
 18. Lê resposta quando chega
 19. Se não tem nota: responde manualmente pedindo
@@ -60,6 +65,7 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 22. Finaliza quando obtém nota
 
 **Etapa 6: Registro Manual (5 min)**
+
 23. Abre planilha Excel ou Google Sheets
 24. Digita manualmente:
     - Nome do cliente
@@ -69,6 +75,7 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 25. Salva planilha
 
 **Etapa 7: Loop**
+
 26. Repete para próximo cliente da lista
 
 ### Problemas Identificados
@@ -139,24 +146,31 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 ### Descrição do Fluxo
 
-**Etapa 1: Trigger (1s)**
-1. Schedule (cron diário) ou execução manual no n8n
-2. Cliente selecionado manualmente pelo ID no workflow
+**Etapa 1: Trigger e Busca (2-3s)**
+1. Schedule (cron diário às 10h) ou execução manual no n8n
+2. Busca automática no HubSpot de contatos com atividade nos últimos 30 dias
+3. Extrai lista de contatos (até 100 por execução)
 
-**Etapa 2: Workflow n8n Inicia (1s)**
-3. Dispara pipeline de agentes para o cliente selecionado
+**Etapa 2: Filtro e Elegibilidade (2-5s)**
 
-**Etapa 3: Agente 1 - Data Fetcher (5-8s)**
-4. Faz chamadas à API do HubSpot:
+4. Para cada contato da lista:
+   - Verifica no Supabase se já recebeu pesquisa nos últimos 30 dias
+   - Marca como elegível ou inelegível
+5. Inicia loop processando apenas os elegíveis
+
+**Etapa 3: Agente 1 - Data Fetcher (5-8s por contato)**
+
+6. Para cada contato elegível, faz chamadas à API do HubSpot:
    - GET contact details
    - GET emails últimos 30 dias
    - GET deals/negócios
    - GET tickets de suporte
-5. Consolida tudo em JSON estruturado
+7. Consolida tudo em JSON estruturado
 
 **Etapa 4: Agente 2 - Context Analyzer (2-4s)**
-6. Tess AI (Agent 2 — ID 38717) analisa JSON
-7. Gera insights:
+
+8. Tess AI (Agent 2 — ID 38717) analisa JSON
+9. Gera insights:
    - Summary dos eventos relevantes
    - Sentimento (positive/negative/neutral)
    - Red flags (alertas importantes)
@@ -164,41 +178,50 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
    - Pontos de personalização
 
 **Etapa 5: Agente 3 - Message Generator (1-2s)**
-8. Tess AI (Agent 3 — ID 38728) cria mensagem personalizada
-9. Usa contexto específico do cliente
-10. Segue tom sugerido pelo Agente 2
-11. Inclui call-to-action claro (pedir nota 1-5)
+
+10. Tess AI (Agent 3 — ID 38728) cria mensagem personalizada
+11. Usa contexto específico do cliente
+12. Segue tom sugerido pelo Agente 2
+13. Inclui call-to-action claro (pedir nota 1-5)
 
 **Etapa 6: Envio Automático (1s)**
-12. Meta WhatsApp API envia via WhatsApp
-13. Confirma entrega
+
+14. Meta WhatsApp API envia via WhatsApp
+15. Confirma entrega
 
 **Etapa 7: Registro Automático (1s)**
-14. **Supabase:** Insere registro com status 'sent'
-15. **Chatwoot:** Cria conversa com todo o contexto
-16. Gerente pode acompanhar em tempo real no dashboard
 
-**Etapa 8: Aguarda Resposta**
-17. Webhook fica escutando mensagens do cliente
+16. **Supabase:** Insere registro com status 'active'
+17. **Chatwoot:** Cria conversa com todo o contexto
+18. Gerente pode acompanhar em tempo real no dashboard
 
-**Etapa 9: Agente 4 - Conversation Handler (2-3s por turno)**
-18. Recebe mensagem do cliente via webhook
-19. Tess AI (Agent 4 V2.0 — ID 38733) analisa resposta:
+**Etapa 8: Loop de Contatos**
+
+19. Sistema retorna ao início do loop (Etapa 3)
+20. Processa próximo contato elegível automaticamente
+21. Continua até processar todos os contatos da lista
+
+**Etapa 9: Aguarda Resposta (FLUXO 2 - via Webhook)**
+
+22. Webhook fica escutando mensagens dos clientes
+
+**Etapa 10: Agente 4 - Conversation Handler (2-3s por turno)**
+
+23. Recebe mensagem do cliente via webhook
+24. Tess AI (Agent 4 V2.0 — ID 38733) analisa resposta:
     - **Se contém nota 1-5:** Extrai e agradece
     - **Se é feedback:** Responde empaticamente e pede nota
     - **Se é dúvida:** Responde e retorna ao objetivo
-20. Envia resposta via WhatsApp
-21. Atualiza Chatwoot e Supabase
-22. **Loop:** Repete até obter nota ou atingir 5 turnos
+25. Envia resposta via WhatsApp
+26. Atualiza Chatwoot e Supabase
+27. **Loop:** Repete até obter nota ou atingir 5 turnos
 
-**Etapa 10: Finalização (1s)**
-23. Quando nota é extraída:
+**Etapa 11: Finalização (1s)**
+
+28. Quando nota é extraída:
     - Agradece graciosamente
     - Atualiza Supabase com nota, feedback e transcrição
     - Marca conversa como resolvida no Chatwoot
-
-**Etapa 11: Loop Automático**
-24. Sistema processa próximo cliente automaticamente
 
 ### Monitoramento Paralelo
 
@@ -299,19 +322,27 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 #### Curto Prazo (1-3 meses)
 ✅ Redução de 63% no custo operacional
+
 ✅ Aumento de 10x na capacidade de pesquisas
+
 ✅ Eliminação de 95% dos erros manuais
 
 #### Médio Prazo (3-6 meses)
 ✅ Identificação proativa de clientes em risco (churn)
+
 ✅ Insights de produto baseados em feedback estruturado
+
 ✅ Benchmark de satisfação por segmento/produto
+
 ✅ Otimização contínua dos prompts (A/B testing)
 
 #### Longo Prazo (6-12 meses)
 ✅ Expansão para outros canais (voz, email, SMS)
+
 ✅ Integração com outros processos (onboarding, renovação)
+
 ✅ Fine-tuning de modelo próprio
+
 ✅ Exportação automática para Data Warehouse/BI
 
 ---
@@ -380,21 +411,33 @@ Práticas manuais que o responsável pelo sistema pode executar periodicamente u
 
 As funcionalidades abaixo foram identificadas durante o projeto mas não foram implementadas no MVP atual. Podem ser incorporadas em fases subsequentes.
 
-### 1. Busca automática de clientes elegíveis
-Substituir a seleção manual de cliente por uma lógica automática no FLUXO 1 que: (a) busque no HubSpot contactos com atividade nos últimos 30 dias, e (b) filtre no Supabase quem já recebeu pesquisa nos últimos 30 dias (`WHERE customer_phone = X AND created_at > NOW() - INTERVAL '30 days'`). O resultado seria uma lista de clientes elegíveis que o workflow itere automaticamente via loop no n8n.
-
-### 2. Notificação automática para scores baixos
+### 1. Notificação automática para scores baixos
 
 Quando o score coletado for 1 ou 2, ou quando o Agent 2 detectar red flags no contexto do cliente, o sistema notificaria automaticamente a gerente de qualidade para follow-up manual prioritário. Isso exigiria um IF adicional no FLUXO 2, após a atualização do Supabase, que verifique o valor de `satisfaction_score` e dispare uma notificação (ex: mensagem no Chatwoot, email ou Slack).
 
-### 3. Relatório consolidado de satisfação
+### 2. Relatório consolidado de satisfação
 Geração automática de um relatório agregado com métricas como distribuição de scores, NPS, sentiment por período e taxa de conclusão. Candidatos de implementação: dashboard no Supabase (com Grafana ou Metabase apontando para a tabela `surveys`), ou um node n8n agendado que consolida os dados e publica no Chatwoot ou em uma ferramenta de BI.
 
-### 4. IA parar automaticamente quando gerente assume a conversa *(requisito FMA)*
+### 3. IA parar automaticamente quando gerente assume a conversa *(requisito FMA)*
 O FMA exige que o gerente possa "assumir o controle da conversa". Atualmente o gerente pode responder manualmente no Chatwoot, mas o bot continua a processar mensagens subsequentes do cliente via webhook Meta independentemente. Para resolver isto, o FLUXO 2 precisaria verificar, antes de chamar o Agent 4, se a conversa no Chatwoot foi atribuída a um agente humano ou se o gerente já respondeu manualmente. Se sim, o fluxo deve parar sem enviar resposta do bot. Isso exigiria uma chamada à API do Chatwoot para consultar o estado da conversa em cada iteração do webhook.
 
-### 5. Feedback Loop de qualidade das conversas
+### 4. Feedback Loop de qualidade das conversas
+
 Permitir que o gerente marque conversas como "boa" ou "ruim" no Chatwoot, e usar esse sinal para guiar a optimização dos prompts dos agentes. Exigiria um campo ou label custom no Chatwoot para classificação, e uma forma de exportar essa informação para análise periódica.
+
+### 5. Otimização: Eliminar chamada redundante ao HubSpot
+
+Atualmente o FLUXO 1 faz duas buscas ao HubSpot para cada contato elegível: (1) `HubSpot - Search Active Contacts` que retorna a lista inicial, e (2) `HubSpot - Get Contact` que busca detalhes completos do contato individualmente. Essa segunda chamada é redundante porque os dados necessários já estão disponíveis no resultado do Search.
+
+**Implementação:** Expandir as propriedades retornadas pelo node `HubSpot - Search Active Contacts` para incluir `company` e `createdate` (atualmente retorna apenas `firstname, lastname, email, phone`), e eliminar completamente o node `HubSpot - Get Contact`. O node `Extract Contact Data` seria ajustado para extrair todos os campos necessários diretamente do resultado do Search.
+
+**Benefícios:**
+- Economiza 1 chamada de API por contato (significativo em larga escala: 100 contatos = 100 chamadas eliminadas)
+- Reduz latência de ~500ms-1s por contato
+- Simplifica o workflow (1 node a menos)
+- Diminui chance de erros (menos pontos de falha na cadeia)
+
+**Impacto estimado:** Para 100 contatos processados, economia de ~50-100s de execução total e redução de 100 chamadas à API do HubSpot.
 
 ---
 
