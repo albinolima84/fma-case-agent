@@ -11,23 +11,26 @@
 Este guia configura um **ambiente 100% funcional na nuvem** onde avaliadores podem testar o sistema completo sem instalar nada localmente.
 
 ### Stack do Demo Online:
-- ☁️ **n8n Cloud** (free tier - 5.000 execuções/mês)
+- ☁️ **n8n Cloud** (trial 14 dias, depois Starter R$150/mês)
 - ☁️ **Supabase Cloud** (free tier - 500MB database)
 - ☁️ **Meta WhatsApp Business API** (oficial — sem deploy próprio)
 - ☁️ **Tess AI** (gpt-4o-mini — agentes pré-configurados)
 - ☁️ **Chatwoot Cloud** (Plano Hacker — gratuito para piloto)
 - ☁️ **HubSpot** (conta existente ou Sandbox de desenvolvedor)
 
-### Custos Estimados (Piloto):
-| Serviço | Plano | Custo/mês |
-|---------|-------|-----------|
-| n8n Cloud | Free tier | $0 |
-| Supabase | Free tier | $0 |
-| Meta WhatsApp API | Plataforma | variável |
-| Tess AI | Créditos | ~$5-10 |
-| Chatwoot Cloud | Hacker (free) | $0 |
-| HubSpot | Existente/Sandbox | $0 |
-| **TOTAL** | | **~$5-10/mês** |
+### Custos Estimados:
+| Serviço | Plano | Custo/mês (Piloto 14d) | Custo/mês (Produção) |
+|---------|-------|------------------------|----------------------|
+| n8n Cloud | Trial → Starter | $0 (14 dias) | R$150 |
+| Supabase | Free tier | $0 | $0 |
+| Meta WhatsApp API | Plataforma | variável | variável |
+| Tess AI | Créditos | ~$5-10 | ~R$30 |
+| Chatwoot Cloud | Hacker (free) | $0 | R$105 (Pro) |
+| HubSpot | Existente/Sandbox | $0 | $0 |
+| **TOTAL (Piloto)** | | **~$5-10/mês** | - |
+| **TOTAL (Produção)** | | - | **~R$285/mês** |
+
+**Importante:** O n8n Cloud oferece 14 dias de trial gratuito. Após isso, o plano mínimo é o Starter (R$150/mês). Para validação do MVP durante o trial, o custo é zero.
 
 ---
 

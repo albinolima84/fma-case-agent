@@ -10,11 +10,11 @@
 
 **Objetivo:** Reduzir em 93% o tempo de execução de pesquisas de satisfação, garantindo personalização, consistência e rastreabilidade completa através de agentes de IA integrados ao CRM HubSpot.
 
-**Investimento Total:** R$ 55.000 (desenvolvimento + setup) + R$ 300-605/mês (operação)
+**Investimento Total:** R$ 55.000 (desenvolvimento + setup) + R$ 450-1.080/mês (operação)
 
-**Economia Anual:** R$ 91.080 (cenário 200 pesquisas/mês)
+**Economia Anual:** R$ 89.280 (cenário 200 pesquisas/mês)
 
-**ROI Ano 1:** 66% | **Payback:** 8 meses
+**ROI Ano 1:** 62% | **Payback:** 8 meses
 
 **Status:** Plano aprovado para execução
 
@@ -305,14 +305,15 @@ Semana 8 (Dias 36-40)
 
 ### Infraestrutura (OPEX - Mensal)
 
-| Item | Custo/Mês | Observação |
-|------|-----------|------------|
-| n8n Cloud | R$ 0 | Tier gratuito (5.000 execuções/mês) |
-| Supabase (tier gratuito) | R$ 0 | Até 500MB |
-| Chatwoot Cloud | R$ 105 | $19/mês — Plano Pro (produção) |
-| **TOTAL OPEX INFRA** | **R$ 105/mês** | |
+| Item | Custo/Mês (Piloto) | Custo/Mês (Produção) | Observação |
+|------|-------------------|----------------------|------------|
+| n8n Cloud | R$ 0 | R$ 150 | Trial 14 dias (piloto), depois Starter |
+| Supabase (tier gratuito) | R$ 0 | R$ 0 | Até 500MB |
+| Chatwoot Cloud | R$ 0 | R$ 105 | Hacker (piloto), Pro (produção) |
+| **TOTAL OPEX INFRA (Piloto)** | **R$ 0/mês** | - | Válido durante 14 dias trial |
+| **TOTAL OPEX INFRA (Produção)** | - | **R$ 255/mês** | |
 
-> **Nota:** Durante o piloto (Fase 1–2), o Chatwoot opera no Plano Hacker (gratuito, R$ 0). Upgrade para Plano Pro necessário a partir da Fase 3, devido à limitação de retenção de dados de 30 dias no plano gratuito.
+> **Nota:** Durante o piloto (Fase 1–2, primeiros 14 dias), n8n opera em trial gratuito e Chatwoot no Plano Hacker (R$ 0). A partir da Fase 3 (produção), n8n Starter (R$150/mês) + Chatwoot Pro (R$105/mês) são necessários.
 
 ### APIs e Serviços (OPEX - Mensal)
 
@@ -329,13 +330,13 @@ Semana 8 (Dias 36-40)
 
 | Item | Custo/Mês (200 pesquisas) | Custo/Mês (1000 pesquisas) |
 |------|---------------------------|----------------------------|
-| Infraestrutura (Cloud) | R$ 105 | R$ 105 (serviços gerenciados) |
-| APIs (Tess AI + Meta) | R$ 195 | R$ 500 |
-| **TOTAL** | **R$ 300/mês** | **R$ 605/mês** |
+| Infraestrutura (n8n + Chatwoot) | R$ 255 | R$ 255 |
+| APIs (Tess AI + Meta) | R$ 195 | R$ 825 |
+| **TOTAL INFRA + APIs** | **R$ 450/mês** | **R$ 1.080/mês** |
 
 **Custo adicional:** Supervisão por gerente de qualidade (~2h/dia) = R$ 4.000/mês
 
-**Custo Total Operacional:** R$ 4.300/mês (200 pesquisas)
+**Custo Total Operacional:** R$ 4.450/mês (200 pesquisas)
 
 ---
 
@@ -371,22 +372,22 @@ Semana 8 (Dias 36-40)
 
 | Item | Cálculo | Custo/Mês |
 |------|---------|-----------|
-| Infraestrutura + APIs | Conforme tabela anterior | R$ 300 |
+| Infraestrutura + APIs | Conforme tabela anterior | R$ 450 |
 | Supervisão gerente (2h/dia) | 40h × R$ 100/h | R$ 4.000 |
 | Manutenção (5% do dev/mês) | R$ 50.200 ÷ 12 × 5% | R$ 210 |
-| **TOTAL PROCESSO OTIMIZADO** | | **R$ 4.510/mês** |
+| **TOTAL PROCESSO OTIMIZADO** | | **R$ 4.660/mês** |
 
-**Anual:** R$ 54.120
+**Anual:** R$ 55.920
 
 ### 4.4 Economia Mensal e Anual
 
 | Métrica | Valor |
 |---------|-------|
 | Custo Atual (AS-IS) | R$ 12.100/mês |
-| Custo Otimizado (TO-BE) | R$ 4.510/mês |
-| **Economia Mensal** | **R$ 7.590/mês** |
-| **Economia Anual** | **R$ 91.080/ano** |
-| **% Redução de Custo** | **63%** |
+| Custo Otimizado (TO-BE) | R$ 4.660/mês |
+| **Economia Mensal** | **R$ 7.440/mês** |
+| **Economia Anual** | **R$ 89.280/ano** |
+| **% Redução de Custo** | **61%** |
 
 ### 4.5 Cálculo do ROI
 
@@ -394,29 +395,29 @@ Semana 8 (Dias 36-40)
 
 **Ano 1:**
 - Investimento: R$ 55.000
-- Economia anual: R$ 91.080
-- Ganho líquido: R$ 91.080 - R$ 55.000 = R$ 36.080
+- Economia anual: R$ 89.280
+- Ganho líquido: R$ 89.280 - R$ 55.000 = R$ 34.280
 
-**ROI Ano 1:** (R$ 36.080 / R$ 55.000) × 100 = **66%**
+**ROI Ano 1:** (R$ 34.280 / R$ 55.000) × 100 = **62%**
 
 **Ano 2 em diante:**
 - Investimento: R$ 0 (já amortizado)
-- Economia anual: R$ 91.080
+- Economia anual: R$ 89.280
 - Custo operacional já está incluso no cálculo de economia
 
-**ROI Ano 2:** (R$ 91.080 / R$ 55.000) × 100 = **166%**
+**ROI Ano 2:** (R$ 89.280 / R$ 55.000) × 100 = **162%**
 
 **ROI Acumulado 3 Anos:**
-- Ganho total: R$ 91.080 × 3 = R$ 273.240
+- Ganho total: R$ 89.280 × 3 = R$ 267.840
 - Investimento: R$ 55.000
 
-**ROI 3 Anos:** (R$ 273.240 / R$ 55.000) × 100 = **497%**
+**ROI 3 Anos:** (R$ 267.840 / R$ 55.000) × 100 = **487%**
 
 ### 4.6 Payback Period
 
 **Payback:** Investimento / Economia Mensal
 
-R$ 55.000 / R$ 7.590 = **7.2 meses**
+R$ 55.000 / R$ 7.440 = **7.4 meses**
 
 Com arredondamento conservador: **8 meses**
 
@@ -424,14 +425,14 @@ Com arredondamento conservador: **8 meses**
 
 ```
 Mês 0: -R$ 55.000 (investimento)
-Mês 1: -R$ 55.000 + R$ 7.590 = -R$ 47.410
-Mês 2: -R$ 47.410 + R$ 7.590 = -R$ 39.820
-Mês 3: -R$ 39.820 + R$ 7.590 = -R$ 32.230
-Mês 4: -R$ 32.230 + R$ 7.590 = -R$ 24.640
-Mês 5: -R$ 24.640 + R$ 7.590 = -R$ 17.050
-Mês 6: -R$ 17.050 + R$ 7.590 = -R$ 9.460
-Mês 7: -R$ 9.460 + R$ 7.590 = -R$ 1.870
-Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
+Mês 1: -R$ 55.000 + R$ 7.440 = -R$ 47.560
+Mês 2: -R$ 47.560 + R$ 7.440 = -R$ 40.120
+Mês 3: -R$ 40.120 + R$ 7.440 = -R$ 32.680
+Mês 4: -R$ 32.680 + R$ 7.440 = -R$ 25.240
+Mês 5: -R$ 25.240 + R$ 7.440 = -R$ 17.800
+Mês 6: -R$ 17.800 + R$ 7.440 = -R$ 10.360
+Mês 7: -R$ 10.360 + R$ 7.440 = -R$ 2.920
+Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 ```
 
 **Break-Even Point:** Mês 8
@@ -461,12 +462,12 @@ Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
 | Métrica | Valor |
 |---------|-------|
 | Custo Atual | R$ 12.100/mês |
-| Custo Otimizado | R$ 4.510/mês |
-| Economia Mensal | R$ 7.590/mês |
-| Economia Anual | R$ 91.080/ano |
-| ROI Ano 1 | 66% |
-| ROI Ano 2 | 166% |
-| ROI Ano 3 | 266% |
+| Custo Otimizado | R$ 4.660/mês |
+| Economia Mensal | R$ 7.440/mês |
+| Economia Anual | R$ 89.280/ano |
+| ROI Ano 1 | 62% |
+| ROI Ano 2 | 162% |
+| ROI Ano 3 | 262% |
 | Payback | 8 meses |
 
 **Conclusão:** Cenário ideal para piloto. ROI excelente e payback rápido.
@@ -522,10 +523,10 @@ Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
 
 | Variação Preço | Custo API/Mês | Custo Total/Mês | Economia Anual | ROI Ano 1 |
 |----------------|---------------|-----------------|----------------|-----------|
-| -50% (promoção) | R$ 98 | R$ 4.428 | R$ 92.064 | 67% |
-| Atual (baseline) | R$ 195 | R$ 4.510 | R$ 91.080 | 66% |
-| +50% (aumento) | R$ 293 | R$ 4.608 | R$ 89.904 | 63% |
-| +100% (dobro) | R$ 390 | R$ 4.705 | R$ 88.740 | 61% |
+| -50% (promoção) | R$ 98 | R$ 4.563 | R$ 90.444 | 64% |
+| Atual (baseline) | R$ 195 | R$ 4.660 | R$ 89.280 | 62% |
+| +50% (aumento) | R$ 293 | R$ 4.758 | R$ 88.104 | 60% |
+| +100% (dobro) | R$ 390 | R$ 4.855 | R$ 86.940 | 58% |
 
 **Insight:** ROI é robusto mesmo com aumento de 100% no custo da API. Risco baixo.
 
@@ -533,10 +534,10 @@ Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
 
 | Variação Dev | Investimento | Economia Anual | ROI Ano 1 | Payback |
 |--------------|--------------|----------------|-----------|---------|
-| -30% (eficiência) | R$ 38.500 | R$ 91.080 | 137% | 5 meses |
-| Atual (baseline) | R$ 55.000 | R$ 91.080 | 66% | 8 meses |
-| +30% (atraso) | R$ 71.500 | R$ 91.080 | 27% | 10 meses |
-| +50% (retrabalho) | R$ 82.500 | R$ 91.080 | 10% | 11 meses |
+| -30% (eficiência) | R$ 38.500 | R$ 89.280 | 132% | 5 meses |
+| Atual (baseline) | R$ 55.000 | R$ 89.280 | 62% | 8 meses |
+| +30% (atraso) | R$ 71.500 | R$ 89.280 | 25% | 10 meses |
+| +50% (retrabalho) | R$ 82.500 | R$ 89.280 | 8% | 11 meses |
 
 **Insight:** Projeto permanece viável mesmo com 50% de estouro no desenvolvimento.
 
@@ -678,20 +679,20 @@ Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
 
 **Investimento:** R$ 55.000 (desenvolvimento + setup)
 
-**Retorno Anual:** R$ 91.080 em economia operacional (cenário 200 pesquisas/mês)
+**Retorno Anual:** R$ 89.280 em economia operacional (cenário 200 pesquisas/mês)
 
-**ROI Ano 1:** 66% | **ROI Ano 2:** 166% | **ROI 3 Anos:** 497%
+**ROI Ano 1:** 62% | **ROI Ano 2:** 162% | **ROI 3 Anos:** 487%
 
 **Payback:** 8 meses | **Break-Even:** Mês 8
 
 #### Detalhamento
 
-**Economia Mensal:** R$ 7.590
+**Economia Mensal:** R$ 7.440
 
 - Redução de 100h → 40h de trabalho de gerente (60h economizadas × R$ 100/h = R$ 6.000)
 - Eliminação de erros e retrabalho (R$ 2.000 → R$ 200 = R$ 1.800 economizados)
 - Redução de custo de ferramentas (planilhas) (R$ 100 → R$ 0 = R$ 100)
-- Custo novo de infraestrutura e APIs (cloud): -R$ 300/mês
+- Custo novo de infraestrutura e APIs (cloud): -R$ 450/mês
 - Custo novo de manutenção: -R$ 210/mês
 
 **Benefícios Não-Financeiros (Não contabilizados no ROI):**
@@ -708,7 +709,7 @@ Mês 8: -R$ 1.870 + R$ 7.590 = +R$ 5.720 ✅ BREAK-EVEN
 | Volume | ROI Ano 1 | Payback | Viabilidade |
 |--------|-----------|---------|-------------|
 | 100 pesquisas/mês | -18% | 15 meses | Viável a médio prazo |
-| **200 pesquisas/mês** | **66%** | **8 meses** | **Recomendado ⭐** |
+| **200 pesquisas/mês** | **62%** | **8 meses** | **Recomendado ⭐** |
 | 500 pesquisas/mês | 437% | 2.5 meses | Excelente |
 | 1000 pesquisas/mês | 1.032% | 1 mês | Extraordinário |
 

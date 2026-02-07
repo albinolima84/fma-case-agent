@@ -482,16 +482,18 @@ Body: {
 
 ### 6.1 Serviços Utilizados (todos Cloud/gerenciados)
 
-| Serviço | Plano | Custo |
-|---------|-------|-------|
-| n8n Cloud | Free tier | $0 |
-| Supabase | Free tier | $0 |
-| Chatwoot Cloud | Hacker (free) | $0 |
-| Tess AI | Créditos | variável |
-| Meta WhatsApp API | Plataforma | variável |
-| HubSpot | Existente | $0 adicional |
+| Serviço | Plano | Custo (Piloto) | Custo (Produção) |
+|---------|-------|----------------|------------------|
+| n8n Cloud | Trial 14d → Starter | $0 | R$150/mês |
+| Supabase | Free tier | $0 | $0 |
+| Chatwoot Cloud | Hacker → Pro | $0 | R$105/mês |
+| Tess AI | Créditos | variável | ~R$165/mês |
+| Meta WhatsApp API | Plataforma | variável | ~R$30/mês |
+| HubSpot | Existente | $0 adicional | $0 adicional |
 
 **Vantagem:** Zero servidores próprios. Todo o sistema opera em serviços gerenciados na nuvem.
+
+**Nota:** n8n Cloud oferece 14 dias de trial gratuito, ideal para validação do MVP. Após o trial, o plano mínimo é o Starter (R$150/mês).
 
 ### 6.2 Credenciais no n8n
 
@@ -597,29 +599,29 @@ Alertas automáticos não existem no MVP atual. Possibilidades para implementaç
 
 ## 10. Estimativa de Custos (Mensal)
 
-### Piloto (50 pesquisas/dia)
+### Piloto (50 pesquisas durante trial de 14 dias)
 
 | Item | Custo |
 |------|-------|
-| n8n Cloud | $0 (free tier) |
-| Supabase | $0 (free tier) |
-| Chatwoot Cloud | $0 |
-| Tess AI (créditos) | ~$5-10 |
-| Meta WhatsApp API | variável |
-| **Total** | **~$6-11/mês** |
+| n8n Cloud (Trial 14 dias) | R$0 |
+| Supabase (free tier) | R$0 |
+| Chatwoot Cloud (Hacker) | R$0 |
+| Tess AI (créditos) | ~R$30 |
+| Meta WhatsApp API | ~R$15 |
+| **Total (14 dias trial)** | **~R$45** |
 
-### Produção (200 pesquisas/dia)
+### Produção (200 pesquisas/mês)
 
 | Item | Custo |
 |------|-------|
-| n8n Cloud (Pro) | $25 |
-| Supabase Pro | $25 |
-| Chatwoot Cloud | $19 (Pro — necessário para retenção > 30 dias) |
-| Tess AI (créditos) | ~$20-40 |
-| Meta WhatsApp API | variável |
-| **Total** | **~$90-110/mês** |
+| n8n Cloud (Starter) | R$150 |
+| Supabase (free tier) | R$0 |
+| Chatwoot Cloud (Pro) | R$105 |
+| Tess AI (créditos) | ~R$165 |
+| Meta WhatsApp API | ~R$30 |
+| **Total** | **~R$450/mês** |
 
-**Nota:** Todos os serviços são gerenciados na nuvem. Sem servidores próprios ou VPS necessários.
+**Nota sobre n8n Cloud:** Trial de 14 dias gratuito permite validar o MVP sem custo. Após o trial, o plano mínimo é o Starter (R$150/mês). Todos os serviços são gerenciados na nuvem — sem servidores próprios ou VPS necessários.
 
 ---
 
