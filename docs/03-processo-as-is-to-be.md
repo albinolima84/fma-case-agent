@@ -439,6 +439,25 @@ Atualmente o FLUXO 1 faz duas buscas ao HubSpot para cada contato elegível: (1)
 
 **Impacto estimado:** Para 100 contatos processados, economia de ~50-100s de execução total e redução de 100 chamadas à API do HubSpot.
 
+### 6. Log de envio/entrega/leitura de mensagens
+
+Implementar rastreamento detalhado do ciclo de vida das mensagens WhatsApp para auditoria e conformidade. A Meta WhatsApp Business API fornece webhooks com status updates (`sent`, `delivered`, `read`) que atualmente não são capturados pelo sistema.
+
+**Implementação:** Adicionar campos na tabela `surveys` para registrar timestamps de cada status:
+- `message_sent_at` - quando a mensagem inicial foi enviada
+- `message_delivered_at` - quando foi entregue ao dispositivo do cliente
+- `message_read_at` - quando o cliente leu a mensagem
+
+Criar um novo webhook handler no n8n (FLUXO 3) para receber status updates da Meta API e atualizar esses campos no Supabase. O FLUXO 1 salvaria `message_sent_at = NOW()` ao enviar, e o webhook atualizaria os demais timestamps conforme os status chegam.
+
+**Benefícios:**
+- Conformidade com requisitos de auditoria (ex: FMA - "log do envio/entrega/leitura quando aplicável")
+- Visibilidade do engajamento do cliente (tempo até ler a mensagem)
+- Identificação de problemas de entrega (mensagens não entregues ou não lidas)
+- Métricas de performance (tempo médio até leitura)
+
+**Escopo opcional:** O sistema poderia rastrear apenas a mensagem inicial (mais simples) ou todas as mensagens trocadas durante a conversa (requer tabela `messages` separada com histórico completo).
+
 ---
 
 ## Conclusão

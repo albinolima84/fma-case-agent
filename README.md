@@ -10,16 +10,25 @@ Sistema automatizado end-to-end para medição de satisfação de clientes utili
 
 ```
 case-agent-dev/
-├── README.md                           # Este arquivo
-├── PROJECT_STATUS.md                   # Status detalhado do projeto
-├── CHECKPOINT-2026-02-02.md            # Checkpoint mais recente
-├── PROMPT-RETOMADA.md                  # Para retomar desenvolvimento
+├── README.md                              # Este arquivo
+├── PROMPT-RETOMADA.md                     # Para retomar desenvolvimento
+├── docs/                                  # Documentação estruturada
+│   ├── 01-arquitetura-solucao.md
+│   ├── 02-agentes-ia-detalhamento.md
+│   ├── 03-processo-as-is-to-be.md
+│   ├── 04-plano-projeto-roi.md
+│   ├── 05-guia-deploy-online.md
+│   └── 06-guia-entrega.md
 ├── workflows/
-│   ├── satisfaction-survey-workflow.json  # Workflow n8n (ÚNICO)
+│   ├── satisfaction-survey-workflow.json   # Workflow n8n exportado
 │   └── README.md
-├── GUIA-META-WHATSAPP-API.md           # Guia completo Meta API
-├── GUIA-N8N-SETUP.md                   # Setup n8n Cloud
-└── CREDENCIAIS-E-CONFIGS.md            # Credenciais e configurações
+├── prompts/                               # Prompts dos agentes
+│   ├── agent-2-context-analyzer.txt
+│   ├── agent-3-message-generator.txt
+│   └── agent-4-conversation-handler.txt
+└── diagrams/                              # Diagramas do processo
+    ├── as-is-processo-manual.mermaid + .png
+    └── to-be-processo-automatizado.mermaid + .png
 ```
 
 ---
@@ -31,7 +40,7 @@ case-agent-dev/
 - **CRM:** HubSpot API v3
 - **Mensageria:** **Meta WhatsApp API (Oficial)** 🆕
 - **Banco de Dados:** Supabase PostgreSQL (Cloud)
-- **Interface:** Chatwoot Cloud ($19/mês) - *Em implementação*
+- **Interface:** Chatwoot Cloud (Hacker gratuito no piloto; Pro R$105/mês em produção)
 
 ---
 
@@ -45,6 +54,14 @@ O sistema utiliza 4 agentes especializados:
 | **Agent 2** | 38717 | Context Analyzer | ✅ Funcionando |
 | **Agent 3** | 38728 | Message Generator | ✅ Funcionando |
 | **Agent 4** | 38733 | Conversation Handler V2.0 | ✅ Otimizado |
+
+### 🔗 Links Públicos dos Agentes
+
+- **[Agent 2 - Context Analyzer](https://tess.im/pt-BR/dashboard/user/ai/chat/ai-chat/context-analyzer-6TBb4l)** (ID: 38717)
+- **[Agent 3 - Message Generator](https://tess.im/pt-BR/dashboard/user/ai/chat/ai-chat/message-generator-vE6X3l)** (ID: 38728)
+- **[Agent 4 - Conversation Handler V2](https://tess.im/pt-BR/dashboard/user/ai/chat/ai-chat/conversation-handler-GjH0pE)** (ID: 38733)
+
+> 💡 **Nota:** Os prompts completos de cada agente estão disponíveis no diretório [`prompts/`](prompts/).
 
 ### Agent 4 V2.0 - Melhorias Implementadas 🆕
 
@@ -70,43 +87,42 @@ O Agent 4 foi completamente otimizado para garantir finalização correta de con
 **FLUXO 1 - Envio Proativo (100% FUNCIONAL):** ✅
 ```
 HubSpot CRM → Agent 1 (Data) → Agent 2 (Análise) →
-Agent 3 (Mensagem) → Meta WhatsApp → Supabase
+Agent 3 (Mensagem) → Meta WhatsApp → Supabase →
+Search/Create Contact (Chatwoot) → Create Conversation → Send Message
 ```
 
 **FLUXO 2 - Respostas (100% FUNCIONAL):** ✅
 ```
 WhatsApp → Meta Webhook → n8n → Supabase (busca survey) →
-Agent 4 V2.0 (Conversa) → Meta API (resposta) → Supabase (update)
+Send User Message (Chatwoot) → Agent 4 V2.0 (Conversa) →
+Meta API (resposta) → Send Bot Response (Chatwoot) →
+IF completed: Add Private Note + Mark Resolved (Chatwoot) →
+Supabase (update)
 ```
 
 ---
 
 ## 📊 Status Atual
 
-**Última atualização:** 2026-02-02
-**Progresso:** 90% completo ████████████████████░░░░
+**Última atualização:** 2026-02-03
+**Progresso:** 100% completo ████████████████████████
 
 ### ✅ Completo e Funcionando
 
 - ✅ **Meta WhatsApp API** configurada e verificada
-- ✅ **FLUXO 1** (Envio Proativo) 100% operacional com texto livre (sem templates)
-- ✅ **FLUXO 2** (Recebimento/Resposta) 100% operacional
+- ✅ **FLUXO 1** (Envio Proativo) 100% operacional com integração Chatwoot
+- ✅ **FLUXO 2** (Recebimento/Resposta) 100% operacional com integração Chatwoot
 - ✅ **Webhook** Meta → n8n funcionando
 - ✅ **Agent 4 V2.0** otimizado com finalização inteligente
 - ✅ **Supabase** salvando conversações em JSONB com histórico completo
-- ✅ **n8n Cloud** workflow ativo 24/7
-- ✅ **Testes end-to-end** completos e validados
-- ✅ **Documentação** completa e atualizada
-
-### ⏳ Pendente (Requisito do FMA)
-
-- ⏳ **Interface de Monitoramento** para Gerentes de Qualidade
+- ✅ **Chatwoot Cloud** — interface de monitoramento integrada (requisito FMA)
   - Supervisão em tempo real de conversas
-  - Acesso ao histórico completo
-  - Possibilidade de intervenção manual
-  - Assumir controle da conversa quando necessário
-
-**Status:** Backend operacional - Falta interface de monitoramento
+  - Histórico completo (mensagens do cliente e do bot)
+  - Nota privada automática com score/sentiment/feedback quando survey é concluído
+  - Conversa marcada como resolvida automaticamente
+  - Intervenção manual disponível pelo gerente
+- ✅ **n8n Cloud** workflow ativo 24/7
+- ✅ **Testes end-to-end** completos e validados (com Chatwoot)
 
 ---
 
@@ -126,9 +142,10 @@ Agent 4 V2.0 (Conversa) → Meta API (resposta) → Supabase (update)
 
 ### ROI Estimado
 - **Economia de tempo:** 28 min/cliente × 200 clientes/mês = 93 horas/mês
-- **Custo operacional:** ~$5-10/mês (APIs + Cloud)
-- **Payback:** < 2 meses
-- **ROI 3 anos:** 502%
+- **Economia mensal:** R$7.590 (63%) | Anual R$91.080
+- **Custo operacional (produção):** R$300/mês (OPEX Total)
+- **Payback:** 8 meses (conservador)
+- **ROI:** Ano 1: 66% | Ano 2: 166% | 3 anos: 497%
 
 ---
 
@@ -145,7 +162,7 @@ Agent 4 V2.0 (Conversa) → Meta API (resposta) → Supabase (update)
 
 ### 2. Deploy
 
-Siga o guia completo: **[GUIA-META-WHATSAPP-API.md](GUIA-META-WHATSAPP-API.md)**
+Siga o guia completo: **[05-guia-deploy-online.md](docs/05-guia-deploy-online.md)**
 
 **Resumo:**
 1. Importar workflow no n8n Cloud
@@ -204,6 +221,7 @@ CREATE TABLE surveys (
   main_feedback TEXT,
   sentiment VARCHAR(20),
   status VARCHAR(20) DEFAULT 'active',
+  chatwoot_conversation_id INTEGER,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -241,24 +259,29 @@ CREATE TABLE surveys (
 - ✅ **Status:** completed (finalizado corretamente)
 - ✅ **Histórico completo:** 5 mensagens preservadas no banco (JSONB)
 - ✅ **Agent 4 V2.0:** Finalizou conversa após coletar nota + feedback
+- ✅ **Chatwoot:** Mensagens do cliente e do bot registradas na conversa
+- ✅ **Chatwoot:** Nota privada com resumo do survey adicionada
+- ✅ **Chatwoot:** Conversa marcada como resolvida
 
 ---
 
 ## 📖 Documentação Completa
 
-### Guias de Setup
-- **[GUIA-META-WHATSAPP-API.md](GUIA-META-WHATSAPP-API.md)** - Setup completo Meta API
-- **[GUIA-N8N-SETUP.md](GUIA-N8N-SETUP.md)** - Configuração n8n
-- **[CREDENCIAIS-E-CONFIGS.md](CREDENCIAIS-E-CONFIGS.md)** - Todas as credenciais
+### Documentação Estruturada
+- **[01 - Arquitetura da Solução](docs/01-arquitetura-solucao.md)**
+- **[02 - Agentes IA (Detalhamento)](docs/02-agentes-ia-detalhamento.md)**
+- **[03 - Processo AS-IS / TO-BE](docs/03-processo-as-is-to-be.md)**
+- **[04 - Plano do Projeto e ROI](docs/04-plano-projeto-roi.md)**
+- **[05 - Guia de Deploy Online](docs/05-guia-deploy-online.md)**
+- **[06 - Guia de Entrega](docs/06-guia-entrega.md)**
 
-### Status e Checkpoints
-- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Status detalhado do projeto
-- **[CHECKPOINT-2026-02-02.md](CHECKPOINT-2026-02-02.md)** - Progresso recente
+### Workflows e Prompts
+- **[workflows/satisfaction-survey-workflow.json](workflows/satisfaction-survey-workflow.json)** - Workflow n8n exportado
+- **[prompts/](prompts/)** - Prompts dos agentes (Agent 2, 3, 4)
+
+### Sessão e Contexto
 - **[PROMPT-RETOMADA.md](PROMPT-RETOMADA.md)** - Para retomar desenvolvimento
-
-### Workflows
-- **[workflows/satisfaction-survey-workflow.json](workflows/satisfaction-survey-workflow.json)** - Workflow completo
-- **[workflows/README.md](workflows/README.md)** - Documentação do workflow
+- **[CHECKPOINT-2026-02-04.md](CHECKPOINT-2026-02-04.md)** - Checkpoint mais recente
 
 ---
 
@@ -281,6 +304,21 @@ CREATE TABLE surveys (
 - Credencial Tess configurada no n8n
 - Formato correto: temperature "1", messages array
 - API key válida
+
+### Tess retorna erro de parse
+**Verificar:**
+- Output do Tess pode vir com ou sem marcações ````json``` ` — não-determinístico
+- Sempre fazer `.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()` antes de `JSON.parse()`
+
+### Erro SQL "Syntax error" com aspas
+**Verificar:**
+- Valores do usuário interpolados em queries precisam de escape: `.replace(/'/g, "''")`
+- Campos afetados: `main_feedback`, `conversation_transcript`
+
+### Merge após IF trava
+**Verificar:**
+- Modo "Combine" espera todos os inputs — trava quando só um branch executa
+- Usar modo **Append** para IFs onde apenas um branch fica ativo
 
 ---
 
@@ -314,6 +352,18 @@ CREATE TABLE surveys (
 - Validar com múltiplos cenários de teste (9+ casos)
 - Agent 4 V2.0: Problema de loop resolvido via otimização de prompt
 
+### 6. LLM Output é Não-Determinístico
+- Tess (gpt-4o-mini) às vezes retorna JSON puro, às vezes envolve em ````json``` `
+- Sempre sanitizar output antes de parsear — não assumir formato fixo
+
+### 7. SQL com Dados do Usuário
+- Valores interpolados diretamente em queries precisam de escape de aspas simples
+- `.replace(/'/g, "''")` é essencial para campos como feedback e transcrição
+
+### 8. n8n Merge após IF
+- Modo "Combine" trava quando apenas um branch do IF executa
+- Usar **Append** — processa cada input independentemente sem esperar todos
+
 ---
 
 ## 📈 Próximos Passos
@@ -325,53 +375,15 @@ CREATE TABLE surveys (
 4. ✅ Testes end-to-end completos e validados
 5. ✅ Documentação completa e atualizada
 
-### ⏳ Fase 2 - Interface de Monitoramento (Pendente - Requisito FMA)
-**Solução:** **Chatwoot (Open Source)** no **Render.com Free Tier**
+### ✅ Fase 2 - Interface de Monitoramento (Completo)
+**Solução:** Chatwoot Cloud (Hacker gratuito no piloto; Pro R$105/mês em produção)
 
-**Decisão de Hospedagem:**
-- **Hospedagem:** Render.com Free Tier
-- **Custo:** $0 (adequado para projeto piloto de 1 mês)
-- **Limitação:** Sleep após 15min de inatividade
-  - Warm-up de 30-60s na primeira abertura
-  - Aceitável para piloto (gerentes acessam poucas vezes/dia)
-- **Dados protegidos:** Sempre salvos no Supabase (fonte primária)
-- **Chatwoot:** Apenas interface de visualização (secundária)
-
-**Por que Chatwoot:**
-- Interface profissional pronta (tipo Intercom/Zendesk)
-- Supervisão em tempo real de conversas
-- Histórico completo com busca e filtros
-- Dashboard com métricas e relatórios
-- **Intervenção manual**: Gerente pode assumir controle da conversa
-- Sistema de tags, notas e atribuições
-- Mobile app nativo (iOS/Android)
-- API REST completa para integração
-- Reduz tempo de desenvolvimento: 2-3 dias vs 7-10 dias (custom)
-
-**Funcionalidades que serão implementadas:**
-1. **Dashboard Principal**
-   - Lista de conversas ativas/pendentes/concluídas
-   - Filtros por status, data, score
-   - Métricas em tempo real (taxa de resposta, distribuição de scores)
-
-2. **Visualização de Conversa**
-   - Histórico completo da conversa
-   - Contexto do HubSpot
-   - Score de satisfação destacado
-   - Botão "Assumir conversa" para intervenção manual
-
-3. **Relatórios**
-   - Export CSV com todas as pesquisas
-   - Gráficos de tendência (score ao longo do tempo)
-   - Identificação de clientes críticos (score 1-2)
-
-**Implementação:**
-- Deploy Chatwoot (Docker): 1-2h
-- Integração n8n ↔ Chatwoot: 2-3h
-- Configuração Dashboard: 1h
-- **Total: 4-6 horas**
-
-**Documentação:** Ver `docs/01-arquitetura-solucao.md` seção 5
+**Implementado:**
+- ✅ Conta Chatwoot Cloud configurada
+- ✅ Inbox "Satisfação WhatsApp" criado
+- ✅ FLUXO 1: Search/Create Contact → Create Conversation → Save ID → Send Message
+- ✅ FLUXO 2: Send User Message → Send Bot Response → Add Private Note → Mark Resolved
+- ✅ Teste end-to-end validado com todas as mensagens registradas
 
 ### Fase 3 - Melhorias Futuras (Opcional)
 1. Dashboard analytics (Supabase + Grafana)
@@ -403,6 +415,6 @@ Este projeto foi desenvolvido para fins educacionais como parte de um case técn
 
 ---
 
-**Última atualização:** 2026-02-02 23:55
-**Versão:** 2.0 (Meta WhatsApp API)
-**Status:** 90% completo - Backend operacional, falta Chatwoot (4-6h)
+**Última atualização:** 2026-02-05
+**Versão:** 3.1 (Meta WhatsApp API + Chatwoot Cloud)
+**Status:** 100% completo
