@@ -122,15 +122,18 @@ ALTER TABLE surveys DISABLE ROW LEVEL SECURITY;
 
 ⚠️ **Nota de Segurança:** Em produção, você configuraria políticas RLS. Para demo, estamos simplificando.
 
-### 1.5. Obter Credenciais
+### 1.5. Obter Credenciais de Conexão PostgreSQL
 
-1. Clique em **"Settings"** (ícone de engrenagem) → **"API"**
-2. **Copie e salve:**
-   - **Project URL:** `https://xxxxxxx.supabase.co`
-   - **anon/public key:** `eyJhbGc...` (chave longa)
-   - **service_role key:** `eyJhbGc...` (chave secreta - NUNCA compartilhe)
+1. Clique em **"Settings"** (ícone de engrenagem) → **"Database"**
+2. Na seção **"Connection string"**, clique na aba **"URI"**
+3. **Copie e salve as informações:**
+   - **Host:** `db.xxxxxxx.supabase.co` (extraído da connection string)
+   - **Database:** `postgres`
+   - **User:** `postgres`
+   - **Password:** a senha que você criou ao criar o projeto
+   - **Port:** `5432`
 
-3. Para n8n, usaremos a **service_role key** (bypass RLS)
+**Nota:** Não usamos as API keys REST do Supabase (anon/service_role). O n8n conecta diretamente ao PostgreSQL via conexão SQL.
 
 ### 1.6. Testar Conexão
 
@@ -290,34 +293,80 @@ Antes de importar o workflow, configure todas as credenciais.
 3. Selecione: `workflows/satisfaction-survey-workflow.json`
 4. O workflow será importado com todos os nodes
 
-### 4.5. Ajustar Credenciais no Workflow
+### 4.5. Configurar Nodes de Configuração (Config)
+
+O workflow já inclui **2 nodes "Config"** (um em cada fluxo) que centralizam as configurações. Você só precisa atualizar os valores com seus IDs:
+
+**📍 Localização dos nodes:**
+- **FLUXO 1:** `Schedule` → **`Config`** → `HubSpot - Search Active Contacts` → ...
+- **FLUXO 2:** `Webhook Meta` → **`Config1`** → `Check Verification` → ...
+
+#### Passo a Passo:
+
+**1. Configurar node "Config" (FLUXO 1):**
+
+   a) Localize e abra o node **"Config"** (logo após o Schedule)
+
+   b) Atualize os valores dos seguintes campos:
+
+   | Nome | Tipo | Valor Atual | Seu Valor | Onde Obter |
+   |------|------|-------------|-----------|------------|
+   | `CHATWOOT_ACCOUNT_ID` | String | 150655 | Seu Account ID | URL do Chatwoot: `/app/accounts/XXXXX` |
+   | `CHATWOOT_INBOX_ID` | String | 94417 | Seu Inbox ID | Chatwoot → Settings → Inboxes → satisfaction-survey |
+   | `META_PHONE_NUMBER_ID` | String | 674094992450703 | Seu Phone Number ID | Meta for Developers → WhatsApp → Configuration |
+
+   c) Clique em **"Save"**
+
+**2. Configurar node "Config1" (FLUXO 2):**
+
+   a) Localize e abra o node **"Config1"** (logo após o Webhook Meta WhatsApp)
+
+   b) Atualize com os **mesmos valores** da etapa 1b
+
+   c) Clique em **"Save"**
+
+**✅ Pronto!** O workflow já usa essas variáveis automaticamente em todos os nodes via sintaxe:
+- `{{$node["Config"].json.CHATWOOT_ACCOUNT_ID}}`
+- `{{$node["Config"].json.CHATWOOT_INBOX_ID}}`
+- `{{$node["Config"].json.META_PHONE_NUMBER_ID}}`
+
+**Exemplo de URL usando as variáveis:**
+```
+https://app.chatwoot.com/api/v1/accounts/{{$node["Config"].json.CHATWOOT_ACCOUNT_ID}}/contacts/search
+```
+
+**Nota:** Os dois nodes Config devem ter os mesmos valores para garantir consistência entre os fluxos.
+
+### 4.6. Ajustar Credenciais no Workflow
 
 Após importar, conecte as credenciais aos nodes:
 
-1. **Nodes Supabase** (`Supabase - Insert Survey`, `Supabase - Get Survey`, `Supabase - Update Ongoing`, `Supabase - Update Completed`):
+1. **Nodes Supabase** (`Supabase - Create Survey`, `Supabase - Get Survey`, `Supabase - Check Recent Survey`, `Supabase - Update Survey`, `Supabase - Save Chatwoot Conversation ID`):
    - Clique em cada → aba "Credentials" → selecione `Supabase - Satisfaction DB`
 
-2. **Nodes Tess AI** (`AGENTE 2: Context Analyzer`, `AGENTE 3: Message Generator`, `AGENTE 4: Conversation Handler`):
+2. **Nodes Tess AI** (`Tess - Agent 2 (Context)`, `Tess - Agent 3 (Message)`, `Tess - Agent 4`):
    - São HTTP Request nodes apontando para `https://api.tess.im/agents/{id}/execute`
    - Clique em cada → selecione `Tess AI`
 
-3. **Nodes Meta WhatsApp API** (`Send WhatsApp Message`, `Send WhatsApp Response`):
-   - São HTTP Request nodes apontando para `https://graph.facebook.com/v21.0/{phone_number_id}/messages`
+3. **Nodes Meta WhatsApp API** (`Send Initial WhatsApp (Meta API)`, `Send Meta WhatsApp`):
+   - São HTTP Request nodes apontando para `https://graph.facebook.com/v21.0/{{$node["Config"].json.META_PHONE_NUMBER_ID}}/messages`
    - Clique em cada → selecione `Meta WhatsApp API`
 
-4. **Nodes Chatwoot** (Search Contact, Create Contact, Create Conversation, Send Message, Add Private Note, Mark Resolved):
-   - São HTTP Request nodes apontando para `https://app.chatwoot.com/api/v1/accounts/{account_id}/...`
+4. **Nodes Chatwoot** (Search Contact, Create Contact, Create Conversation, Send Message, Send User Message to Chatwoot, Send Bot Response to Chatwoot, Add Private Note, Mark Conversation Resolved):
+   - São HTTP Request nodes apontando para `https://app.chatwoot.com/api/v1/accounts/{{$node["Config"].json.CHATWOOT_ACCOUNT_ID}}/...`
    - Clique em cada → selecione `Chatwoot Cloud API`
 
-5. **Nodes HubSpot** (`Get Contact`, `Get Emails`, `Get Deals`, `Get Tickets`):
+5. **Nodes HubSpot** (`HubSpot - Search Active Contacts`, `HubSpot - Get Contact`, `HubSpot - Get Emails`, `HubSpot - Get Deals`, `HubSpot - Get Tickets`):
    - Clique em cada → selecione `HubSpot API`
 
-### 4.6. Ativar o Workflow
+**✅ Pronto!** O workflow já vem configurado com as variáveis do Config. Não é necessário substituir IDs manualmente — basta ajustar os valores nos nodes Config (seção 4.5).
+
+### 4.7. Ativar o Workflow
 
 1. No canto superior direito, toggle **"Inactive"** → **"Active"**
 2. ✅ Workflow está ativo!
 
-### 4.7. Obter URL do Webhook
+### 4.8. Obter URL do Webhook
 
 1. Abra o node **"Webhook - WhatsApp Meta"** (início do FLUXO 2)
 2. Copie a **Production URL** (será algo como):
@@ -396,112 +445,110 @@ O workflow faz o parsing de `responses[0].output` e aplica sanitização de JSON
 
 ### 7.1. Criar Dados de Teste no HubSpot (ou Mockar)
 
-**Opção A: Mockar HubSpot (Mais Simples para Demo)**
+**Opção A: Mockar HubSpot Search (Mais Simples para Demo)**
 
-1. No workflow, adicione um node **"Code"** antes dos nodes HubSpot
-2. Nomeie: `Mock HubSpot Data`
-3. Cole o código:
+Para testar sem precisar de dados reais no HubSpot, você pode mockar o node de busca:
+
+1. No workflow, localize o node **"HubSpot - Search Active Contacts"**
+2. Desconecte-o ou desabilite-o
+3. Adicione um node **"Code"** entre `Config` e `Extract Results Array`
+4. Nomeie: `Mock HubSpot Search`
+5. Cole o código:
 
 ```javascript
-const contactId = $input.first().json.contact_id;
-
+// Retorna lista mockada de contatos para teste
 return [{
   json: {
-    contact: {
-      id: contactId,
-      properties: {
-        firstname: "João",
-        lastname: "Silva",
-        email: "joao.silva@example.com",
-        phone: "5511999887766",
-        lifecyclestage: "customer",
-        hs_lead_status: "CUSTOMER"
+    results: [
+      {
+        id: "demo-12345",
+        properties: {
+          firstname: "João",
+          lastname: "Silva",
+          email: "joao.silva@example.com",
+          phone: "+5511999887766"
+        }
+      },
+      {
+        id: "demo-67890",
+        properties: {
+          firstname: "Maria",
+          lastname: "Santos",
+          email: "maria.santos@example.com",
+          phone: "+5511988776655"
+        }
       }
-    },
-    emails: {
-      results: [
-        {
-          properties: {
-            hs_email_subject: "Boas-vindas ao nosso sistema!",
-            hs_email_text: "Olá João, bem-vindo!",
-            hs_timestamp: "2025-12-01T10:00:00Z"
-          }
-        },
-        {
-          properties: {
-            hs_email_subject: "Seu upgrade foi concluído",
-            hs_email_text: "Parabéns pelo upgrade para o Plano Pro!",
-            hs_timestamp: "2026-01-15T14:30:00Z"
-          }
-        }
-      ]
-    },
-    deals: {
-      results: [
-        {
-          properties: {
-            dealname: "Upgrade para Plano Pro",
-            dealstage: "closedwon",
-            amount: "499",
-            closedate: "2026-01-15"
-          }
-        }
-      ]
-    },
-    tickets: {
-      results: [
-        {
-          properties: {
-            subject: "Dúvida sobre integração API",
-            hs_ticket_priority: "HIGH",
-            hs_pipeline_stage: "4",
-            createdate: "2026-01-20T09:00:00Z"
-          }
-        }
-      ]
-    }
+    ]
   }
 }];
 ```
 
-4. Conecte `Set Contact ID` → `Mock HubSpot Data` → nó de consolidação
-5. Desconecte os 4 nodes de HubSpot API real (ou deixe em paralelo para usar depois)
+6. Conecte: `Config` → `Mock HubSpot Search` → `Extract Results Array`
+7. O restante do fluxo funcionará normalmente, processando esses 2 contatos mockados
 
-**Opção B: Usar HubSpot Real**
+**Opção B: Mockar Dados Completos do HubSpot**
 
-Se você tem uma conta HubSpot com contatos, pode usar os nodes reais diretamente. Certifique-se de que o token da credencial `HubSpot API` é válido.
+Se quiser controlar também os emails/deals/tickets retornados, você pode substituir os 4 nodes de busca (`Get Contact`, `Get Emails`, `Get Deals`, `Get Tickets`) por um único node Code que retorna dados completos mockados. Cole no node `Consolidate HubSpot Data` antes de processar.
 
-### 7.2. Teste Manual - Envio Inicial
+**Opção C: Usar HubSpot Real**
 
-1. No workflow, clique no node **"Set Contact ID"**
-2. Clique em **"Execute Node"**
-3. No painel, cole:
-```json
-{
-  "contact_id": "demo-12345"
-}
-```
-4. Clique em **"Execute Node"**
-5. 🎯 Acompanhe a execução percorrer todos os nodes:
-   - Get Contact / Mock Data ✅
-   - Get Emails / Get Deals / Get Tickets ✅
-   - Consolidate Data ✅
-   - AGENTE 2: Context Analyzer (Tess AI) ✅
-   - AGENTE 3: Message Generator (Tess AI) ✅
-   - Send WhatsApp (Meta API) ✅
-   - Supabase Insert + Chatwoot Create (paralelo) ✅
+Se você tem uma conta HubSpot (ou HubSpot Sandbox) com contatos, pode usar o workflow sem modificações:
 
-6. **Verificar WhatsApp:**
-   - Você deve receber uma mensagem no número conectado à Meta WhatsApp Business API
-   - Exemplo: *"Oi João! Vi que você fez upgrade para o Plano Pro recentemente. Como está sendo a experiência? De 1 a 5, como você avalia nosso serviço?"*
+1. Certifique-se de que a credencial `HubSpot API` está configurada corretamente
+2. O node `HubSpot - Search Active Contacts` buscará automaticamente contatos com atividade nos últimos 30 dias
+3. O workflow processará até 100 contatos por execução (configurável no limit do node)
 
-7. **Verificar Supabase:**
-   - Vá no Supabase → Table Editor → `surveys`
-   - Deve ter 1 registro novo com `status = 'active'`
+### 7.2. Teste Manual - Envio Inicial (FLUXO 1)
 
-8. **Verificar Chatwoot:**
-   - No Chatwoot dashboard, deve aparecer uma nova conversa com o contato
-   - A mensagem enviada via WhatsApp deve estar registrada
+Com o FLUXO 1 automatizado, você tem 2 opções para testar:
+
+**Opção A: Executar Workflow Completo Manualmente**
+
+1. No workflow, localize o node **"Schedule - Enviar Pesquisas"** (desabilitado por padrão)
+2. **Não habilite o Schedule** (para não executar automaticamente)
+3. Clique no botão **"Execute Workflow"** (canto superior direito, ícone de play)
+4. 🎯 O workflow vai executar o FLUXO 1 completo:
+   - Config → define variáveis ✅
+   - HubSpot Search (ou Mock) → busca contatos com atividade 30d ✅
+   - Extract Results → lista de contatos ✅
+   - Loop Through Contacts → processa cada um ✅
+   - Para cada contato elegível:
+     - Extract Contact Data ✅
+     - Supabase Check → verifica se já tem survey recente ✅
+     - IF elegível → continua ✅
+     - Get Contact / Emails / Deals / Tickets (ou Mock) ✅
+     - Consolidate Data ✅
+     - AGENTE 2: Context Analyzer (Tess AI) ✅
+     - AGENTE 3: Message Generator (Tess AI) ✅
+     - Send WhatsApp (Meta API) ✅
+     - Supabase INSERT + Chatwoot Create ✅
+     - Volta ao loop → próximo contato ✅
+
+**Opção B: Executar Apenas um Trecho do Workflow**
+
+Se quiser testar apenas parte do fluxo (por exemplo, só os agentes):
+
+1. Localize o node onde quer começar (ex: `Consolidate HubSpot Data`)
+2. Clique com botão direito → **"Execute from this node"**
+3. Cole dados de entrada mockados no painel
+
+**5. Verificar Resultados:**
+
+**WhatsApp:**
+- Você deve receber mensagens no(s) número(s) dos contatos processados
+- Exemplo: *"Oi João! Vi que você fez upgrade para o Plano Pro recentemente. Como está sendo a experiência? De 1 a 5, como você avalia nosso serviço?"*
+
+**Supabase:**
+- Vá no Supabase → Table Editor → `surveys`
+- Deve ter 1+ registros novos (um para cada contato processado) com `status = 'active'`
+
+**Chatwoot:**
+- No Chatwoot dashboard, deve aparecer novas conversas (uma para cada contato)
+- As mensagens enviadas via WhatsApp devem estar registradas
+
+**n8n Executions:**
+- Veja o log completo da execução
+- Verifique quantos contatos foram processados (no output do Loop)
 
 ### 7.3. Teste de Conversa - Responder no WhatsApp
 
