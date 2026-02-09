@@ -146,31 +146,35 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 ### Descrição do Fluxo
 
-**Etapa 1: Trigger e Busca (2-3s)**
+**Etapa 1: Trigger e Configuração (2-3s)**
 1. Schedule (cron diário às 10h) ou execução manual no n8n
-2. Busca automática no HubSpot de contatos com atividade nos últimos 30 dias
-3. Extrai lista de contatos (até 100 por execução)
+2. Node **Config** define variáveis centralizadas:
+   - `CHATWOOT_ACCOUNT_ID`: ID da conta Chatwoot
+   - `CHATWOOT_INBOX_ID`: ID do inbox Chatwoot
+   - `META_PHONE_NUMBER_ID`: ID do número WhatsApp Business
+3. Busca automática no HubSpot de contatos com atividade nos últimos 30 dias
+4. Extrai lista de contatos (até 100 por execução)
 
 **Etapa 2: Filtro e Elegibilidade (2-5s)**
 
-4. Para cada contato da lista:
+5. Para cada contato da lista:
    - Verifica no Supabase se já recebeu pesquisa nos últimos 30 dias
    - Marca como elegível ou inelegível
-5. Inicia loop processando apenas os elegíveis
+6. Inicia loop processando apenas os elegíveis
 
 **Etapa 3: Agente 1 - Data Fetcher (5-8s por contato)**
 
-6. Para cada contato elegível, faz chamadas à API do HubSpot:
+7. Para cada contato elegível, faz chamadas à API do HubSpot:
    - GET contact details
    - GET emails últimos 30 dias
    - GET deals/negócios
    - GET tickets de suporte
-7. Consolida tudo em JSON estruturado
+8. Consolida tudo em JSON estruturado
 
 **Etapa 4: Agente 2 - Context Analyzer (2-4s)**
 
-8. Tess AI (Agent 2 — ID 38717) analisa JSON
-9. Gera insights:
+9. Tess AI (Agent 2 — ID 38717) analisa JSON
+10. Gera insights:
    - Summary dos eventos relevantes
    - Sentimento (positive/negative/neutral)
    - Red flags (alertas importantes)
@@ -179,46 +183,49 @@ Os fluxogramas foram criados em formato Mermaid e podem ser visualizados de vár
 
 **Etapa 5: Agente 3 - Message Generator (1-2s)**
 
-10. Tess AI (Agent 3 — ID 38728) cria mensagem personalizada
-11. Usa contexto específico do cliente
-12. Segue tom sugerido pelo Agente 2
-13. Inclui call-to-action claro (pedir nota 1-5)
+11. Tess AI (Agent 3 — ID 38728) cria mensagem personalizada
+12. Usa contexto específico do cliente
+13. Segue tom sugerido pelo Agente 2
+14. Inclui call-to-action claro (pedir nota 1-5)
 
 **Etapa 6: Envio Automático (1s)**
 
-14. Meta WhatsApp API envia via WhatsApp
-15. Confirma entrega
+15. Meta WhatsApp API envia via WhatsApp (usando `META_PHONE_NUMBER_ID` do Config)
+16. Confirma entrega
 
 **Etapa 7: Registro Automático (1s)**
 
-16. **Supabase:** Insere registro com status 'active'
-17. **Chatwoot:** Cria conversa com todo o contexto
-18. Gerente pode acompanhar em tempo real no dashboard
+17. **Supabase:** Insere registro com status 'active'
+18. **Chatwoot:** Cria conversa com todo o contexto (usando IDs do Config)
+19. Gerente pode acompanhar em tempo real no dashboard
 
 **Etapa 8: Loop de Contatos**
 
-19. Sistema retorna ao início do loop (Etapa 3)
-20. Processa próximo contato elegível automaticamente
-21. Continua até processar todos os contatos da lista
+20. Sistema retorna ao início do loop (Etapa 3)
+21. Processa próximo contato elegível automaticamente
+22. Continua até processar todos os contatos da lista
 
-**Etapa 9: Aguarda Resposta (FLUXO 2 - via Webhook)**
+**Etapa 9: Webhook e Configuração (FLUXO 2)**
 
-22. Webhook fica escutando mensagens dos clientes
+23. Webhook recebe mensagens do cliente via Meta API
+24. Node **Config1** define variáveis centralizadas (mesmos valores do FLUXO 1):
+   - `CHATWOOT_ACCOUNT_ID`, `CHATWOOT_INBOX_ID`, `META_PHONE_NUMBER_ID`
+25. Verificação se é GET (validação webhook) ou POST (mensagem real)
 
 **Etapa 10: Agente 4 - Conversation Handler (2-3s por turno)**
 
-23. Recebe mensagem do cliente via webhook
-24. Tess AI (Agent 4 V2.0 — ID 38733) analisa resposta:
+26. Recebe mensagem do cliente via webhook
+27. Tess AI (Agent 4 V2.0 — ID 38733) analisa resposta:
     - **Se contém nota 1-5:** Extrai e agradece
     - **Se é feedback:** Responde empaticamente e pede nota
     - **Se é dúvida:** Responde e retorna ao objetivo
-25. Envia resposta via WhatsApp
-26. Atualiza Chatwoot e Supabase
-27. **Loop:** Repete até obter nota ou atingir 5 turnos
+28. Envia resposta via WhatsApp (usando `META_PHONE_NUMBER_ID` do Config1)
+29. Atualiza Chatwoot (usando IDs do Config1) e Supabase
+30. **Loop:** Repete até obter nota ou atingir 5 turnos
 
 **Etapa 11: Finalização (1s)**
 
-28. Quando nota é extraída:
+31. Quando nota é extraída:
     - Agradece graciosamente
     - Atualiza Supabase com nota, feedback e transcrição
     - Marca conversa como resolvida no Chatwoot

@@ -20,24 +20,8 @@
         4704,
         1312
       ],
-      "notes": "Executa diariamente às 10h"
-    },
-    {
-      "parameters": {
-        "mode": "raw",
-        "jsonOutput": "{\n  \"hubspot_contact_id\": \"198003468904\"\n}\n",
-        "options": {}
-      },
-      "id": "87fd6eb1-a28c-4e0c-b241-00742e86a89f",
-      "name": "Set Contact ID",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.2,
-      "position": [
-        5152,
-        1104
-      ],
       "disabled": true,
-      "notes": "ID do contato HubSpot para testar"
+      "notes": "Executa diariamente às 10h"
     },
     {
       "parameters": {
@@ -60,7 +44,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6400,
+        6608,
         1264
       ],
       "credentials": {
@@ -86,7 +70,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6608,
+        6816,
         1264
       ],
       "credentials": {
@@ -112,7 +96,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        6800,
+        7008,
         1264
       ],
       "credentials": {
@@ -138,7 +122,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7008,
+        7216,
         1264
       ],
       "credentials": {
@@ -157,7 +141,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7248,
+        7456,
         1264
       ],
       "notes": "Agente 1 - Data Fetcher (inline)"
@@ -178,7 +162,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7472,
+        7680,
         1264
       ],
       "credentials": {
@@ -197,7 +181,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        7680,
+        7888,
         1264
       ]
     },
@@ -217,7 +201,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        7888,
+        8096,
         1264
       ],
       "credentials": {
@@ -236,14 +220,14 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        8080,
+        8288,
         1264
       ]
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://graph.facebook.com/v21.0/674094992450703/messages",
+        "url": "=https://graph.facebook.com/v21.0/{{ $node[\"Config\"].json.META_PHONE_NUMBER_ID }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -256,7 +240,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        8288,
+        8496,
         1264
       ],
       "credentials": {
@@ -278,7 +262,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.4,
       "position": [
-        8496,
+        8704,
         1264
       ],
       "credentials": {
@@ -301,7 +285,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        4992,
+        4736,
         2000
       ],
       "webhookId": "whatsapp-meta-webhook"
@@ -312,24 +296,27 @@
           "options": {
             "caseSensitive": true,
             "leftValue": "",
-            "typeValidation": "strict"
+            "typeValidation": "strict",
+            "version": 1
           },
           "conditions": [
             {
-              "leftValue": "={{ $json.query['hub.mode'] }}",
+              "leftValue": "={{ $node[\"Webhook Meta WhatsApp\"].json.query['hub.mode'] }}",
               "rightValue": "subscribe",
               "operator": {
                 "type": "string",
                 "operation": "equals"
-              }
+              },
+              "id": "930aeac9-4081-4d29-9a52-ebca73d1d55a"
             },
             {
-              "leftValue": "={{ $json.query['hub.verify_token'] }}",
+              "leftValue": "={{ $node[\"Webhook Meta WhatsApp\"].json.query['hub.verify_token'] }}",
               "rightValue": "satisfaction-survey-2026",
               "operator": {
                 "type": "string",
                 "operation": "equals"
-              }
+              },
+              "id": "fac75194-92ca-41f6-9800-0912dabfe404"
             }
           ],
           "combinator": "and"
@@ -372,7 +359,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Parse mensagem da API Meta WhatsApp\nconst body = $input.first().json.body || $input.first().json;\n\nconst entry = body.entry?.[0];\nconst changes = entry?.changes?.[0];\nconst value = changes?.value;\nconst messages = value?.messages?.[0];\nconst contacts = value?.contacts?.[0];\n\nif (!messages) {\n  return { json: { skip: true } };\n}\n\nconst phoneNumber = messages.from;\nconst messageText = messages.text?.body || '';\nconst messageId = messages.id;\nconst timestamp = messages.timestamp;\n\nreturn {\n  json: {\n    phone: '+' + phoneNumber,\n    message: messageText,\n    message_id: messageId,\n    from_me: false,\n    timestamp: new Date(parseInt(timestamp) * 1000).toISOString(),\n    contact_name: contacts?.profile?.name || 'Cliente'\n  }\n};"
+        "jsCode": "// Parse mensagem da API Meta WhatsApp\nconst body = $node[\"Webhook Meta WhatsApp\"].json.body || $node[\"Webhook Meta WhatsApp\"].json;\n\nconst entry = body.entry?.[0];\nconst changes = entry?.changes?.[0];\nconst value = changes?.value;\nconst messages = value?.messages?.[0];\nconst contacts = value?.contacts?.[0];\n\nif (!messages) {\n  return { json: { skip: true } };\n}\n\nconst phoneNumber = messages.from;\nconst messageText = messages.text?.body || '';\nconst messageId = messages.id;\nconst timestamp = messages.timestamp;\n\nreturn {\n  json: {\n    phone: '+' + phoneNumber,\n    message: messageText,\n    message_id: messageId,\n    from_me: false,\n    timestamp: new Date(parseInt(timestamp) * 1000).toISOString(),\n    contact_name: contacts?.profile?.name || 'Cliente'\n  }\n};"
       },
       "id": "e0c39554-61be-490c-9025-8dbf12ca3ceb",
       "name": "Parse Meta Message",
@@ -481,7 +468,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://graph.facebook.com/v21.0/674094992450703/messages",
+        "url": "=https://graph.facebook.com/v21.0/{{$node[\"Config1\"].json.META_PHONE_NUMBER_ID}}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -558,7 +545,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://app.chatwoot.com/api/v1/accounts/150655/contacts",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config\"].json.CHATWOOT_ACCOUNT_ID}}/contacts",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -566,13 +553,13 @@
         "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    \"inbox_id\": 94417,\n    \"name\": \"{{ $('Consolidate HubSpot Data').first().json.customer_name }}\",\n    \"phone_number\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"hubspot_id\": \"{{ $('Consolidate HubSpot Data').first().json.hubspot_data.contact.id }}\",\n      \"context_summary\": \"{{ JSON.parse($('Tess - Agent 2 (Context)').first().json.responses[0].output).summary }}\",\n      \"survey_id\": {{ $('Supabase - Create Survey').first().json.id }}\n    }\n  }",
+        "jsonBody": "={\n    \"inbox_id\": {{$node[\"Config\"].json.CHATWOOT_INBOX_ID}},\n    \"name\": \"{{ $('Consolidate HubSpot Data').first().json.customer_name }}\",\n    \"phone_number\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"hubspot_id\": \"{{ $('Consolidate HubSpot Data').first().json.hubspot_data.contact.id }}\",\n      \"context_summary\": \"{{ JSON.parse($('Tess - Agent 2 (Context)').first().json.responses[0].output).summary }}\",\n      \"survey_id\": {{ $('Supabase - Create Survey').first().json.id }}\n    }\n  }",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        9152,
+        9360,
         1344
       ],
       "id": "bfd6f59c-ab52-419a-a9f1-53cbf9507a78",
@@ -587,7 +574,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "https://app.chatwoot.com/api/v1/accounts/150655/conversations",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config\"].json.CHATWOOT_ACCOUNT_ID}}/conversations",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -595,13 +582,13 @@
         "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}  ",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n    \"inbox_id\": 94417,\n    \"contact_id\": {{ $json.contact_id }},\n    \"source_id\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"survey_id\": \"{{ $('Supabase - Create Survey').first().json.id }}\",\n      \"type\": \"satisfaction_survey\"\n    }\n  }",
+        "jsonBody": "={\n    \"inbox_id\": {{$node[\"Config\"].json.CHATWOOT_INBOX_ID}},\n    \"contact_id\": {{ $json.contact_id }},\n    \"source_id\": \"{{ $('Consolidate HubSpot Data').first().json.customer_phone }}\",\n    \"custom_attributes\": {\n      \"survey_id\": \"{{ $('Supabase - Create Survey').first().json.id }}\",\n      \"type\": \"satisfaction_survey\"\n    }\n  }",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        9744,
+        9952,
         1264
       ],
       "id": "491c49d1-69e8-4311-b8ec-6e44f024b2b2",
@@ -616,7 +603,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Create Conversation').first().json.id }}/messages",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config\"].json.CHATWOOT_ACCOUNT_ID}}/conversations/{{ $('Create Conversation').first().json.id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -630,7 +617,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        10144,
+        10352,
         1264
       ],
       "id": "7a63e7af-096b-4219-851a-a187805924c4",
@@ -737,7 +724,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        8912,
+        9120,
         1264
       ],
       "id": "43fdfc7e-1496-41a5-9fce-c7ca9d132547",
@@ -745,7 +732,7 @@
     },
     {
       "parameters": {
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/contacts/search?q={{ $('Consolidate HubSpot Data').first().json.customer_phone }}&page=1",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config\"].json.CHATWOOT_ACCOUNT_ID}}/contacts/search?q={{ $('Consolidate HubSpot Data').first().json.customer_phone }}&page=1",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {}
@@ -753,7 +740,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        8704,
+        8912,
         1264
       ],
       "id": "5a18c40c-2fe4-4e7a-bee9-46d9416a0e44",
@@ -770,7 +757,7 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        9328,
+        9536,
         1264
       ],
       "id": "6c8a7f1f-1086-4c5f-99cf-a30e2dd921fe",
@@ -786,7 +773,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        9952,
+        10160,
         1264
       ],
       "id": "176bd4a4-1b4c-4ee7-99ed-ef09d1f5a009",
@@ -805,7 +792,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        9536,
+        9744,
         1264
       ],
       "id": "ab42ad5b-3627-4f97-acd3-c41fca5effe8",
@@ -814,7 +801,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config1\"].json.CHATWOOT_ACCOUNT_ID}}/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -843,7 +830,7 @@
     {
       "parameters": {
         "method": "PATCH",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config1\"].json.CHATWOOT_ACCOUNT_ID}}/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -885,7 +872,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config1\"].json.CHATWOOT_ACCOUNT_ID}}/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -911,7 +898,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://app.chatwoot.com/api/v1/accounts/150655/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
+        "url": "=https://app.chatwoot.com/api/v1/accounts/{{$node[\"Config1\"].json.CHATWOOT_ACCOUNT_ID}}/conversations/{{ $('Supabase - Get Survey').first().json.chatwoot_conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -948,7 +935,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        4912,
+        5120,
         1312
       ],
       "id": "6c4233f8-e27a-4b37-b9b0-f7a70150f8c1",
@@ -969,7 +956,7 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        5312,
+        5520,
         1312
       ],
       "id": "49ad02c2-efc9-4741-9ee7-1a788264b488",
@@ -983,7 +970,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5536,
+        5744,
         1328
       ],
       "id": "1cda12ee-0b01-440b-8be5-dad12e27d5bf",
@@ -998,7 +985,7 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.6,
       "position": [
-        5728,
+        5936,
         1328
       ],
       "id": "90a37cea-5af3-4983-8df4-9abce63eeb3a",
@@ -1039,7 +1026,7 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        6144,
+        6352,
         1328
       ],
       "id": "a8f43ff3-12ac-459c-828b-004022273637",
@@ -1052,7 +1039,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5120,
+        5328,
         1312
       ],
       "id": "c8097386-d796-41bb-ad77-b7632bb4098f",
@@ -1065,11 +1052,81 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        5936,
+        6144,
         1328
       ],
       "id": "07c6e11b-ddd7-4e72-90ea-18d9bbbda25b",
       "name": "Mark Eligibility"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a393396d-2927-47b6-8351-c68162523438",
+              "name": "CHATWOOT_ACCOUNT_ID",
+              "value": "=150655",
+              "type": "string"
+            },
+            {
+              "id": "829065aa-d4fd-4c35-ae3e-9ff8cd193792",
+              "name": "CHATWOOT_INBOX_ID",
+              "value": "94417",
+              "type": "string"
+            },
+            {
+              "id": "49bfa397-068d-4b03-a643-8f432635da8d",
+              "name": "META_PHONE_NUMBER_ID",
+              "value": "674094992450703",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4912,
+        1312
+      ],
+      "id": "7f58e771-30b3-4511-a237-b4726debd185",
+      "name": "Config"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "34e0b85e-6d9d-454e-b515-cb116f39cde8",
+              "name": "CHATWOOT_ACCOUNT_ID",
+              "value": "150655",
+              "type": "string"
+            },
+            {
+              "id": "82d73b61-c8be-4f4e-a547-f43ed9345fab",
+              "name": "CHATWOOT_INBOX_ID",
+              "value": "94417",
+              "type": "string"
+            },
+            {
+              "id": "26371644-ad7b-4c10-b606-5930df332862",
+              "name": "META_PHONE_NUMBER_ID",
+              "value": "674094992450703",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4992,
+        2000
+      ],
+      "id": "6036ace2-25ca-4dfb-849c-6c34b1b90888",
+      "name": "Config1"
     }
   ],
   "pinData": {
@@ -1079,26 +1136,26 @@
           "headers": {
             "host": "albino.app.n8n.cloud",
             "user-agent": "facebookexternalua",
-            "content-length": "504",
+            "content-length": "517",
             "accept": "*/*",
             "accept-encoding": "gzip, br",
             "cdn-loop": "cloudflare; loops=1; subreqs=1",
-            "cf-connecting-ip": "2a03:2880:10ff:74::",
+            "cf-connecting-ip": "2a03:2880:22ff:1::",
             "cf-ew-via": "15",
             "cf-ipcountry": "US",
-            "cf-ray": "9c848993113caf10-DFW",
+            "cf-ray": "9ca7d8b87335d6c8-IAD",
             "cf-visitor": "{\"scheme\":\"https\"}",
             "cf-worker": "n8n.cloud",
             "content-type": "application/json",
-            "x-forwarded-for": "2a03:2880:10ff:74::, 162.159.104.8",
+            "x-forwarded-for": "2a03:2880:22ff:1::, 172.71.195.53",
             "x-forwarded-host": "albino.app.n8n.cloud",
             "x-forwarded-port": "443",
             "x-forwarded-proto": "https",
-            "x-forwarded-server": "traefik-prod-users-gwc-96-57f65f45bd-mctl7",
-            "x-hub-signature": "sha1=6d5fb053140f7ebfd4bd2826a901bcebd52e08d6",
-            "x-hub-signature-256": "sha256=1a599e552adc67ae7433db6983364f1d0e5216ce59a23487413b815e2796987b",
+            "x-forwarded-server": "traefik-prod-users-gwc-96-57f65f45bd-mnqms",
+            "x-hub-signature": "sha1=d32d30af51b9943616cdeeee1a9fcd1de368e53d",
+            "x-hub-signature-256": "sha256=014566e9cc0630c6afe8f051c4241cea86920c5c2ed63419a7156d40685fcaa9",
             "x-is-trusted": "yes",
-            "x-real-ip": "2a03:2880:10ff:74::"
+            "x-real-ip": "2a03:2880:22ff:1::"
           },
           "params": {},
           "query": {},
@@ -1126,10 +1183,10 @@
                       "messages": [
                         {
                           "from": "5521981444992",
-                          "id": "wamid.HBgNNTUyMTk4MTQ0NDk5MhUCABIYFjNFQjAzNjE5NjFDQUI0MkNBQURDMDAA",
-                          "timestamp": "1770149065",
+                          "id": "wamid.HBgNNTUyMTk4MTQ0NDk5MhUCABIYFDNBM0U5RTMwNDMzNzY5MUQ0RUEzAA==",
+                          "timestamp": "1770519309",
                           "text": {
-                            "body": "Gostei muito do atendimento"
+                            "body": "Desculpa, perdi sua última mensagem"
                           },
                           "type": "text"
                         }
@@ -1155,16 +1212,11 @@
       "main": [
         [
           {
-            "node": "HubSpot - Search Active Contacts",
+            "node": "Config",
             "type": "main",
             "index": 0
           }
         ]
-      ]
-    },
-    "Set Contact ID": {
-      "main": [
-        []
       ]
     },
     "HubSpot - Get Contact": {
@@ -1281,7 +1333,7 @@
       "main": [
         [
           {
-            "node": "Check Verification",
+            "node": "Config1",
             "type": "main",
             "index": 0
           }
@@ -1686,6 +1738,28 @@
           }
         ]
       ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "HubSpot - Search Active Contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config1": {
+      "main": [
+        [
+          {
+            "node": "Check Verification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -1693,7 +1767,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "0b5da967-9436-4994-ab25-7e1731ed396c",
+  "versionId": "605eb8a2-5d42-4ae8-90de-1a66c06d2303",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "92d6759b0d5abe55175188fd74828c8fd26c59a4c86569a664d3b739d352e946"

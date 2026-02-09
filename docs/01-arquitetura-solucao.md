@@ -260,6 +260,18 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
                          │
                          ↓
 ┌─────────────────────────────────────────────────────────────────┐
+│            CONFIG NODE (Configuração Centralizada)              │
+│                                                                  │
+│  Define variáveis usadas no workflow:                           │
+│  - CHATWOOT_ACCOUNT_ID: ID da conta Chatwoot                   │
+│  - CHATWOOT_INBOX_ID: ID do inbox                              │
+│  - META_PHONE_NUMBER_ID: ID do número WhatsApp Business        │
+│                                                                  │
+│  Padrão de acesso: $node["Config"].json.VARIABLE_NAME          │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ↓
+┌─────────────────────────────────────────────────────────────────┐
 │              1. AGENTE DATA FETCHER (n8n workflow)              │
 │                                                                  │
 │  ┌──────────────┐    API     ┌─────────────────────┐           │
@@ -453,12 +465,12 @@ Adoraria saber sua opinião! De 1 a 5, como você avalia nosso serviço?
 
 ```javascript
 // n8n node: Chatwoot - Create Conversation
-POST https://app.chatwoot.com/api/v1/accounts/150655/conversations
+POST https://app.chatwoot.com/api/v1/accounts/{{$node["Config"].json.CHATWOOT_ACCOUNT_ID}}/conversations
 Headers: {
   "api_access_token": "{CHATWOOT_API_TOKEN}"
 }
 Body: {
-  "inbox_id": 94417,
+  "inbox_id": {{$node["Config"].json.CHATWOOT_INBOX_ID}},
   "contact_id": "{contact_id}",
   "source_id": "{customer_phone}",
   "additional_attributes": {
@@ -468,6 +480,8 @@ Body: {
   }
 }
 ```
+
+**📝 Nota:** Os IDs do Chatwoot são gerenciados centralmente via **node "Config"** (Set node). O Config define `CHATWOOT_ACCOUNT_ID`, `CHATWOOT_INBOX_ID` e `META_PHONE_NUMBER_ID`, facilitando a portabilidade do workflow entre ambientes — basta alterar os valores no node Config.
 
 **Sincronização de mensagens:**
 - Webhook Meta → n8n → Chatwoot API
