@@ -864,7 +864,7 @@ Para dúvidas técnicas, demonstrações ao vivo ou discussões sobre o projeto,
 
 ---
 
-**Documento elaborado para:** Programa FMA (Founders & Makers Accelerator)
+**Documento elaborado para:** MBA em Inteligência Artificial | FMA
 **Projeto:** Case Agent Dev - Sistema de Satisfação com IA
 **Data de Entrega:** Fevereiro 2026
 **Status:** ✅ Completo e validado
