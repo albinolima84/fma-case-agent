@@ -51,7 +51,7 @@ Sistema automatizado end-to-end utilizando **4 agentes de IA especializados** qu
 2. [Solução Proposta](#2-solução-proposta)
 3. [Arquitetura Técnica](#3-arquitetura-técnica)
 4. [Implementação](#4-implementação)
-5. [Evidências e Resultados](#5-evidências-e-resultados)
+5. [Evidências e Resultados](#5-evidências-e-resultados) — [▶ Vídeo Demo](https://www.loom.com/share/2656b06ebba644c98097d4aa0e125ff9)
 6. [Métricas e Validação](#6-métricas-e-validação)
 7. [ROI e Análise Financeira](#7-roi-e-análise-financeira)
 8. [Guia de Reprodução](#8-guia-de-reprodução)
@@ -429,7 +429,28 @@ CREATE TABLE surveys (
 
 ## 5. Evidências e Resultados
 
-### 5.1 Screenshots do Sistema
+### 5.1 Vídeo Demo - Sistema em Funcionamento
+
+**🎥 Demonstração completa do sistema funcionando end-to-end:**
+
+> **[▶ Assistir Demo no Loom](https://www.loom.com/share/2656b06ebba644c98097d4aa0e125ff9)**
+
+**O que o vídeo demonstra (~9 minutos):**
+- ✅ Execução do workflow n8n (FLUXO 1 e FLUXO 2)
+- ✅ Busca automática de contatos no HubSpot
+- ✅ Verificação de elegibilidade no Supabase
+- ✅ Saída dos Agentes 2 e 3 (contexto + mensagem personalizada)
+- ✅ Mensagem enviada e recebida no WhatsApp
+- ✅ Conversa criada no Chatwoot em tempo real
+- ✅ Registro criado no banco Supabase
+- ✅ Cliente respondendo e webhook disparando
+- ✅ Agente 4 processando respostas (múltiplos turnos)
+- ✅ Finalização com nota privada no Chatwoot + status "completed"
+- ✅ Registro completo no banco (score, feedback, sentiment, transcript)
+
+---
+
+### 5.2 Screenshots do Sistema
 
 **Clique nos links abaixo para visualizar:**
 
