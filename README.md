@@ -107,9 +107,9 @@ fma-case-agent/
 ├── workflows/
 │   └── satisfaction-survey-workflow.json  ← Workflow n8n v2.0 (Config nodes)
 ├── prompts/
-│   ├── agent-2-context-analyzer-AJUSTADO.txt
-│   ├── agent-3-message-generator-AJUSTADO.txt
-│   └── agent-4-conversation-handler-V2.txt
+│   ├── agent-2-context-analyzer.txt
+│   ├── agent-3-message-generator.txt
+│   └── agent-4-conversation-handler.txt
 ├── diagrams/
 │   ├── as-is-processo-manual.png           ← Processo manual
 │   └── to-be-processo-automatizado.png     ← Processo automatizado com loop
@@ -151,8 +151,6 @@ fma-case-agent/
 | **ROI Ano 1** | **62%** |
 | **ROI 3 Anos** | **487%** |
 | **Payback** | **8 meses** |
-
----
 
 ---
 

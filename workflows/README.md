@@ -18,7 +18,7 @@ Este diretório contém o workflow completo do n8n que implementa o sistema auto
 - n8n instalado (Docker recomendado)
 - Contas e API keys:
   - HubSpot API Key
-  - Anthropic API Key (Claude)
+  - Tess AI API Key (gpt-4o-mini)
   - Supabase (project URL + anon key)
   - Evolution API (instância configurada)
   - Chatwoot (account + API token)
@@ -60,9 +60,9 @@ Após importar, você precisa configurar as credenciais para cada integração:
    - **Header Name:** `Authorization`
    - **Header Value:** `Bearer YOUR_HUBSPOT_API_KEY`
 
-#### Anthropic API (Claude)
-As chamadas à API Claude estão configuradas como HTTP Request genérico usando variáveis de ambiente:
-- Configure `ANTHROPIC_API_KEY` no arquivo `.env`
+#### Tess AI API (gpt-4o-mini)
+As chamadas à Tess AI estão configuradas como HTTP Request genérico usando variáveis de ambiente:
+- Configure `TESS_API_KEY` no arquivo `.env`
 
 #### Supabase
 1. Vá em **Settings → Credentials**
@@ -184,11 +184,11 @@ Set Contact ID
     ↓
 AGENTE 1: Data Fetcher (consolida dados)
     ↓
-AGENTE 2: Context Analyzer (Claude - análise)
+AGENTE 2: Context Analyzer (Tess AI - análise)
     ↓
 Validate Analysis (validação + fallback)
     ↓
-AGENTE 3: Message Generator (Claude - mensagem)
+AGENTE 3: Message Generator (Tess AI - mensagem)
     ↓
 Prepare Message
     ↓
@@ -209,7 +209,7 @@ Supabase - Get Survey (busca pesquisa ativa)
     ↓
 Build Conversation History (monta histórico)
     ↓
-AGENTE 4: Conversation Handler (Claude - resposta)
+AGENTE 4: Conversation Handler (Tess AI - resposta)
     ↓
 Process Conversation Response (processa e decide)
     ↓
@@ -381,15 +381,15 @@ Por pesquisa completa (200 pesquisas/mês):
 | API | Custo/Pesquisa | Custo/Mês |
 |-----|----------------|-----------|
 | HubSpot | $0 (incluído) | $0 |
-| Claude (Agente 2) | $0.006 | $1.20 |
-| Claude (Agente 3) | $0.003 | $0.60 |
-| Claude (Agente 4, 3 turnos) | $0.010 | $2.00 |
+| Tess AI/gpt-4o-mini (Agente 2) | $0.006 | $1.20 |
+| Tess AI/gpt-4o-mini (Agente 3) | $0.003 | $0.60 |
+| Tess AI/gpt-4o-mini (Agente 4, 3 turnos) | $0.010 | $2.00 |
 | **Total** | **$0.019** | **$3.80** |
 
 ### Limites e Throttling
 
 - **HubSpot:** 100 req/10s (API Enterprise)
-- **Claude:** 50 req/min
+- **Tess AI:** 50 req/min
 - **Evolution API:** Sem limite (self-hosted)
 
 Configurar retry e backoff exponencial nos nodes HTTP Request:
@@ -420,16 +420,17 @@ Configurar retry e backoff exponencial nos nodes HTTP Request:
      -H "Authorization: Bearer YOUR_KEY"
    ```
 
-### Erro: "Claude API 401 Unauthorized"
+### Erro: "Tess AI API 401 Unauthorized"
 
 **Solução:**
-1. Verifique a API key da Anthropic
+1. Verifique a API key da Tess AI
 2. Confirme que a key está ativa e tem créditos
 3. Teste manualmente:
    ```bash
-   curl https://api.anthropic.com/v1/messages \
-     -H "x-api-key: YOUR_KEY" \
-     -H "anthropic-version: 2023-06-01"
+   curl -X POST https://api.tess.im/agents/38717/execute \
+     -H "Authorization: Bearer YOUR_KEY" \
+     -H "Content-Type: application/json" \
+     -d '{"input": "teste"}'
    ```
 
 ### Erro: "Evolution API Connection Refused"
@@ -503,7 +504,7 @@ Mantenha um registro de mudanças:
 ## v1.0 (2026-01-28)
 - Versão inicial do workflow
 - 4 agentes funcionais
-- Integração completa HubSpot → Claude → WhatsApp
+- Integração completa HubSpot → Tess AI → WhatsApp
 ```
 
 ---
@@ -512,7 +513,7 @@ Mantenha um registro de mudanças:
 
 - [Documentação oficial do n8n](https://docs.n8n.io/)
 - [HubSpot API Reference](https://developers.hubspot.com/docs/api/overview)
-- [Anthropic Claude API Docs](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
+- [Tess AI Documentation](https://tess.im/pt-BR/docs)
 - [Evolution API Docs](https://doc.evolution-api.com/)
 - [Chatwoot API Docs](https://www.chatwoot.com/developers/api/)
 

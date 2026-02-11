@@ -13,7 +13,7 @@ Esta pasta contém os prompts completos dos agentes de IA utilizados no sistema 
 
 **Output:** JSON com summary, sentiment, key_events, suggested_tone, red_flags, personalization_points
 
-**Modelo:** Claude 3.5 Sonnet
+**Modelo:** gpt-4o-mini (via Tess AI)
 **Temperatura:** 0.3 (baixa para consistência)
 **Tokens médios:** ~1900
 **Custo:** ~$0.006 por análise
@@ -29,7 +29,7 @@ Esta pasta contém os prompts completos dos agentes de IA utilizados no sistema 
 
 **Output:** Texto da mensagem pronta para envio
 
-**Modelo:** Claude 3.5 Sonnet
+**Modelo:** gpt-4o-mini (via Tess AI)
 **Temperatura:** 0.7 (moderada para naturalidade)
 **Tokens médios:** ~700
 **Custo:** ~$0.003 por mensagem
@@ -45,7 +45,7 @@ Esta pasta contém os prompts completos dos agentes de IA utilizados no sistema 
 
 **Output:** JSON com response, status (continue/completed/escalate), extracted_data
 
-**Modelo:** Claude 3.5 Sonnet
+**Modelo:** gpt-4o-mini (via Tess AI)
 **Temperatura:** 0.8 (alta para conversação natural)
 **Tokens médios:** ~800 por turno, ~2500 por conversa
 **Custo:** ~$0.010 por conversa completa
@@ -54,59 +54,33 @@ Esta pasta contém os prompts completos dos agentes de IA utilizados no sistema 
 
 ## 🚀 Como Usar
 
-### 1. Integração via Anthropic API
+### 1. Integração via Tess AI (implementação atual)
 
-Todos os prompts são projetados para uso com a API da Anthropic (Claude).
+Os prompts estão configurados nos agentes Tess AI (IDs 38717, 38728, 38733) usando gpt-4o-mini.
 
-**Exemplo de chamada (Node.js):**
+**Exemplo de chamada (HTTP Request via curl):**
 
-```javascript
-const Anthropic = require('@anthropic-ai/sdk');
-
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
-const message = await anthropic.messages.create({
-  model: "claude-3-5-sonnet-20241022",
-  max_tokens: 1024,
-  temperature: 0.3,
-  system: SYSTEM_PROMPT_DO_ARQUIVO,
-  messages: [
-    {
-      role: "user",
-      content: JSON.stringify(inputData)
-    }
-  ]
-});
-
-const response = message.content[0].text;
+```bash
+curl -X POST https://api.tess.im/agents/38717/execute \
+  -H "Authorization: Bearer YOUR_TESS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": "<INPUT_JSON>"
+  }'
 ```
 
 ### 2. Integração via n8n
 
-No n8n, use o node **HTTP Request** para chamar a API da Anthropic:
+No n8n, os agentes são chamados via node **HTTP Request** para a API da Tess AI:
 
-**Configuração do node:**
+**Configuração do node (Agente 2 — adaptar ID para cada agente):**
 - Method: POST
-- URL: `https://api.anthropic.com/v1/messages`
-- Headers:
-  - `x-api-key`: `{{$env.ANTHROPIC_API_KEY}}`
-  - `anthropic-version`: `2023-06-01`
-  - `content-type`: `application/json`
+- URL: `https://api.tess.im/agents/38717/execute`
+- Authentication: Header Auth (`Authorization: Bearer YOUR_TESS_API_KEY`)
 - Body (JSON):
 ```json
 {
-  "model": "claude-3-5-sonnet-20241022",
-  "max_tokens": 1024,
-  "temperature": 0.3,
-  "system": "{{$node.ReadPrompt.json.system_prompt}}",
-  "messages": [
-    {
-      "role": "user",
-      "content": "{{$json.input_data}}"
-    }
-  ]
+  "input": "{{$json.input_data}}"
 }
 ```
 
@@ -151,9 +125,9 @@ const systemPrompt = systemPromptMatch ? systemPromptMatch[1].trim() : null;
 | 200 pesquisas/dia | $3.80 | $114 |
 | 1000 pesquisas/dia | $19.00 | $570 |
 
-**Nota:** Custos baseados em pricing da Anthropic (janeiro 2025):
-- Input: $3 por 1M tokens
-- Output: $15 por 1M tokens
+**Nota:** Custos baseados em pricing do gpt-4o-mini (via Tess AI):
+- Input: $0.15 por 1M tokens
+- Output: $0.60 por 1M tokens
 
 ---
 
@@ -162,7 +136,7 @@ const systemPrompt = systemPromptMatch ? systemPromptMatch[1].trim() : null;
 ### Agente 2: Context Analyzer
 ```json
 {
-  "model": "claude-3-5-sonnet-20241022",
+  "model": "gpt-4o-mini",
   "max_tokens": 1024,
   "temperature": 0.3,
   "top_p": 1.0
@@ -173,7 +147,7 @@ const systemPrompt = systemPromptMatch ? systemPromptMatch[1].trim() : null;
 ### Agente 3: Message Generator
 ```json
 {
-  "model": "claude-3-5-sonnet-20241022",
+  "model": "gpt-4o-mini",
   "max_tokens": 256,
   "temperature": 0.7,
   "top_p": 1.0
@@ -184,7 +158,7 @@ const systemPrompt = systemPromptMatch ? systemPromptMatch[1].trim() : null;
 ### Agente 4: Conversation Handler
 ```json
 {
-  "model": "claude-3-5-sonnet-20241022",
+  "model": "gpt-4o-mini",
   "max_tokens": 256,
   "temperature": 0.8,
   "top_p": 1.0
@@ -310,10 +284,10 @@ Isso garante que o sistema nunca trava completamente.
 
 ## 🔗 Links Úteis
 
-- [Anthropic API Documentation](https://docs.anthropic.com/claude/reference/getting-started-with-the-api)
-- [Claude Model Comparison](https://docs.anthropic.com/claude/docs/models-overview)
-- [Prompt Engineering Guide](https://docs.anthropic.com/claude/docs/prompt-engineering)
-- [n8n Anthropic Integration](https://docs.n8n.io/integrations/builtin/credentials/anthropic/)
+- [Tess AI Documentation](https://tess.im/pt-BR/docs)
+- [OpenAI gpt-4o-mini Overview](https://platform.openai.com/docs/models/gpt-4o-mini)
+- [Prompt Engineering Guide](https://platform.openai.com/docs/guides/prompt-engineering)
+- [n8n HTTP Request Node](https://docs.n8n.io/integrations/builtin/core-nodes/n8n-nodes-base.httprequest/)
 
 ---
 

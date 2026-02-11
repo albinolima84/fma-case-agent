@@ -317,7 +317,7 @@ Estimativa de tokens:
 - Output: ~80-120 tokens (mensagem curta)
 - Total: ~680-920 tokens por mensagem
 
-Custo estimado (Tess ou Anthropic direto):
+Custo estimado (Tess AI - gpt-4o-mini):
 - ~$0.003 por mensagem
 - $3 por 1000 mensagens
 
@@ -370,7 +370,7 @@ Limitações Conhecidas:
 NOTAS DE IMPLEMENTAÇÃO
 ===========================
 
-- Este prompt pode ser usado na Tess (Pareto) ou via n8n + Anthropic API direta
+- Este prompt é usado na Tess AI via n8n (HTTP Request node)
 - Garantir que API key está configurada como variável de ambiente
 - Implementar retry se API retornar erro (max 3 tentativas)
 - Timeout de 15 segundos por request (mensagens são rápidas)

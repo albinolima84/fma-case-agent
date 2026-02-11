@@ -376,7 +376,7 @@ Fallback seguro:
 NOTAS DE IMPLEMENTAÇÃO
 ===========================
 
-- Este prompt deve ser usado no n8n via HTTP Request node para Anthropic API
+- Este prompt deve ser usado no n8n via HTTP Request node para a API da Tess AI (gpt-4o-mini)
 - Garantir que API key está configurada como variável de ambiente
 - Implementar retry com backoff exponencial (max 3 tentativas)
 - Timeout de 30 segundos por request

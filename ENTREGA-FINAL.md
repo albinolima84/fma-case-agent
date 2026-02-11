@@ -481,11 +481,11 @@ As principais escolhas tecnológicas foram feitas com critérios explícitos de 
 10. **[chatwoot.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/chatwoot.png)** - Interface Chatwoot com conversa e nota privada
 11. **[tess-agents.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/tess-agents.png)** - Dashboard Tess AI mostrando os 3 agentes
 
-### 5.2 Exemplo de Conversa Real
+### 5.3 Exemplo de Conversa Real
 
 **Para ver todas as 5 conversas completas, acesse:** [Exemplos de Conversas Completas](https://github.com/albinolima84/fma-case-agent/blob/master/docs/exemplos-conversas-completas.md)
 
-**Cliente:** Carlos Mendes (+55 21 98144-4992)
+**Cliente:** Carlos Mendes
 **Data:** 2026-02-06 18:13
 **Score:** 2/5
 **Sentiment:** Negative
@@ -890,11 +890,7 @@ O processo TO-BE não substitui completamente o humano, mas **potencializa** a c
 
 **💼 Desenvolvedor Responsável**
 
-```
 👤 Albino Lima
-
-
-```
 
 Para dúvidas técnicas, demonstrações ao vivo ou discussões sobre o projeto, entre em contato pelos canais acima.
 
