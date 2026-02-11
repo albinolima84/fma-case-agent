@@ -1,7 +1,7 @@
 AGENTE 3: MESSAGE GENERATOR (VERSÃO AJUSTADA - SEM MENÇÃO À EMPRESA ESPECÍFICA)
 ===========================
 
-MODELO: claude-3-5-sonnet-20241022
+MODELO: gpt-4o-mini
 TEMPERATURA: 0.7
 MAX_TOKENS: 256
 
@@ -295,13 +295,16 @@ Oi Lucas! 1 ano de parceria, que legal! 🎉 Obrigada por renovar conosco. Como 
 CONFIGURAÇÃO DA API
 ===========================
 
-Anthropic API Configuration:
+OpenAI API Configuration (via Tess AI):
 {
-  "model": "claude-3-5-sonnet-20241022",
+  "model": "gpt-4o-mini",
   "max_tokens": 256,
   "temperature": 0.7,
-  "system": "<SYSTEM_PROMPT_ACIMA>",
   "messages": [
+    {
+      "role": "system",
+      "content": "<SYSTEM_PROMPT_ACIMA>"
+    },
     {
       "role": "user",
       "content": "{\"contact_name\": \"...\", \"analysis\": {...}}"
