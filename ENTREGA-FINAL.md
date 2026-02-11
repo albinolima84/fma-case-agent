@@ -49,7 +49,7 @@ Sistema automatizado end-to-end utilizando **4 agentes de IA especializados** qu
 
 1. [Contexto e Problema](#1-contexto-e-problema)
 2. [Solução Proposta](#2-solução-proposta)
-3. [Arquitetura Técnica](#3-arquitetura-técnica)
+3. [Arquitetura Técnica](#3-arquitetura-técnica) — [Decisões de Arquitetura](#34-decisões-de-arquitetura)
 4. [Implementação](#4-implementação)
 5. [Evidências e Resultados](#5-evidências-e-resultados) — [▶ Vídeo Demo](https://www.loom.com/share/2656b06ebba644c98097d4aa0e125ff9)
 6. [Métricas e Validação](#6-métricas-e-validação)
@@ -315,7 +315,22 @@ CREATE TABLE surveys (
 ]
 ```
 
-### 3.4 Interface de Monitoramento (Chatwoot)
+### 3.4 Decisões de Arquitetura
+
+As principais escolhas tecnológicas foram feitas com critérios explícitos de custo, manutenibilidade e adequação ao problema:
+
+| Decisão | Alternativas consideradas | Escolha | Justificativa |
+|---------|--------------------------|---------|---------------|
+| **Orquestração** | Zapier, Make (Integromat) | **n8n Cloud** | Execução de código JavaScript nativo nos nodes (essencial para manipular JSONB e sanitizar SQL); sem limitação de operações por mês; self-hostable se necessário |
+| **LLM / Agentes** | OpenAI API direta, LangChain | **Tess AI** | Abstrai billing e gerenciamento de API keys; interface visual para ajuste de prompts sem deploy; gpt-4o-mini com custo ~10x menor que GPT-4; IDs de agentes estáveis para reuso |
+| **4 agentes separados** | 1 agente monolítico, 2 agentes | **Pipeline de 4 agentes** | Separação de responsabilidades: cada agente tem contexto e prompt focado, o que aumenta qualidade e facilita manutenção — trocar o Message Generator não afeta o Context Analyzer; testável isoladamente |
+| **Banco de dados** | Firebase, MongoDB Atlas, MySQL | **Supabase PostgreSQL** | JSONB nativo para `conversation_transcript` sem schema rígido; free tier generoso para o volume do projeto; SQL familiar para queries analíticas futuras; Row Level Security disponível |
+| **WhatsApp** | Twilio, Z-API, WPPConnect | **Meta WhatsApp Business API oficial** | Zero risco de bloqueio de número; webhooks 100% confiáveis (crítico para FLUXO 2); SLA garantido pela Meta; conformidade com LGPD |
+| **Monitoramento** | Slack, e-mail, dashboard custom | **Chatwoot Cloud** | Interface de conversas pronta (zero desenvolvimento); intervenção manual disponível; nota privada automática ao finalizar survey; plano Hacker gratuito para piloto |
+
+**Princípio geral:** preferimos **serviços gerenciados cloud** (zero servidores próprios) para minimizar overhead operacional e focar no valor do produto — automação inteligente do processo de satisfação.
+
+### 3.5 Interface de Monitoramento (Chatwoot)
 
 **Funcionalidades:**
 - Dashboard com lista de conversas ativas/pendentes/concluídas
