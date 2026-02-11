@@ -64,7 +64,7 @@ Sistema automatizado end-to-end utilizando **4 agentes de IA especializados** qu
 
 ### 1.1 Cenário Atual (AS-IS)
 
-**Visualização do processo manual:** [Diagrama AS-IS - Processo Manual](diagrams/as-is-processo-manual.png)
+**Visualização do processo manual:** [Diagrama AS-IS - Processo Manual](https://github.com/albinolima84/fma-case-agent/blob/master/diagrams/as-is-processo-manual.png)
 
 Empresas SaaS B2B precisam medir satisfação de clientes continuamente para:
 - Identificar riscos de churn precocemente
@@ -110,7 +110,7 @@ Empresas SaaS B2B precisam medir satisfação de clientes continuamente para:
 
 ### 2.1 Visão Geral
 
-**Visualização do processo automatizado:** [Diagrama TO-BE - Processo Automatizado com IA](diagrams/to-be-processo-automatizado.png)
+**Visualização do processo automatizado:** [Diagrama TO-BE - Processo Automatizado com IA](https://github.com/albinolima84/fma-case-agent/blob/master/diagrams/to-be-processo-automatizado.png)
 
 Sistema automatizado com **4 agentes de IA especializados** trabalhando em pipeline, integrando dados do CRM HubSpot, processando com modelos de linguagem (gpt-4o-mini via Tess AI), enviando mensagens via Meta WhatsApp Business API oficial, e orquestrando todo o fluxo via n8n Cloud.
 
@@ -454,21 +454,21 @@ CREATE TABLE surveys (
 
 **Clique nos links abaixo para visualizar:**
 
-1. **[fluxos-completos.png](screenshots/fluxos-completos.png)** - Vista geral do workflow n8n (FLUXO 1 + FLUXO 2)
-2. **[fluxo-1-parte-1.png](screenshots/fluxo-1-parte-1.png)** - Detalhes do FLUXO 1 (Envio Proativo) - Parte 1
-3. **[fluxo-1-parte-2.png](screenshots/fluxo-1-parte-2.png)** - Detalhes do FLUXO 1 (Envio Proativo) - Parte 2
-4. **[fluxo-2-parte-1.png](screenshots/fluxo-2-parte-1.png)** - Detalhes do FLUXO 2 (Respostas) - Parte 1
-5. **[fluxo-2-parte-2.png](screenshots/fluxo-2-parte-2.png)** - Detalhes do FLUXO 2 (Respostas) - Parte 2
-6. **[log-executions-1.png](screenshots/log-executions-1.png)** - Logs de execuções bem-sucedidas - Parte 1
-7. **[log-executions-2.png](screenshots/log-executions-2.png)** - Logs de execuções bem-sucedidas - Parte 2
-8. **[whatsapp.png](screenshots/whatsapp.png)** - Conversa real no WhatsApp (cliente ↔ bot)
-9. **[supabase-surveys.png](screenshots/supabase-surveys.png)** - Dados salvos no banco Supabase
-10. **[chatwoot.png](screenshots/chatwoot.png)** - Interface Chatwoot com conversa e nota privada
-11. **[tess-agents.png](screenshots/tess-agents.png)** - Dashboard Tess AI mostrando os 3 agentes
+1. **[fluxos-completos.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/fluxos-completos.png)** - Vista geral do workflow n8n (FLUXO 1 + FLUXO 2)
+2. **[fluxo-1-parte-1.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/fluxo-1-parte-1.png)** - Detalhes do FLUXO 1 (Envio Proativo) - Parte 1
+3. **[fluxo-1-parte-2.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/fluxo-1-parte-2.png)** - Detalhes do FLUXO 1 (Envio Proativo) - Parte 2
+4. **[fluxo-2-parte-1.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/fluxo-2-parte-1.png)** - Detalhes do FLUXO 2 (Respostas) - Parte 1
+5. **[fluxo-2-parte-2.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/fluxo-2-parte-2.png)** - Detalhes do FLUXO 2 (Respostas) - Parte 2
+6. **[log-executions-1.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/log-executions-1.png)** - Logs de execuções bem-sucedidas - Parte 1
+7. **[log-executions-2.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/log-executions-2.png)** - Logs de execuções bem-sucedidas - Parte 2
+8. **[whatsapp.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/whatsapp.png)** - Conversa real no WhatsApp (cliente ↔ bot)
+9. **[supabase-surveys.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/supabase-surveys.png)** - Dados salvos no banco Supabase
+10. **[chatwoot.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/chatwoot.png)** - Interface Chatwoot com conversa e nota privada
+11. **[tess-agents.png](https://github.com/albinolima84/fma-case-agent/blob/master/screenshots/tess-agents.png)** - Dashboard Tess AI mostrando os 3 agentes
 
 ### 5.2 Exemplo de Conversa Real
 
-**Para ver todas as 5 conversas completas, acesse:** [Exemplos de Conversas Completas](docs/exemplos-conversas-completas.md)
+**Para ver todas as 5 conversas completas, acesse:** [Exemplos de Conversas Completas](https://github.com/albinolima84/fma-case-agent/blob/master/docs/exemplos-conversas-completas.md)
 
 **Cliente:** Carlos Mendes (+55 21 98144-4992)
 **Data:** 2026-02-06 18:13
@@ -601,7 +601,7 @@ CREATE TABLE surveys (
 
 ## 7. ROI e Análise Financeira
 
-**Para análise detalhada com cenários, sensibilidade e fases do projeto, acesse:** [Plano de Projeto e Análise de ROI](docs/04-plano-projeto-roi.md)
+**Para análise detalhada com cenários, sensibilidade e fases do projeto, acesse:** [Plano de Projeto e Análise de ROI](https://github.com/albinolima84/fma-case-agent/blob/master/docs/04-plano-projeto-roi.md)
 
 ### 7.1 Investimento Inicial
 
@@ -711,7 +711,7 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 
 ## 8. Guia de Reprodução
 
-**Para guia completo passo a passo de deploy em cloud, acesse:** [Guia de Deploy Online](docs/05-guia-deploy-online.md)
+**Para guia completo passo a passo de deploy em cloud, acesse:** [Guia de Deploy Online](https://github.com/albinolima84/fma-case-agent/blob/master/docs/05-guia-deploy-online.md)
 
 ### 8.1 Pré-requisitos
 
@@ -727,7 +727,7 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 #### 1. Configurar Supabase
 
 1. Criar projeto no Supabase
-2. Executar SQL para criar tabela `surveys` (ver script em [docs/05-guia-deploy-online.md](docs/05-guia-deploy-online.md))
+2. Executar SQL para criar tabela `surveys` (ver script em [docs/05-guia-deploy-online.md](https://github.com/albinolima84/fma-case-agent/blob/master/docs/05-guia-deploy-online.md))
 3. Copiar credenciais: Project URL, service_role key
 
 #### 2. Configurar n8n Cloud
@@ -736,7 +736,7 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 2. Configurar credenciais:
    - Postgres (Supabase)
    - Header Auth (Tess AI, Meta WhatsApp, Chatwoot, HubSpot)
-3. Importar workflow: [workflows/satisfaction-survey-workflow.json](workflows/satisfaction-survey-workflow.json)
+3. Importar workflow: [workflows/satisfaction-survey-workflow.json](https://github.com/albinolima84/fma-case-agent/blob/master/workflows/satisfaction-survey-workflow.json)
 4. Ajustar credenciais em cada node
 5. Ativar workflow
 
@@ -761,7 +761,7 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 #### 5. Configurar Agentes Tess AI
 
 1. Criar 3 agentes na plataforma Tess AI
-2. Configurar prompts (ver [prompts/](prompts/))
+2. Configurar prompts (ver [prompts/](https://github.com/albinolima84/fma-case-agent/tree/master/prompts))
 3. Copiar IDs dos agentes
 4. Atualizar nos nodes do n8n
 
@@ -776,11 +776,11 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 ### 8.3 Links e Recursos
 
 **Documentação Completa:**
-- [Guia de Deploy](docs/05-guia-deploy-online.md)
-- [Guia de Entrega](docs/06-guia-entrega.md)
-- [Arquitetura da Solução](docs/01-arquitetura-solucao.md)
-- [Processo AS-IS/TO-BE](docs/03-processo-as-is-to-be.md)
-- [ROI Detalhado](docs/04-plano-projeto-roi.md)
+- [Guia de Deploy](https://github.com/albinolima84/fma-case-agent/blob/master/docs/05-guia-deploy-online.md)
+- [Guia de Entrega](https://github.com/albinolima84/fma-case-agent/blob/master/docs/06-guia-entrega.md)
+- [Arquitetura da Solução](https://github.com/albinolima84/fma-case-agent/blob/master/docs/01-arquitetura-solucao.md)
+- [Processo AS-IS/TO-BE](https://github.com/albinolima84/fma-case-agent/blob/master/docs/03-processo-as-is-to-be.md)
+- [ROI Detalhado](https://github.com/albinolima84/fma-case-agent/blob/master/docs/04-plano-projeto-roi.md)
 
 **Agentes Tess AI (Links Públicos):**
 - [Agent 2 - Context Analyzer](https://tess.im/pt-BR/dashboard/user/ai/chat/ai-chat/context-analyzer-6TBb4l) (ID: 38717)
@@ -788,8 +788,8 @@ Mês 8: -R$ 2.920 + R$ 7.440 = +R$ 4.520 ✅ BREAK-EVEN
 - [Agent 4 - Conversation Handler V2](https://tess.im/pt-BR/dashboard/user/ai/chat/ai-chat/conversation-handler-GjH0pE) (ID: 38733)
 
 **Workflow e Prompts:**
-- [Workflow n8n (JSON)](workflows/satisfaction-survey-workflow.json)
-- [Prompts dos Agentes](prompts/)
+- [Workflow n8n (JSON)](https://github.com/albinolima84/fma-case-agent/blob/master/workflows/satisfaction-survey-workflow.json)
+- [Prompts dos Agentes](https://github.com/albinolima84/fma-case-agent/tree/master/prompts)
 
 ---
 
