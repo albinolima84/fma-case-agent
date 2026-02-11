@@ -154,12 +154,6 @@ fma-case-agent/
 
 ---
 
-## 📞 Contato
-
-**[Autor]**
-
-
-
 ---
 
 **MBA em Inteligência Artificial | FMA | Fevereiro 2026**
